@@ -5,7 +5,7 @@ int main()
 {
     try
     {
-        throw Exception("Aafnai bariko exception");
+        throw Exception("Aafnai bariko exception, aina herera");
     }
     catch (Exception &ex)
     {
