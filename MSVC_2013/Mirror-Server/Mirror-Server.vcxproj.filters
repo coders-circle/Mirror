@@ -24,7 +24,13 @@
     <ClInclude Include="..\..\include\common\Exception.h">
       <Filter>include\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\RtpSreamer.h">
+    <ClInclude Include="..\..\include\common\RtpTransmitter.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpReceiver.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RTPCommon.h">
       <Filter>include\common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,7 +38,10 @@
     <ClCompile Include="..\..\src\server\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\RtpStreamer.cpp">
+    <ClCompile Include="..\..\src\common\RtpTransmitter.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\RtpReceiver.cpp">
       <Filter>src\common</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,4 +1,5 @@
 #pragma once
+#include "RTPCommon.h"
 
 class RtpTransmissionException : public Exception
 {
@@ -14,7 +15,7 @@ public:
     RtpTransmitter();
     ~RtpTransmitter();
 
-    void Initialize(boost::shared_ptr<boost::asio::ip::udp::socket> socket, const boost::asio::ip::udp::endpoint &clientEndpoint);
+    void Initialize(boost::shared_ptr<udp::socket> socket, const udp::endpoint &destination);
     void CleanUp();
 
     int GetTimeStamp() const { return m_timeStamp; }
@@ -31,8 +32,8 @@ public:
 
     void Send(const std::vector<char> &data);
 private:
-    boost::shared_ptr<boost::asio::ip::udp::socket> m_socket;
-    boost::asio::ip::udp::endpoint m_clientEndpoint;
+    boost::shared_ptr<udp::socket> m_socket;
+    udp::endpoint m_destination;
 
     uint16_t m_sequenceNumber;
     int m_timeStamp, m_timeStampIncrement;
