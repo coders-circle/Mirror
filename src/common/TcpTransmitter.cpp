@@ -19,7 +19,7 @@ void TcpTransmitter::Initialize(boost::shared_ptr<tcp::socket> socket, const udp
 void TcpTransmitter::Send(const std::vector<char> &data)
 {
 	if(!m_socket)
-		throw TcpTransmissionException("TCP Transmitter hasn't been properly initialized");
+		throw TcpTransmitterException("TCP Transmitter hasn't been properly initialized");
 
 	m_socket->send(boost::asio::buffer(data, data.size()));
 }
