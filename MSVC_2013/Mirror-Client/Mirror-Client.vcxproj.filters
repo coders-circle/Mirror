@@ -24,10 +24,25 @@
     <ClInclude Include="..\..\include\client\FrameRenderer.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpTransmitter.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpReceiver.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RTPCommon.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\main.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\RtpTransmitter.cpp">
+      <Filter>src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\RtpReceiver.cpp">
+      <Filter>src\common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp">
       <Filter>src</Filter>

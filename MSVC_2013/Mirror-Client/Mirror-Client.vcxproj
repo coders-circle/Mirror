@@ -62,6 +62,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\include;$(BOOST_ROOT);</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -74,10 +75,15 @@
     <ClInclude Include="..\..\include\client\FrameRenderer.h" />
     <ClInclude Include="..\..\include\common\common.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
+    <ClInclude Include="..\..\include\common\RTPCommon.h" />
+    <ClInclude Include="..\..\include\common\RtpReceiver.h" />
+    <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
+    <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
+    <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

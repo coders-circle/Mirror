@@ -72,12 +72,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\common\common.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
-    <ClInclude Include="..\..\include\common\RTPCommon.h" />
-    <ClInclude Include="..\..\include\common\RtpReceiver.h" />
     <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
     <ClCompile Include="..\..\src\server\main.cpp" />
   </ItemGroup>
