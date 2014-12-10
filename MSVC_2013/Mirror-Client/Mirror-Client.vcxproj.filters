@@ -21,9 +21,15 @@
     <ClInclude Include="..\..\include\common\Exception.h">
       <Filter>include\common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\FrameRenderer.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\FrameRenderer.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
