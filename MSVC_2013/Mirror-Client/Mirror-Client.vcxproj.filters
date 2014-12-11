@@ -36,9 +36,6 @@
     <ClInclude Include="..\..\include\client\FrameRenderer.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\VideoCapture.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\common\RTPCommon.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
@@ -68,6 +65,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\common\Page.h">
       <Filter>include\common\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\VideoCapture.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
