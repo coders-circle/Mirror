@@ -75,8 +75,11 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\client\FrameRenderer.h" />
     <ClInclude Include="..\..\include\client\VideoCapture.h" />
+    <ClInclude Include="..\..\include\common\Button.h" />
     <ClInclude Include="..\..\include\common\common.h" />
+    <ClInclude Include="..\..\include\common\Control.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
+    <ClInclude Include="..\..\include\common\Page.h" />
     <ClInclude Include="..\..\include\common\RTPCommon.h" />
     <ClInclude Include="..\..\include\common\RtpReceiver.h" />
     <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
@@ -85,6 +88,9 @@
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
     <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
+    <ClCompile Include="..\..\src\common\Button.cpp" />
+    <ClCompile Include="..\..\src\common\Control.cpp" />
+    <ClCompile Include="..\..\src\common\Page.cpp" />
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
   </ItemGroup>
