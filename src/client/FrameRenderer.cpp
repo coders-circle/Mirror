@@ -5,6 +5,7 @@
 void FrameRenderer::SetRGBData(unsigned char* rgbData)
 {
     memcpy(m_rgbData, rgbData, m_fw*m_fh*4);
+    gtk_widget_queue_draw_area(m_drawingArea, 0, 0, m_fw, m_fh);
 }
 
 gboolean FrameRenderer::OnDraw(GtkWidget* widget, cairo_t* cr, gpointer frPointer)

@@ -1,62 +1,44 @@
 /* Client - main.cpp */
 
 #include <common/common.h>
-
-//boost test for separate thread
-//void Thread()
-//{
-//		int i=0;
-//		while(i<100)
-//		{
-//      	std::cout << "From Child Thread" << std::endl;
-//			i++;
-//		}
-//}
-//int main()
-//{
-//    boost::thread t(Thread);
-//    std::cout << "From Main Thread" << std::endl;
-//	 t.join();
-//    return 0;
-//}
-
-#include <gtk/gtk.h>
-
 #include "client/FrameRenderer.h"
+#include "client/VideoCapture.h"
 
 #ifdef _WIN32
 #pragma comment(lib, "gtk-win32-3.0.lib")
 #pragma comment(lib, "gobject-2.0.lib")
 #pragma comment(lib, "cairo.lib")
+#pragma comment(lib, "glib-2.0.lib")
+#pragma comment(lib, "opencv_highgui245.lib")
+#pragma comment(lib, "opencv_core245.lib")
+#pragma comment(lib, "opencv_imgproc245.lib")
 #endif
 
+FrameRenderer fr;
+VideoCapture vidCap;
+
+
+gboolean IdleFunction(gpointer userData)
+{
+    fr.SetRGBData(vidCap.GetBGRAFrame());
+    return TRUE;
+}
 
 int main(int argc, char *argv[])
 {
-  
     GtkWidget *window;
-
     gtk_init(&argc, &argv);
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     
-    
     gtk_window_set_default_size(GTK_WINDOW(window), 1000, 600);
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
     gtk_widget_set_size_request(window, 1000, 600);
-
-    FrameRenderer fr;
-    fr.Initialize(window, 100, 100, 256, 256);
-    unsigned char* frameData = new unsigned char[256 * 256 * 4];
-    for (int i = 0; i < 256 * 256; i++)
-    {
-        frameData[4 * i + 0] = i % 256;
-        frameData[4 * i + 1] = 0;
-        frameData[4 * i + 2] = 0;
-        frameData[4 * i + 3] = 255;
-    }
-    fr.SetRGBData(frameData);
-    delete frameData;
+    g_signal_connect_swapped(G_OBJECT(window), "destroy",
+        G_CALLBACK(gtk_main_quit), NULL);
+    g_idle_add(IdleFunction, 0);
+    vidCap.Initialize();
+    fr.Initialize(window, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());
     gtk_widget_show_all(window);
 
     gtk_main();

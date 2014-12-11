@@ -40,18 +40,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(GTKDIR)\include\gail-3.0;$(GTKDIR)\include\atk-1.0;$(GTKDIR)\include\gdk-pixbuf-2.0;$(SolutionDir)\..\include;$(BOOST_ROOT);$(GTKDIR)\include\gtk-3.0;$(GTKDIR)\include\glib-2.0;$(GTKDIR)\include\pango-1.0;$(GTKDIR)\lib\glib-2.0\include;$(GTKDIR)\include\cairo</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENCV_ROOT)\include;$(GTKDIR)\include\gail-3.0;$(GTKDIR)\include\atk-1.0;$(GTKDIR)\include\gdk-pixbuf-2.0;$(SolutionDir)\..\include;$(BOOST_ROOT);$(GTKDIR)\include\gtk-3.0;$(GTKDIR)\include\glib-2.0;$(GTKDIR)\include\pango-1.0;$(GTKDIR)\lib\glib-2.0\include;$(GTKDIR)\include\cairo</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(GTKDIR)\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(GTKDIR)\lib;$(OPENCV_ROOT)\lib;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -61,29 +62,46 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\include;$(BOOST_ROOT);</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENCV_ROOT)\build\include;$(GTKDIR)\include\gail-3.0;$(GTKDIR)\include\atk-1.0;$(GTKDIR)\include\gdk-pixbuf-2.0;$(SolutionDir)\..\include;$(BOOST_ROOT);$(GTKDIR)\include\gtk-3.0;$(GTKDIR)\include\glib-2.0;$(GTKDIR)\include\pango-1.0;$(GTKDIR)\lib\glib-2.0\include;$(GTKDIR)\include\cairo</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(GTKDIR)\lib;$(OPENCV_ROOT)\lib;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\client\FrameRenderer.h" />
+    <ClInclude Include="..\..\include\client\TcpClient.h" />
+    <ClInclude Include="..\..\include\client\VideoCapture.h" />
+    <ClInclude Include="..\..\include\common\Button.h" />
     <ClInclude Include="..\..\include\common\common.h" />
+    <ClInclude Include="..\..\include\common\Control.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
+    <ClInclude Include="..\..\include\common\Page.h" />
     <ClInclude Include="..\..\include\common\RTPCommon.h" />
     <ClInclude Include="..\..\include\common\RtpReceiver.h" />
     <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
+    <ClInclude Include="..\..\include\common\TcpHandler.h" />
+    <ClInclude Include="..\..\include\common\TcpListener.h" />
+    <ClInclude Include="..\..\include\common\TcpReceiver.h" />
+    <ClInclude Include="..\..\include\common\TcpTransmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
+    <ClCompile Include="..\..\src\client\TcpClient.cpp" />
+    <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
+    <ClCompile Include="..\..\src\common\Button.cpp" />
+    <ClCompile Include="..\..\src\common\Control.cpp" />
+    <ClCompile Include="..\..\src\common\Page.cpp" />
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
+    <ClCompile Include="..\..\src\common\TcpListener.cpp" />
+    <ClCompile Include="..\..\src\common\TcpReceiver.cpp" />
+    <ClCompile Include="..\..\src\common\TcpTransmitter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
