@@ -9,7 +9,7 @@ TcpReceiver::~TcpReceiver()
 {
 }
 
-void TcpReceiver::Initialize(boost::shared_ptr<tcp::socket> socket, const udp::endpoint &destination)
+void TcpReceiver::Initialize(boost::shared_ptr<tcp::socket> socket, const tcp::endpoint &destination)
 {
 	m_socket = socket;
 	m_destination = destination;
