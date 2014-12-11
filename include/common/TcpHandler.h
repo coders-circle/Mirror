@@ -15,7 +15,7 @@ class TcpHandler
 {
 	public:
 		TcpHandler(boost::asio::io_service &ioService);
-		~Tcphandler();
+        ~TcpHandler();
 
 		// initialize with a socket
 		void Initialize(boost::shared_ptr<tcp::socket> socket);
@@ -27,7 +27,7 @@ class TcpHandler
 
 		void Send(const std::vector<char> &data);
 		
-		void Receive(const std::vector<char> &data);
+		void Receive(std::vector<char> &data);
 
 	private:
 		boost::shared_ptr<tcp::socket> m_socket;

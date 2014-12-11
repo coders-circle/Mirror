@@ -99,6 +99,7 @@
     <ClCompile Include="..\..\src\common\Page.cpp" />
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
+    <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
     <ClCompile Include="..\..\src\common\TcpListener.cpp" />
     <ClCompile Include="..\..\src\common\TcpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\TcpTransmitter.cpp" />
