@@ -1,4 +1,5 @@
-
+#ifndef __EXCEPTION__
+#define __EXCEPTION__
 class Exception : public std::runtime_error
 {
 public:
@@ -6,3 +7,4 @@ public:
         : std::runtime_error(errorString)
     {}
 };
+#endif

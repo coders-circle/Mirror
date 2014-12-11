@@ -1,7 +1,7 @@
 #ifndef __FRAMERENDERER__
 #define __FRAMERENDERER__
 
-#include <gtk/gtk.h>
+#include <common/common.h>
 #include <cairo.h>
 
 class FrameRenderer
