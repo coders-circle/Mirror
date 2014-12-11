@@ -9,8 +9,8 @@
 class Page
 {
 public:
-private:
-    std::vector<Control> m_controls;
+protected:
+    std::vector<Control*> m_controls;
 };
 
 #endif
