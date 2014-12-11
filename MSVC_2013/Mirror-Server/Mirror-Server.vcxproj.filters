@@ -59,5 +59,8 @@
     <ClCompile Include="..\..\src\common\TcpTransmitter.cpp">
       <Filter>src\common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\client\TcpClient.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -80,6 +80,7 @@
     <ClInclude Include="..\..\include\common\TcpTransmitter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\client\TcpClient.cpp" />
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
     <ClCompile Include="..\..\src\common\TcpReceiver.cpp" />
