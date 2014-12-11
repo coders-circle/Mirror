@@ -74,6 +74,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\client\FrameRenderer.h" />
+    <ClInclude Include="..\..\include\client\TcpClient.h" />
     <ClInclude Include="..\..\include\client\VideoCapture.h" />
     <ClInclude Include="..\..\include\common\Button.h" />
     <ClInclude Include="..\..\include\common\common.h" />
@@ -91,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
+    <ClCompile Include="..\..\src\client\TcpClient.cpp" />
     <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
     <ClCompile Include="..\..\src\common\Button.cpp" />
     <ClCompile Include="..\..\src\common\Control.cpp" />
