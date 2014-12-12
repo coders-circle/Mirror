@@ -14,40 +14,35 @@ TcpHandler::~TcpHandler()
 //  a connection from a peer and creates a socket
 void TcpHandler::Initialize(boost::shared_ptr<tcp::socket> socket)
 {
-	m_socket = socket;
+    m_socket = socket;
+    std::cout << "Connected to " << m_socket->remote_endpoint().address().to_string() << "  " << m_socket->remote_endpoint().port() << std::endl;
 }
 
 // 
-void TcpHandler::Initialize(tcp::endpoint &destEndpoint)
+void TcpHandler::Initialize(const tcp::endpoint &destEndpoint)
 {
 	m_socket.reset(new tcp::socket(m_ioService));
+    m_socket->connect(destEndpoint);
+    std::cout << "Connected to " << m_socket->remote_endpoint().address().to_string() << "  " << m_socket->remote_endpoint().port() << std::endl;
 }
 
 // 
-void TcpHandler::Send(const std::vector<char> &data)
+void TcpHandler::Send(const char* data, size_t size)
 {
-	boost::asio::write(*m_socket, boost::asio::buffer(data));
-	m_lastSent = data;
+    if (!m_socket) return;
+	boost::asio::write(*m_socket, boost::asio::buffer(data, size));
 }
 
-// 
-void TcpHandler::Receive(std::vector<char> &data)
+//
+void TcpHandler::Receive(char* data, size_t max_size)
 {
-	boost::system::error_code error;
-	size_t len = m_socket->read_some(boost::asio::buffer(data), error);
+    if (!m_socket) return; 
+    boost::system::error_code error;
 
-	if (error == boost::asio::error::eof) // connection closed by the peer
-	{
-		//
-	}
-	else if (error)
-		throw TcpHandlerException("Error receiving data : " + error.message());
-
-	// do something with the received data
-}
-
-void TcpHandler::Request(tcp::endpoint &destEndpoint)
-{
-	m_socket->connect(destEndpoint);
-	m_destination.reset(new tcp::endpoint(destEndpoint));
+    m_socket->read_some(boost::asio::buffer(data, max_size), error);
+    
+    if (error == boost::asio::error::eof)
+        data[0] = 0;
+    else
+        throw Exception(error.message());
 }

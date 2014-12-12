@@ -20,19 +20,16 @@ class TcpHandler
 		// initialize with a socket
 		void Initialize(boost::shared_ptr<tcp::socket> socket);
 		// send tcp request to the endpoint and create socket
-		void Initialize(tcp::endpoint &destEndpoint); 
+		void Initialize(const tcp::endpoint &destEndpoint);
 
 		// initial request for creating connection
 		void Request(tcp::endpoint &destEndpoint);// for normal tcp connect request
 
-		void Send(const std::vector<char> &data);
+		void Send(const char* data, size_t size);
 		
-		void Receive(std::vector<char> &data);
+		void Receive(char* data, size_t max_size);
 
 	private:
 		boost::shared_ptr<tcp::socket> m_socket;
-		boost::shared_ptr<tcp::endpoint> m_destination;
 		boost::asio::io_service &m_ioService;
-		std::vector<char> m_lastSent; // may not be needed
-		std::vector<char> m_lastReceived; // may not be needed
 };

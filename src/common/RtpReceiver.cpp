@@ -20,14 +20,14 @@ void RtpReceiver::CleanUp()
     m_socket.reset();
 }
 
-void RtpReceiver::Receive(std::vector<char> &data, size_t maxSize)
+void RtpReceiver::Receive(char *data, size_t maxSize)
 {
     if (!m_socket)
         throw RtpReceptionError("RTP Receiver hasn't been properly initialized");
 
     std::vector<char> packet;
     packet.resize(maxSize);
-    size_t len = m_socket->receive_from(boost::asio::buffer(data), m_source);
+    size_t len = m_socket->receive_from(boost::asio::buffer(packet), m_source);
     packet.resize(len);
 
     char version = packet[0];
@@ -36,5 +36,6 @@ void RtpReceiver::Receive(std::vector<char> &data, size_t maxSize)
     m_timeStamp = *((int*)&packet[4]);
     int SSRC = *((int*)&packet[8]);
     
-    data.assign(packet.begin() + RTP_HEADER_SIZE, packet.end());
+    for (unsigned int i = 0; i < len - RTP_HEADER_SIZE; ++i)
+        data[i] = packet[i + RTP_HEADER_SIZE];
 }

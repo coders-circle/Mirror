@@ -7,63 +7,13 @@
     <Filter Include="include">
       <UniqueIdentifier>{901cda44-2609-4a20-bf53-fff3e0af9875}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\common">
-      <UniqueIdentifier>{468317da-7019-44a9-9204-ec31406d9baf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{34d0d713-51c2-4570-b77a-9ac3a2176ef1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\common">
-      <UniqueIdentifier>{66d0e2a1-f6cd-48cb-b33c-ec7dbdec73da}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\include\common\common.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\Exception.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\RtpTransmitter.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\RtpReceiver.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\RTPCommon.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpTransmitter.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpHandler.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpReceiver.h">
-      <Filter>include\common</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\server\main.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\RtpTransmitter.cpp">
-      <Filter>src\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\RtpReceiver.cpp">
-      <Filter>src\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpReceiver.cpp">
-      <Filter>src\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpTransmitter.cpp">
-      <Filter>src\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\TcpClient.cpp">
-      <Filter>include</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpListener.cpp">
-      <Filter>src\common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
