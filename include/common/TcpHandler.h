@@ -22,11 +22,7 @@ class TcpHandler
 		// send tcp request to the endpoint and create socket
 		void Initialize(const tcp::endpoint &destEndpoint);
 
-		// initial request for creating connection
-		void Request(tcp::endpoint &destEndpoint);// for normal tcp connect request
-
 		void Send(const char* data, size_t size);
-		
 		void Receive(char* data, size_t max_size);
 
 	private:

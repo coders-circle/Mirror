@@ -14,7 +14,10 @@ public:
     TcpListener(boost::asio::io_service &io);
     ~TcpListener();
 
+    // Initialize the listener to listen at given local endpoint
     void Initialize(const tcp::endpoint &localEndpoint);
+    // Listen for incomming connections and call 'callback' when connected to any
+    //  The callback is called on a new thread
     void Listen(boost::function<void(boost::shared_ptr<tcp::socket>)> callback);
 
 private:
@@ -22,5 +25,5 @@ private:
     boost::function<void(boost::shared_ptr<tcp::socket>)> m_callback;
 
     void StartListening();
-    void NewThread();
+    void ListeningThread();
 };
