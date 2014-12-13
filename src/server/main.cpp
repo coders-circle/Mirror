@@ -1,16 +1,25 @@
 /* Server - main.cpp */
 
 #include <common/common.h>
+#include <server/ClientsManager.h>
+
 int main()
 {
-    try
+    boost::asio::io_service io_service;
+    ClientsManager manager(io_service);
+
+    size_t clientsNumber = 0;
+    // 8183 is the port of this server; 8183 == BIBE(K) :P
+    manager.StartListening(tcp::endpoint(tcp::v4(), 8183));  
+    manager.StartProcessing();
+    
+    while (true)
     {
-        throw Exception("Aafnai bariko exception, aina herera");
+        // for every new connection, print its address
+        for (; clientsNumber < manager.GetClients().size(); ++clientsNumber)
+            std::cout << "Client Connected: " << manager.GetClients()[clientsNumber].connection.GetDestinationAddress() << std::endl;
     }
-    catch (Exception &ex)
-    {
-        std::cout << ex.what() << std::endl;
-    }
+
     std::cin.get();
     return 0;
 }

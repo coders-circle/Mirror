@@ -7,10 +7,66 @@
     <Filter Include="src">
       <UniqueIdentifier>{34d0d713-51c2-4570-b77a-9ac3a2176ef1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\common">
+      <UniqueIdentifier>{056a9fd5-2ff8-44a0-8d6a-2ec35c6def8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\common\Network">
+      <UniqueIdentifier>{c610381c-f408-42d5-b16b-e72a27a09f45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{cbb7e2c4-afe4-4030-8839-a5c49b4b694d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common\Network">
+      <UniqueIdentifier>{61477837-06db-47c8-8f06-925c674e49f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\server\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\RtpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpListener.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\ChatMessage.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Server\ClientsManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\RequestHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\common\common.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\Exception.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpListener.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\ChatMessage.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Server\ClientsManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RequestHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

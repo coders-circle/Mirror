@@ -17,7 +17,6 @@ void TcpHandler::Initialize(boost::shared_ptr<tcp::socket> socket)
     if (m_socket)
         throw TcpHandlerException("Socket alread created");
     m_socket = socket;
-    std::cout << "Connected to " << m_socket->remote_endpoint().address().to_string() << "  " << m_socket->remote_endpoint().port() << std::endl;
 }
 
 // this is used to create a new socket to connect to a peer at
@@ -28,7 +27,6 @@ void TcpHandler::Initialize(const tcp::endpoint &destEndpoint)
         throw TcpHandlerException("Socket alread created");
 	m_socket.reset(new tcp::socket(m_ioService));
     m_socket->connect(destEndpoint);
-    std::cout << "Connected to " << m_socket->remote_endpoint().address().to_string() << "  " << m_socket->remote_endpoint().port() << std::endl;
 }
 
 // 
@@ -43,4 +41,17 @@ void TcpHandler::Receive(char* data, size_t max_size)
 {
     if (!m_socket) return; 
     m_socket->read_some(boost::asio::buffer(data, max_size));;
+}
+
+size_t TcpHandler::Available()
+{
+    if (!m_socket) return 0;
+    return m_socket->available();
+}
+
+std::string TcpHandler::GetDestinationAddress() const
+{
+    std::stringstream ss;
+    ss << "IP: " << m_socket->remote_endpoint().address().to_string() << "  Port: " << m_socket->remote_endpoint().port();
+    return ss.str();
 }

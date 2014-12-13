@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <unordered_map>
+
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
