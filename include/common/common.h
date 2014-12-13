@@ -10,7 +10,7 @@
 #include <boost/random.hpp>
 
 #include <gtk/gtk.h>
-#include <opencv2/opencv.hpp>
+//#include <opencv2/opencv.hpp>
 
 
 #include "Exception.h"
