@@ -1,6 +1,7 @@
 #pragma once
 
 //don't use pragma, use standard header guard technique
+class Exception;
 
 class TcpHandlerException : public Exception
 {

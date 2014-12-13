@@ -12,7 +12,7 @@ class VideoCaptureDevice
 };
 
 
-
+/*
 
 class VideoCapture
 {
@@ -31,4 +31,5 @@ private:
     int m_fw, m_fh;
 };
 
+*/
 #endif
