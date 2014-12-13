@@ -13,12 +13,12 @@ int main()
     manager.StartListening(tcp::endpoint(tcp::v4(), 8183));  
     manager.StartProcessing();
     
-    while (true)
-    {
-        // for every new connection, print its address
-        for (; clientsNumber < manager.GetClients().size(); ++clientsNumber)
-            std::cout << "Client Connected: " << manager.GetClients()[clientsNumber].connection.GetDestinationAddress() << std::endl;
-    }
+    //while (true)
+    //{
+    //    // for every new connection, print its address
+    //    for (; clientsNumber < manager.GetClients().size(); ++clientsNumber)
+    //        std::cout << "Client Connected: " << manager.GetClients()[clientsNumber].connection.GetDestinationAddress() << std::endl;
+    //}
 
     std::cin.get();
     return 0;

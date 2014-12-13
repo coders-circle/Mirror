@@ -19,11 +19,12 @@ public:
     void StartListening(const tcp::endpoint &localEndpoint);
     // Start another thread to process each client
     void StartProcessing();
+    // Get the connected clients
     std::vector<ClientInfo>& GetClients() { return m_clients; }
    
 private:
-    TcpListener m_listener;
     boost::asio::io_service &m_ioService;
+    TcpListener m_listener;
     RequestHandler m_requests;
     bool m_lock;
 
@@ -32,6 +33,11 @@ private:
     std::unordered_map<uint32_t, std::vector<unsigned int>> m_groups; // map groupId to a list of id's of clients
                                                                       //  each client id is index of m_clients vector
 
+    // Handle a newly connected client
     void HandleClient(boost::shared_ptr<tcp::socket> &socket);
+    // Process each client
     void ProcessClients();
+
+    // Test Method to receive chat messages on GROUP_CHAT request
+    void ReceiveChat(unsigned int client, unsigned int group);
 };

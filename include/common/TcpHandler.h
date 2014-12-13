@@ -28,6 +28,7 @@ class TcpHandler
         size_t Available();
 
         std::string GetDestinationAddress() const;
+        boost::shared_ptr<tcp::socket> GetSocket() const { return m_socket; }
 
 	private:
 		boost::shared_ptr<tcp::socket> m_socket;

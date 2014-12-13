@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
             std::cout << "Enter group-id to join: ";
             std::cin >> groupId;
             client.JoinGroup(groupId);
+            client.StartChatSession(groupId);
             while (true);
         }
     }
