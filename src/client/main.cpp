@@ -1,47 +1,33 @@
 /* Client - main.cpp */
 
 #include <common/common.h>
-#include "client/FrameRenderer.h"
-#include "client/VideoCapture.h"
+#include <client/TcpClient.h>
 
-#ifdef _WIN32
-#pragma comment(lib, "gtk-win32-3.0.lib")
-#pragma comment(lib, "gobject-2.0.lib")
-#pragma comment(lib, "cairo.lib")
-#pragma comment(lib, "glib-2.0.lib")
-#pragma comment(lib, "opencv_highgui245.lib")
-#pragma comment(lib, "opencv_core245.lib")
-#pragma comment(lib, "opencv_imgproc245.lib")
-#endif
-
-FrameRenderer fr;
-VideoCapture vidCap;
-
-
-gboolean IdleFunction(gpointer userData)
-{
-    fr.SetRGBData(vidCap.GetBGRAFrame());
-    return TRUE;
-}
 
 int main(int argc, char *argv[])
 {
-    GtkWidget *window;
-    gtk_init(&argc, &argv);
+    try
+    {
+        boost::asio::io_service io;
+        TcpClient client(io);
+        uint16_t port;
+        std::cout << "Enter port to listen to: ";
+        std::cin >> port;
+        client.StartListening(tcp::endpoint(tcp::v4(), port));
 
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    
-    gtk_window_set_default_size(GTK_WINDOW(window), 1000, 600);
-    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-    gtk_widget_set_size_request(window, 1000, 600);
-    g_signal_connect_swapped(G_OBJECT(window), "destroy",
-        G_CALLBACK(gtk_main_quit), NULL);
-    g_idle_add(IdleFunction, 0);
-    vidCap.Initialize();
-    fr.Initialize(window, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());
-    gtk_widget_show_all(window);
 
-    gtk_main();
-
+        {
+            std::cout << "Enter port to connect to: ";
+            std::cin >> port;
+            client.Connect(tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), port));
+            while (true);
+        }
+    }
+    catch (std::exception &ex)
+    {
+        std::cout << ex.what() << std::endl;
+        std::cin.get();
+    }
+    std::cin.get();
     return 0;
 }

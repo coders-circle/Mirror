@@ -73,36 +73,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\client\FrameRenderer.h" />
     <ClInclude Include="..\..\include\client\TcpClient.h" />
-    <ClInclude Include="..\..\include\client\VideoCapture.h" />
-    <ClInclude Include="..\..\include\common\Button.h" />
     <ClInclude Include="..\..\include\common\common.h" />
-    <ClInclude Include="..\..\include\common\Control.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
-    <ClInclude Include="..\..\include\common\Page.h" />
     <ClInclude Include="..\..\include\common\RTPCommon.h" />
     <ClInclude Include="..\..\include\common\RtpReceiver.h" />
     <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
     <ClInclude Include="..\..\include\common\TcpHandler.h" />
     <ClInclude Include="..\..\include\common\TcpListener.h" />
-    <ClInclude Include="..\..\include\common\TcpReceiver.h" />
-    <ClInclude Include="..\..\include\common\TcpTransmitter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
     <ClCompile Include="..\..\src\client\TcpClient.cpp" />
-    <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
-    <ClCompile Include="..\..\src\common\Button.cpp" />
-    <ClCompile Include="..\..\src\common\Control.cpp" />
-    <ClCompile Include="..\..\src\common\Page.cpp" />
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
     <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
     <ClCompile Include="..\..\src\common\TcpListener.cpp" />
-    <ClCompile Include="..\..\src\common\TcpReceiver.cpp" />
-    <ClCompile Include="..\..\src\common\TcpTransmitter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

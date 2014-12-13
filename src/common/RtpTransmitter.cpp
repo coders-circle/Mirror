@@ -24,7 +24,7 @@ void RtpTransmitter::CleanUp()
     m_destination = udp::endpoint();
 }
 
-void RtpTransmitter::Send(const std::vector<char> &data)
+void RtpTransmitter::Send(const char *data, size_t size)
 {
     if (!m_socket)
         throw RtpTransmissionException("RTP Transmitter hasn't been properly initialized");
@@ -44,7 +44,8 @@ void RtpTransmitter::Send(const std::vector<char> &data)
     packet[10] = (char)0x7e;
     packet[11] = (char)0x67;
 
-    packet.insert(packet.end(), data.begin(), data.end());
+    for (unsigned int i = 0; i < size; ++i)
+        packet[RTP_HEADER_SIZE + i] = data[i];
 
     m_sequenceNumber++;
     m_timeStamp += m_timeStampIncrement;

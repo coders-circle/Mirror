@@ -22,5 +22,5 @@ private:
     boost::function<void(boost::shared_ptr<tcp::socket>)> m_callback;
 
     void StartListening();
-    void HandleAccept(boost::shared_ptr<tcp::socket> socket, const boost::system::error_code& error);
+    void NewThread();
 };

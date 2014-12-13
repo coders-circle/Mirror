@@ -29,7 +29,7 @@ public:
 
     const udp::endpoint& GetSource() const { return m_source; }
 
-    void Receive(std::vector<char> &data, size_t maxSize = 1500);
+    void Receive(char* data, size_t maxSize = 1500);
 private:
     boost::shared_ptr<udp::socket> m_socket;
     udp::endpoint m_source;

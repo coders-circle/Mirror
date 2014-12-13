@@ -28,13 +28,15 @@ void TcpListener::Listen(boost::function<void(boost::shared_ptr<tcp::socket>)> c
 
 void TcpListener::StartListening()
 {
-    boost::shared_ptr<tcp::socket> socket(new tcp::socket(m_acceptor.get_io_service()));
-    m_acceptor.async_accept(*socket, boost::bind(&TcpListener::HandleAccept, this, socket, boost::asio::placeholders::error));
+    boost::thread t(boost::bind(&TcpListener::NewThread, this));
 }
 
-void TcpListener::HandleAccept(boost::shared_ptr<tcp::socket> socket, const boost::system::error_code& error)
+void TcpListener::NewThread()
 {
-    if (error)
+    while (true)
+    {
+        boost::shared_ptr<tcp::socket> socket(new tcp::socket(m_acceptor.get_io_service()));
+        m_acceptor.accept(*socket);
         m_callback(socket);
-    StartListening();
+    }
 }

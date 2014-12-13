@@ -30,7 +30,7 @@ public:
     uint8_t GetPayloadType() const { return m_payloadType; }
     void SetPayloadType(uint8_t payloadType) { m_payloadType = payloadType; }
 
-    void Send(const std::vector<char> &data);
+    void Send(const char *data, size_t size);
 private:
     boost::shared_ptr<udp::socket> m_socket;
     udp::endpoint m_destination;
