@@ -74,6 +74,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\client\FrameRenderer.h" />
+    <ClInclude Include="..\..\include\client\TcpClient.h" />
     <ClInclude Include="..\..\include\client\UI\Button.h" />
     <ClInclude Include="..\..\include\client\UI\Control.h" />
     <ClInclude Include="..\..\include\client\UI\Label.h" />
@@ -98,9 +99,11 @@
     <ClCompile Include="..\..\src\client\UI\Label.cpp" />
     <ClCompile Include="..\..\src\client\UI\Page.cpp" />
     <ClCompile Include="..\..\src\client\UI\TextEdit.cpp" />
+    <ClCompile Include="..\..\src\client\TcpClient.cpp" />
     <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
+    <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
     <ClCompile Include="..\..\src\common\TcpListener.cpp" />
     <ClCompile Include="..\..\src\common\TcpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\TcpTransmitter.cpp" />

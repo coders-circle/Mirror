@@ -75,15 +75,15 @@
     <ClInclude Include="..\..\include\client\UI\TextEdit.h">
       <Filter>include\UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\TcpClient.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpListener.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\common\TcpReceiver.cpp">
@@ -115,6 +115,15 @@
     </ClCompile>
     <ClCompile Include="..\..\src\client\UI\TextEdit.cpp">
       <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\TcpClient.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpListener.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpHandler.cpp">
+      <Filter>src\common\Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

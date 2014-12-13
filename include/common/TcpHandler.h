@@ -14,25 +14,25 @@ class TcpHandlerException : public Exception
 class TcpHandler
 {
 	public:
-		TcpHandler();
-		~Tcphandler();
+		TcpHandler(boost::asio::io_service &ioService);
+        ~TcpHandler();
 
 		// initialize with a socket
-		Initialize(boost::shared_ptr<tcp::socket> socket);
+		void Initialize(boost::shared_ptr<tcp::socket> socket);
 		// send tcp request to the endpoint and create socket
-		Initialize(tcp::endpoint &endpoint); 
+		void Initialize(tcp::endpoint &destEndpoint); 
 
 		// initial request for creating connection
-		Request(tcp::endpoint &endpoint);
+		void Request(tcp::endpoint &destEndpoint);// for normal tcp connect request
 
-		Send(const std::vector<char> & data);
+		void Send(const std::vector<char> &data);
 		
-		Receive(const std::vector<char> & data);
+		void Receive(std::vector<char> &data);
 
 	private:
 		boost::shared_ptr<tcp::socket> m_socket;
 		boost::shared_ptr<tcp::endpoint> m_destination;
-		boost::shared_ptr<TcpTransmitter> m_transmitter;
-		boost::shared_ptr<TcpReceiver> m_receiver;
-		const int m_port;
+		boost::asio::io_service &m_ioService;
+		std::vector<char> m_lastSent; // may not be needed
+		std::vector<char> m_lastReceived; // may not be needed
 };

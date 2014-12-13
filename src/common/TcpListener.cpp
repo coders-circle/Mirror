@@ -9,7 +9,10 @@ TcpListener::~TcpListener()
 
 void TcpListener::Initialize(const tcp::endpoint &localEndpoint)
 {
+    m_acceptor.open(localEndpoint.protocol());
+    m_acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
     m_acceptor.bind(localEndpoint);
+    m_acceptor.listen();
 }
 
 void ListeningThread()
