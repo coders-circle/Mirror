@@ -8,49 +8,66 @@ TcpClient::TcpClient(boost::asio::io_service &io)
 TcpClient::~TcpClient()
 {}
 
-void TcpClient::StartListening(const tcp::endpoint& server)
+void TcpClient::StartListening(const tcp::endpoint& localEndPoint)
 {
-    m_listener.Initialize(server);
+    m_listener.Initialize(localEndPoint);
+    // Listen method will start listening in new thread
     m_listener.Listen(boost::bind(&TcpClient::ListenerHandler, this, _1));
 }
 
-
+// This is the handler called when the listener accepts a new connection
 void TcpClient::ListenerHandler(boost::shared_ptr<tcp::socket> socket)
 {
     m_handler.Initialize(socket);
 
-    for (long long i = 0; i < 100000000; ++i);
+    // For test purpose, we start a new session to send/receive random data
+    // The random data is seeded with current time
+    // Since two client applications are opened and run simultaneously
+    //  both generate same random data as they are connected at same time
+    // To solve this issue, in the listening client, we make some delay
+    // In the client that sends the request for connection,
+    //  we make no such delay (see below)
+    for (long long i = 0; i < 100000000; ++i)
+        ;
+    // Now start the new thread to send/receive data
     boost::thread t(boost::bind(&TcpClient::StartChatSession, this));
 }
 
-void TcpClient::Connect(const tcp::endpoint& server)
+void TcpClient::Connect(const tcp::endpoint& peer)
 {
-    m_handler.Initialize(server);
+    m_handler.Initialize(peer);
+
+    // For test purpose, start a new thread to send/receive data
     boost::thread t(boost::bind(&TcpClient::StartChatSession, this));;
 }
 
+#include <common/ChatMessage.h>
+// Send/Receive randome data
 void TcpClient::StartChatSession()
 {
     try
     {
+        // Generate a string with random numbers
         srand((unsigned int)time(NULL));
-
         std::stringstream ss;
         for (int i = 0; i < 10; ++i)
             ss << rand()%20 << "  ";
         std::string str = ss.str();
         std::cout << "\n\nSending Data " << str << std::endl;
 
-        m_handler.Send(str.c_str(), str.size());
 
+        // Send the string as a chat message
+        ChatMessage message;
+        message.SetMessage(str);
+        message.Send(m_handler);
+
+
+        // keep receiving messages and print them
         while (true)
         {
-            std::vector<char> data;
-            data.resize(str.size() + 10);
-            m_handler.Receive(&data[0], data.size());
+            message.Receive(m_handler);
             std::cout << "\n\nReceived Data ";
-            for (unsigned i = 0; i < data.size(); ++i)
-                std::cout << data[i];
+            std::cout << message.GetMessage();
             std::cout << std::endl;
         }
     }

@@ -1,30 +1,30 @@
 #include <common/common.h>
-#include <common/RtpTransmitter.h>
+#include <common/RtpHandler.h>
 
-RtpTransmitter::RtpTransmitter()
+RtpHandler::RtpHandler()
 {
 }
 
-RtpTransmitter::~RtpTransmitter()
+RtpHandler::~RtpHandler()
 {
     CleanUp();
 }
 
-void RtpTransmitter::Initialize(boost::shared_ptr<udp::socket> socket, const udp::endpoint &destination)
+void RtpHandler::Initialize(boost::shared_ptr<udp::socket> socket, const udp::endpoint &remoteEndpoint)
 {
     m_socket = socket;
-    m_destination = destination;
+    m_remoteEndpoint = remoteEndpoint;
     m_sequenceNumber = m_timeStamp = 0;
     m_timeStampIncrement = 3600;        // for 25fps video
 }
 
-void RtpTransmitter::CleanUp()
+void RtpHandler::CleanUp()
 {
     m_socket.reset();
-    m_destination = udp::endpoint();
+    m_remoteEndpoint = udp::endpoint();
 }
 
-void RtpTransmitter::Send(const char *data, size_t size)
+void RtpHandler::Send(const char *data, size_t size)
 {
     if (!m_socket)
         throw RtpTransmissionException("RTP Transmitter hasn't been properly initialized");
@@ -50,5 +50,26 @@ void RtpTransmitter::Send(const char *data, size_t size)
     m_sequenceNumber++;
     m_timeStamp += m_timeStampIncrement;
 
-    m_socket->send_to(boost::asio::buffer(packet), m_destination);
+    m_socket->send_to(boost::asio::buffer(packet), m_remoteEndpoint);
+}
+
+
+void RtpHandler::Receive(char* data, size_t maxSize)
+{
+    if (!m_socket)
+        throw RtpReceptionError("RTP Receiver hasn't been properly initialized");
+
+    std::vector<char> packet;
+    packet.resize(maxSize);
+    size_t len = m_socket->receive_from(boost::asio::buffer(packet), m_remoteEndpoint);
+    packet.resize(len);
+
+    char version = packet[0];
+    m_payloadType = packet[1];
+    m_sequenceNumber = *((uint16_t*)&packet[2]);
+    m_timeStamp = *((int*)&packet[4]);
+    int SSRC = *((int*)&packet[8]);
+
+    for (unsigned int i = 0; i < len - RTP_HEADER_SIZE; ++i)
+        data[i] = packet[i + RTP_HEADER_SIZE];
 }

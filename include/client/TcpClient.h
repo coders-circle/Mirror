@@ -8,13 +8,14 @@ public:
     TcpClient(boost::asio::io_service &io);
     ~TcpClient();
 
-    void StartListening(const tcp::endpoint& server);
-    void Connect(const tcp::endpoint& server);
+    // Start listening for incoming connections in a new thread
+    void StartListening(const tcp::endpoint& localEndPoint);
+    // Connect to a peer
+    void Connect(const tcp::endpoint& peer);
     
     // Test Method
     void StartChatSession();
 
-    TcpHandler& GetHandler() { return m_handler; }
 private:
     boost::asio::io_service &m_io;
     TcpListener m_listener;
