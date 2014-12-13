@@ -70,7 +70,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\common\ChatMessage.cpp" />
+    <ClCompile Include="..\..\src\common\RequestHandler.cpp" />
+    <ClCompile Include="..\..\src\common\RtpHandler.cpp" />
+    <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
+    <ClCompile Include="..\..\src\common\TcpListener.cpp" />
+    <ClCompile Include="..\..\src\Server\ClientsManager.cpp" />
     <ClCompile Include="..\..\src\server\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\common\ChatMessage.h" />
+    <ClInclude Include="..\..\include\common\common.h" />
+    <ClInclude Include="..\..\include\common\Exception.h" />
+    <ClInclude Include="..\..\include\common\RequestHandler.h" />
+    <ClInclude Include="..\..\include\common\RtpHandler.h" />
+    <ClInclude Include="..\..\include\common\TcpHandler.h" />
+    <ClInclude Include="..\..\include\common\TcpListener.h" />
+    <ClInclude Include="..\..\include\Server\ClientsManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

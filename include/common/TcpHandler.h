@@ -25,6 +25,9 @@ class TcpHandler
 
 		void Send(const char* data, size_t size);
 		void Receive(char* data, size_t max_size);
+        size_t Available();
+
+        std::string GetDestinationAddress() const;
 
 	private:
 		boost::shared_ptr<tcp::socket> m_socket;

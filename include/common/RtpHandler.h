@@ -1,5 +1,4 @@
 #pragma once
-#define RTP_HEADER_SIZE 12 
 
 class RtpTransmissionException : public Exception
 {
@@ -16,6 +15,7 @@ public:
     {}
 };
 
+const size_t RTP_HEADER_SIZE = 12;
 class RtpHandler
 {
 public:

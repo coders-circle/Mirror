@@ -16,8 +16,8 @@ public:
 
     // Initialize the listener to listen at given local endpoint
     void Initialize(const tcp::endpoint &localEndpoint);
-    // Listen for incomming connections and call 'callback' when connected to any
-    //  The callback is called on a new thread
+    // Listen for incomming connections in a new thread 
+    //  and call 'callback' for each connection
     void Listen(boost::function<void(boost::shared_ptr<tcp::socket>)> callback);
 
 private:

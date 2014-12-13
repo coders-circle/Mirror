@@ -2,7 +2,7 @@
 #include <client/TcpClient.h>
 
 TcpClient::TcpClient(boost::asio::io_service &io)
-:m_io(io), m_listener(io), m_handler(io)
+:m_io(io), m_listener(io), m_tcpHandler(io)
 {}
 
 TcpClient::~TcpClient()
@@ -18,7 +18,8 @@ void TcpClient::StartListening(const tcp::endpoint& localEndPoint)
 // This is the handler called when the listener accepts a new connection
 void TcpClient::ListenerHandler(boost::shared_ptr<tcp::socket> socket)
 {
-    m_handler.Initialize(socket);
+    m_tcpHandler.Initialize(socket);
+    std::cout << "Connected: " << m_tcpHandler.GetDestinationAddress() << std::endl;
 
     // For test purpose, we start a new session to send/receive random data
     // The random data is seeded with current time
@@ -27,18 +28,24 @@ void TcpClient::ListenerHandler(boost::shared_ptr<tcp::socket> socket)
     // To solve this issue, in the listening client, we make some delay
     // In the client that sends the request for connection,
     //  we make no such delay (see below)
-    for (long long i = 0; i < 100000000; ++i)
-        ;
+    //for (long long i = 0; i < 100000000; ++i)
+    //    ;
     // Now start the new thread to send/receive data
-    boost::thread t(boost::bind(&TcpClient::StartChatSession, this));
+    //boost::thread t(boost::bind(&TcpClient::StartChatSession, this));
 }
 
 void TcpClient::Connect(const tcp::endpoint& peer)
 {
-    m_handler.Initialize(peer);
+    m_tcpHandler.Initialize(peer);
+    std::cout << "Connected: " << m_tcpHandler.GetDestinationAddress() << std::endl;
 
     // For test purpose, start a new thread to send/receive data
-    boost::thread t(boost::bind(&TcpClient::StartChatSession, this));;
+    //boost::thread t(boost::bind(&TcpClient::StartChatSession, this));;
+}
+
+void TcpClient::JoinGroup(uint32_t groupId)
+{
+    m_requests.JoinGroup(m_tcpHandler, groupId);
 }
 
 #include <common/ChatMessage.h>
@@ -59,13 +66,13 @@ void TcpClient::StartChatSession()
         // Send the string as a chat message
         ChatMessage message;
         message.SetMessage(str);
-        message.Send(m_handler);
+        message.Send(m_tcpHandler);
 
 
         // keep receiving messages and print them
         while (true)
         {
-            message.Receive(m_handler);
+            message.Receive(m_tcpHandler);
             std::cout << "\n\nReceived Data ";
             std::cout << message.GetMessage();
             std::cout << std::endl;
