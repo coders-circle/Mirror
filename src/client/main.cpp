@@ -1,18 +1,13 @@
 /* Client - main.cpp */
 
+
+
 #include <common/common.h>
 #include "client/FrameRenderer.h"
 #include "client/VideoCapture.h"
+#include "client/UI/Page.h"
 
-#ifdef _WIN32
-#pragma comment(lib, "gtk-win32-3.0.lib")
-#pragma comment(lib, "gobject-2.0.lib")
-#pragma comment(lib, "cairo.lib")
-#pragma comment(lib, "glib-2.0.lib")
-#pragma comment(lib, "opencv_highgui245.lib")
-#pragma comment(lib, "opencv_core245.lib")
-#pragma comment(lib, "opencv_imgproc245.lib")
-#endif
+
 
 FrameRenderer fr;
 VideoCapture vidCap;
@@ -34,14 +29,37 @@ int main(int argc, char *argv[])
     gtk_window_set_default_size(GTK_WINDOW(window), 1000, 600);
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
     gtk_widget_set_size_request(window, 1000, 600);
-    g_signal_connect_swapped(G_OBJECT(window), "destroy",
-        G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect_swapped(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_idle_add(IdleFunction, 0);
     vidCap.Initialize();
-    fr.Initialize(window, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());
+    GtkWidget* fixed = gtk_fixed_new();
+    gtk_container_add(GTK_CONTAINER(window), fixed);
+    fr.Initialize(window, fixed, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());
     gtk_widget_show_all(window);
+    Page p;
+    p.Initialize(window, fixed);
+    p.AddButton("Test1", 800, 100, 150, 50);
+    p.AddButton("Test2", 800, 200, 150, 50);
+    p.AddButton("Test3", 800, 300, 150, 50);
+    p.AddLabel("To <b>infinity</b> and <b>beyond</b>.\nNow this is awesome", 0, 400, 600, 100);
+    p.AddTextEdit(700, 500, 200, 20);
 
+    p.ShowControls();
     gtk_main();
-
+    
+    
     return 0;
 }
+
+
+
+#ifdef _WIN32
+#pragma comment(lib, "gtk-win32-3.0.lib")
+#pragma comment(lib, "gobject-2.0.lib")
+#pragma comment(lib, "cairo.lib")
+#pragma comment(lib, "glib-2.0.lib")
+#pragma comment(lib, "opencv_highgui245.lib")
+#pragma comment(lib, "opencv_core245.lib")
+#pragma comment(lib, "opencv_imgproc245.lib")
+#endif
+

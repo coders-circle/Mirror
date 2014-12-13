@@ -74,12 +74,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\client\FrameRenderer.h" />
+    <ClInclude Include="..\..\include\client\UI\Button.h" />
+    <ClInclude Include="..\..\include\client\UI\Control.h" />
+    <ClInclude Include="..\..\include\client\UI\Label.h" />
+    <ClInclude Include="..\..\include\client\UI\Page.h" />
+    <ClInclude Include="..\..\include\client\UI\TextEdit.h" />
     <ClInclude Include="..\..\include\client\VideoCapture.h" />
-    <ClInclude Include="..\..\include\common\Button.h" />
     <ClInclude Include="..\..\include\common\common.h" />
-    <ClInclude Include="..\..\include\common\Control.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
-    <ClInclude Include="..\..\include\common\Page.h" />
     <ClInclude Include="..\..\include\common\RTPCommon.h" />
     <ClInclude Include="..\..\include\common\RtpReceiver.h" />
     <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
@@ -91,10 +93,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Button.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Control.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Label.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Page.cpp" />
+    <ClCompile Include="..\..\src\client\UI\TextEdit.cpp" />
     <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
-    <ClCompile Include="..\..\src\common\Button.cpp" />
-    <ClCompile Include="..\..\src\common\Control.cpp" />
-    <ClCompile Include="..\..\src\common\Page.cpp" />
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
     <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
     <ClCompile Include="..\..\src\common\TcpListener.cpp" />

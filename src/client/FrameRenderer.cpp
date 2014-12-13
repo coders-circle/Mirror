@@ -16,7 +16,7 @@ gboolean FrameRenderer::OnDraw(GtkWidget* widget, cairo_t* cr, gpointer frPointe
     return FALSE;
 }
 
-void FrameRenderer::Initialize(GtkWidget* parentWindow, int x, int y, int fw, int fh)
+void FrameRenderer::Initialize(GtkWidget* parentWindow, GtkWidget* fixed, int x, int y, int fw, int fh)
 {
     m_x = x;
     m_y = y;
@@ -32,9 +32,9 @@ void FrameRenderer::Initialize(GtkWidget* parentWindow, int x, int y, int fw, in
     m_rgbData       = new unsigned char[4*m_fw*m_fh];
     m_drawingArea   = gtk_drawing_area_new();
     m_rgbImage = cairo_image_surface_create_for_data(m_rgbData, CAIRO_FORMAT_ARGB32, m_fw, m_fh, m_fw*4);
-    m_fixed = gtk_fixed_new();
+    m_fixed = fixed;
     gtk_widget_set_size_request(m_drawingArea, fw, fh);
-    gtk_container_add(GTK_CONTAINER(m_parentWindow), m_fixed);
+    //gtk_container_add(GTK_CONTAINER(m_parentWindow), m_fixed);
     g_signal_connect(G_OBJECT(m_drawingArea), "draw", G_CALLBACK(this->OnDraw), this);
     gtk_fixed_put(GTK_FIXED(m_fixed), m_drawingArea, m_x, m_y);
 }

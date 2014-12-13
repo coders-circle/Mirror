@@ -16,14 +16,14 @@
     <Filter Include="include\common\Network">
       <UniqueIdentifier>{9c21b098-89eb-42ac-a5b6-3b2b2d9e0348}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\common\UI">
-      <UniqueIdentifier>{94db33d3-f59b-4fce-bb19-26a69d1732e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\common\Network">
       <UniqueIdentifier>{7ad2755b-7297-4301-a7ca-de728d42e37d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\common\UI">
-      <UniqueIdentifier>{d7763af7-b00e-423f-9925-8d714b2840f8}</UniqueIdentifier>
+    <Filter Include="include\UI">
+      <UniqueIdentifier>{637617ae-ac52-4d8c-8fda-a3c9bd66ebda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\UI">
+      <UniqueIdentifier>{ac82514a-e491-4024-93fe-1552d69bc617}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,17 +57,23 @@
     <ClInclude Include="..\..\include\common\TcpTransmitter.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\Button.h">
-      <Filter>include\common\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\Control.h">
-      <Filter>include\common\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\Page.h">
-      <Filter>include\common\UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\VideoCapture.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Button.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Control.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Label.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Page.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\TextEdit.h">
+      <Filter>include\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,15 +92,6 @@
     <ClCompile Include="..\..\src\common\TcpTransmitter.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\Button.cpp">
-      <Filter>src\common\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\Control.cpp">
-      <Filter>src\common\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\Page.cpp">
-      <Filter>src\common\UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -103,6 +100,21 @@
     </ClCompile>
     <ClCompile Include="..\..\src\client\VideoCapture.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Button.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Control.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Page.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Label.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\TextEdit.cpp">
+      <Filter>src\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
