@@ -4,8 +4,6 @@ Label::Label()
 {
     m_handle = gtk_label_new(NULL);
     m_type = Control::LABEL;
-    //gtk_button_set
-    //gtk_widget_set_size_request
 }
 
 void Label::Set(std::string label, GtkWidget* fixed, int x, int y, int w, int h)

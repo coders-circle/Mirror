@@ -18,3 +18,8 @@ void TextEdit::Set( GtkWidget* fixed, int x, int y, int w, int h)
     gtk_widget_set_size_request(m_handle, w, h);
     this->PutFixedAt(fixed, x, y);
 }
+
+const gchar* TextEdit::GetText()
+{
+    return gtk_entry_get_text(GTK_ENTRY(m_handle));
+}

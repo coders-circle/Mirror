@@ -17,14 +17,40 @@
 class Page
 {
 public:
+
+    // Don't use:  Under Construction!
+    // Loads the page from a file
     void LoadFromFile(std::string fileName);
-    void AddButton(std::string label, int x, int y, int w, int h);
-    void AddLabel(std::string label, int x, int y, int w, int h);
-    void AddTextEdit(int x, int y, int w, int h);
+
+    // Adds a button with specified label in the specified coordinate,
+    // returns a unique ID for the control in the page
+    int AddButton(std::string label, int x, int y, int w, int h);
+
+    // Adds a text label with specified text in the specified coordinate,
+    // the text can contain certain markups,
+    // returns a unique ID for the control in the page
+    int AddLabel(std::string text, int x, int y, int w, int h);
+
+    // Adds a Edit Box in the specified coordinate,
+    // returns a unique ID for the control in the page
+    int AddTextEdit(int x, int y, int w, int h);
+
+    // shows all controls within the page
     void ShowControls();
+
+
     void Initialize(GtkWidget* parentWindow, GtkWidget* fixed);
+
+    // Handles the events for the controls in the page
+    static void ControlEventHandler(GtkWidget* widget, gpointer data);
 protected:
+    // Allocates memory for a specified new control to be added,
+    // also sets a unique id to that control starting from 0
+    void AllocateNewControl(Control::ControlType type);
+
+    // Array of controls present in the page
     std::vector<Control*> m_controls;
+
     GtkWidget* m_fixed;
     GtkWidget* m_parentWindow;
 };

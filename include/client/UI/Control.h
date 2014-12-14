@@ -4,15 +4,20 @@
 #include <gtk/gtk.h>
 #include <string>
 
+// base class for UI control elements
 class Control
 {
 public:
     enum ControlType{ BUTTON, LABEL, TEXTEDIT };
     Control() :m_handle(0){}
+    void SetID(int id);
+    int GetID();
     void PutFixedAt(GtkWidget *fixed, int x, int y);
     void PutFixedRelativeTo(Control* obj, GtkWidget* fixed, int xOffset, int yOffset);
     void Show();
     void Hide();
+    GtkWidget* GetHandle();
+    // void SetEventHandler();
 protected:
     GtkWidget* m_handle;
     int m_x, m_y, m_w, m_h;
