@@ -19,21 +19,18 @@ void ClientsManager::StartListening(const tcp::endpoint &localEndpoint)
 // Add any client that is connected to the clients list
 void ClientsManager::HandleClient(boost::shared_ptr<tcp::socket> &socket)
 {
-    m_lock = true;      // Lock to ensure "m_clients" vector isn't used while adding client to it
-
+    boost::lock_guard<boost::mutex> guard(m_mutex);
     ClientInfo client(m_ioService);
     client.connection.Initialize(socket);
     m_clients.push_back(client);
     std::cout << "Client Connected: " << m_clients[m_clients.size() - 1].connection.GetDestinationAddress() << std::endl;
-
-    m_lock = false;     // Un-lock
 }
 
 // Start processing each client
 void ClientsManager::StartProcessing()
 {
-    m_lock = false; // Initially, the "m_clients" vector is un-locked
-    boost::thread t(boost::bind(&ClientsManager::ProcessClients, this));
+    //boost::thread t(boost::bind(&ClientsManager::ProcessClients, this));
+    ProcessClients();
 }
 
 // Process each client
@@ -41,14 +38,12 @@ void ClientsManager::ProcessClients()
 {
     while (true)
     {
-        while (m_lock)
-            ;             // Don't continue while locked
-
+        while (m_clients.size() == 0)
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+        m_mutex.lock();
         // Process each client in turn
         for (unsigned int i = 0; i < m_clients.size(); ++i)
         {
-            while (m_lock)
-                ;         // Pause processing while locked
             try
             {
                 // See if any request is incomming for this client
@@ -83,6 +78,7 @@ void ClientsManager::ProcessClients()
                 std::cout << ex.what() << std::endl;
             }
         }
+        m_mutex.unlock();
     }
 }
 
@@ -90,8 +86,7 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
 {
     ChatMessage chat;
     chat.Receive(m_clients[client].connection);
-    while (m_lock)
-        ;  // while locked, don't continue
+    m_mutex.lock();
 
     // Send the messsage to each client in the group
     for (unsigned int i = 0; i < m_groups[group].size(); ++i)
@@ -100,8 +95,6 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
         {
             if (m_groups[group][i] != client)
                 chat.Send(m_clients[m_groups[group][i]].connection);
-            while (m_lock)
-                ; // while locked, don't continue
         }
         // client may be disconnected and exception may be thrown
         //  we catch the exception inside the loop so that
@@ -111,4 +104,5 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
             std::cout << ex.what() << std::endl;
         }
     }
+    m_mutex.unlock();
 }

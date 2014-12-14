@@ -10,7 +10,7 @@ public:
     ~TcpClient();
 
     // Start listening for incoming connections in a new thread
-    void StartListening(const tcp::endpoint& localEndPoint);
+    void StartListening(/*const tcp::endpoint& localEndPoint*/);
     // Connect to a peer (server/client)
     void Connect(const tcp::endpoint& peer);
     

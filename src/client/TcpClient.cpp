@@ -9,9 +9,11 @@ TcpClient::TcpClient(boost::asio::io_service &io)
 TcpClient::~TcpClient()
 {}
 
-void TcpClient::StartListening(const tcp::endpoint& localEndPoint)
+void TcpClient::StartListening(/*const tcp::endpoint& localEndPoint*/)
 {
-    m_listener.Initialize(localEndPoint);
+     uint16_t port = m_listener.Initialize(tcp::endpoint(tcp::v4(), 0));
+     std::cout << "Listening at port: " << port << std::endl;
+   
     // Listen method will start listening in new thread
     m_listener.Listen(boost::bind(&TcpClient::ListenerHandler, this, _1));
 }

@@ -17,7 +17,7 @@ public:
 
     // Start a new thread to listen to and accept clients
     void StartListening(const tcp::endpoint &localEndpoint);
-    // Start another thread to process each client
+    // Start an infinite loop to process each client
     void StartProcessing();
     // Get the connected clients
     std::vector<ClientInfo>& GetClients() { return m_clients; }
@@ -26,7 +26,7 @@ private:
     boost::asio::io_service &m_ioService;
     TcpListener m_listener;
     RequestHandler m_requests;
-    bool m_lock;
+    boost::mutex m_mutex;
 
     // Clients List
     std::vector<ClientInfo> m_clients;
