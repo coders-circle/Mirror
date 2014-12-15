@@ -104,5 +104,5 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
             std::cout << ex.what() << std::endl;
         }
     }
-   // m_mutex.unlock();
+    //m_mutex.unlock();
 }

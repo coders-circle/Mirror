@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         {
             std::string ip;
             std::cout << "Enter ip of server: "; std::cin >> ip;
-            client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011));
+            client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011/*8183*/));  // 10011 for Ankit's Server
             uint32_t groupId;
             std::cout << "Enter group-id to join: ";
             std::cin >> groupId;
