@@ -86,7 +86,7 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
 {
     ChatMessage chat;
     chat.Receive(m_clients[client].connection);
-    m_mutex.lock();
+    //m_mutex.lock();
 
     // Send the messsage to each client in the group
     for (unsigned int i = 0; i < m_groups[group].size(); ++i)
@@ -104,5 +104,5 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
             std::cout << ex.what() << std::endl;
         }
     }
-    m_mutex.unlock();
+   // m_mutex.unlock();
 }
