@@ -25,13 +25,18 @@ int main(int argc, char *argv[])
 
         // Connect to server
         {
-            std::string ip;
+            std::string ip, name;
             std::cout << "Enter ip of server: "; std::cin >> ip;
             client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011/*8183*/));  // 10011 for Ankit's Server
             uint32_t groupId;
             std::cout << "Enter group-id to join: ";
             std::cin >> groupId;
-            client.JoinGroup(groupId);
+            std::cout << "Enter name: ";
+            std::fflush(stdin);
+            char namec[200];
+            std::cin.getline(namec, 200);
+            name = std::string(namec);
+            client.JoinGroup(groupId, name);
             client.StartChatSession(groupId);
             
             while (true)
