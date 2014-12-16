@@ -33,9 +33,10 @@ void TcpClient::Connect(const tcp::endpoint& peer)
 }
 
 // Join group by sending request to server
-void TcpClient::JoinGroup(uint32_t groupId)
+void TcpClient::JoinGroup(uint32_t groupId, const std::string &name)
 {
     m_requests.JoinGroup(m_tcpHandler, groupId);
+    m_name = name;
 }
 
 // Start group chat in a new thread
@@ -79,7 +80,7 @@ void TcpClient::ChatInput(uint32_t groupId)
         char input[1024];
 
         std::cin.getline(input, 1024);
-        std::string message = std::to_string(m_tcpHandler.GetSocket()->local_endpoint().port()) + ": " + input;
+        std::string message = m_name + ": " + input;
 
         // Send the chat message after a GROUP_CHAT request
         m_requests.GroupChat(m_tcpHandler, groupId);

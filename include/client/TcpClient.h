@@ -16,7 +16,7 @@ public:
     
     // Test Methods
     // Join a group 
-    void JoinGroup(uint32_t groupId);
+    void JoinGroup(uint32_t groupId, const std::string &name);
     // Start a group chat
     void StartChatSession(uint32_t groupId);
 
@@ -25,6 +25,7 @@ private:
     TcpListener m_listener;
     TcpHandler m_tcpHandler;
     RequestHandler m_requests;
+    std::string m_name;
 
     void ListenerHandler(boost::shared_ptr<tcp::socket> socket);
 
