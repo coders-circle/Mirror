@@ -40,7 +40,7 @@ void RequestHandler::JoinGroup(TcpHandler &tcpHandler, uint32_t groupId)
     
     // Send the "fixed-size" request
     char request[REQUEST_MAX_SIZE];
-    strcpy_s(request, GetJsonString().c_str());
+    strcpy(request, GetJsonString().c_str());
     tcpHandler.Send(request, REQUEST_MAX_SIZE);
 }
 
@@ -60,7 +60,7 @@ void RequestHandler::GroupChat(TcpHandler &tcpHandler, uint32_t groupId)
 
     // Send the "fixed-size" request
     char request[REQUEST_MAX_SIZE];
-    strcpy_s(request, GetJsonString().c_str());
+    strcpy(request, GetJsonString().c_str());
     tcpHandler.Send(request, REQUEST_MAX_SIZE);
 }
 
