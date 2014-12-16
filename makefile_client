@@ -21,7 +21,7 @@ all:  client.o common
 common: $(OBJECTS_COMM)
 	$(CC) -c -o common.o $<
 
-%.o :  src/common/%.cpp $(FHEADERS_COMM)
+%.o :  src/common/%.cpp 
 	$(CC) -c -o $@ $< $(LDFLAGS_COMM) -Iinclude/ $(CFLAG) $(CFLAGS)
 
 client.o: src/client/TcpClient.cpp

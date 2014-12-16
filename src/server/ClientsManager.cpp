@@ -69,7 +69,7 @@ void ClientsManager::ProcessClients()
                         break;
 
                     default:
-                        std::cout << "Invalid Request Got from client #" << i << std::endl;
+                        std::cout << "Invalid Request " << m_requests.GetRequestType() << " from client #" << i << std::endl;
                     }
                 }
             }
