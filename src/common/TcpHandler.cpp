@@ -37,10 +37,16 @@ void TcpHandler::Send(const char* data, size_t size)
 }
 
 //
-void TcpHandler::Receive(char* data, size_t max_size)
+void TcpHandler::Receive(char* data, size_t size)
 {
     if (!m_socket) return; 
-    m_socket->read_some(boost::asio::buffer(data, max_size));;
+    boost::asio::read(*m_socket, boost::asio::buffer(data, size));
+}
+
+void TcpHandler::ReceiveSome(char* data, size_t max_size)
+{
+    if (!m_socket) return;
+    m_socket->read_some(boost::asio::buffer(data, max_size));
 }
 
 size_t TcpHandler::Available()

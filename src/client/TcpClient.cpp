@@ -56,6 +56,9 @@ void TcpClient::ChatSession(uint32_t groupId)
         ChatMessage chat;
         while (true)
         {
+            while (!m_tcpHandler.Available())
+                boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+
             chat.Receive(m_tcpHandler);
             std::cout << "\n\n" << chat.GetMessage() << "\n\nYou: ";
         }
