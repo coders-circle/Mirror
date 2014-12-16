@@ -53,17 +53,17 @@ void ClientsManager::ProcessClients()
                 if (bytes > 0)
                 {
                     m_requests.ReceiveRequest(m_clients[i].connection);
-                    switch (m_requests.GetLastRequest().type)
+                    switch (m_requests.GetRequestType())
                     {
                     case RequestHandler::JOIN_GROUP:
-                        gid = m_requests.GetLastRequest().info.join.groupId;
+                        gid = m_requests.GetGroupId();
                         // push the client id to the group
                         m_groups[gid].push_back(i);   
                         std::cout << "Connected client #" << i << " to group #" << gid << std::endl;
                         break;
                     
                     case RequestHandler::GROUP_CHAT:
-                        gid = m_requests.GetLastRequest().info.groupChat.groupId;
+                        gid = m_requests.GetGroupId();
                         // receive the chat message
                         ReceiveChat(i, gid);
                         break;

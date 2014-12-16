@@ -33,7 +33,10 @@ int main(int argc, char *argv[])
             std::cin >> groupId;
             client.JoinGroup(groupId);
             client.StartChatSession(groupId);
-            while (true);
+            
+            while (true)
+                boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+                ;
         }
     }
     catch (std::exception &ex)

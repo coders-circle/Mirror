@@ -1,28 +1,18 @@
 #pragma once
 #include "TcpHandler.h"
+#include "rapidjson/document.h"
 
-const size_t REQUEST_MAX_SIZE = 150;
+class RequestException : public Exception
+{
+public:
+    RequestException(const std::string &errorString)
+        :Exception("Error processing request: "+errorString)
+    {}
+};
 class RequestHandler
 {
 public:
-    enum REQUEST_TYPE{ JOIN_GROUP = 0, GROUP_CHAT };
-    struct Request
-    {
-        REQUEST_TYPE type;  // Request type
-        union               // Union of request data for each type
-        {
-            // JOIN_GROUP
-            struct
-            {
-                uint32_t groupId;   // group-id to join
-            } join;
-            // GROUP_CHAT
-            struct
-            {
-                uint32_t groupId;   // group-id to send chat message to
-            } groupChat;
-        } info;
-    };
+    enum REQUEST_TYPE{ INAVLID_TYPE = 0, JOIN_GROUP, GROUP_CHAT };
 
     RequestHandler();
     ~RequestHandler();
@@ -31,12 +21,15 @@ public:
     void JoinGroup(TcpHandler &tcpHandler, uint32_t groupId);
     // Request the server to wait for incoming chat message for a group
     void GroupChat(TcpHandler &tcpHandler, uint32_t groupId);
-    
-    
     // Receive a request 
     void ReceiveRequest(TcpHandler &tcpHandler);
-    // Get last sent/received request
-    const Request& GetLastRequest() { return m_request; }
+
+    // Request Data
+    REQUEST_TYPE GetRequestType();
+    uint32_t GetGroupId();
 private:
-    Request m_request;
+    // The Json Document that holds the request
+    rapidjson::Document m_document;
+    // Get string from the Json Doucment
+    std::string GetJsonString();
 };

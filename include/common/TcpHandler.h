@@ -18,13 +18,18 @@ class TcpHandler
 		TcpHandler(boost::asio::io_service &ioService);
         ~TcpHandler();
 
-		// initialize with a socket
+		// Initialize with an already created socket
 		void Initialize(boost::shared_ptr<tcp::socket> socket);
-		// send tcp request to the endpoint and create socket
+		// Connect to given endpoint and initialize by creating new socker
 		void Initialize(const tcp::endpoint &destEndpoint);
 
+        // Send data of given size
 		void Send(const char* data, size_t size);
-		void Receive(char* data, size_t max_size);
+        // Receive data of given size
+		void Receive(char* data, size_t size);
+        // Receive data of given size or less
+        void ReceiveSome(char* data, size_t max_size);
+        // Check if the socket has data to be read
         size_t Available();
 
         std::string GetDestinationAddress() const;
