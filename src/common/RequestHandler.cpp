@@ -69,6 +69,7 @@ void RequestHandler::ReceiveRequest(TcpHandler &tcpHandler)
     // Get the "fixed-size" request
     char request[REQUEST_MAX_SIZE];
     tcpHandler.Receive(request, REQUEST_MAX_SIZE);
+    std::cout << request << std::endl;
 
     // Parse the request
     m_document = Document();
@@ -78,7 +79,7 @@ void RequestHandler::ReceiveRequest(TcpHandler &tcpHandler)
 RequestHandler::REQUEST_TYPE RequestHandler::GetRequestType()
 {
     // Return INVALID_TYPE when Request-Type value is absent or isn't integer
-    if (!m_document.HasMember("Request-Type") || !m_document["Request-Type"].IsInt())
+    if (!m_document.IsObject() || !m_document.HasMember("Request-Type") || !m_document["Request-Type"].IsInt())
         return INAVLID_TYPE;
     return (REQUEST_TYPE)m_document["Request-Type"].GetInt();
 }
