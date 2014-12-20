@@ -7,10 +7,14 @@
 #include "client/VideoCapture.h"
 #include "client/UI/Page.h"
 
+#include "client/UI/pages/LoginPage.h"
+#include "client/UI/Menu.h"
+#include "client/UI/UIManager.h"
 
 
-FrameRenderer fr;
-VideoCapture vidCap;
+
+//FrameRenderer fr;
+//VideoCapture vidCap;
 
 
 gboolean IdleFunction(gpointer userData)
@@ -21,33 +25,26 @@ gboolean IdleFunction(gpointer userData)
 
 int main(int argc, char *argv[])
 {
-    GtkWidget *window;
+    GtkWidget *mainWindow;
     gtk_init(&argc, &argv);
-
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     
-    gtk_window_set_default_size(GTK_WINDOW(window), 1000, 600);
-    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-    gtk_widget_set_size_request(window, 1000, 600);
-    g_signal_connect_swapped(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    //g_idle_add(IdleFunction, 0);
-    //vidCap.Initialize();
+    gtk_window_set_default_size(GTK_WINDOW(mainWindow), 1000, 600);
+    gtk_window_set_resizable(GTK_WINDOW(mainWindow), FALSE);
+    gtk_widget_set_size_request(mainWindow, 1000, 600);
+    g_signal_connect_swapped(G_OBJECT(mainWindow), "destroy", G_CALLBACK(gtk_main_quit), NULL);
     GtkWidget* fixed = gtk_fixed_new();
-    gtk_container_add(GTK_CONTAINER(window), fixed);
-    fr.Initialize(window, fixed, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());
-    gtk_widget_show_all(window);
-    Page p;
+    gtk_container_add(GTK_CONTAINER(mainWindow), fixed);
+
+    gtk_widget_show_all(mainWindow);
+
+    UIManager uiManager;
+    uiManager.Initialize(mainWindow, fixed);
+    uiManager.NavigateTo(UIManager::LOGINPAGE);
+
     
     
-    p.Initialize(window, fixed);
-    p.AddLabel("<b>Username:</b>", 300, 100, 100, 20);
-    p.AddLabel("<b>Password:</b> ", 300, 200, 100, 20);
-    p.AddTextEdit(410, 100, 200, 25);
-    p.AddTextEdit(410, 200, 200, 25);
-    p.AddButton("Sign In", 400, 300, 100, 30);
-    p.ShowControls();
     gtk_main();
-    
     
     return 0;
 }

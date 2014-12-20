@@ -17,4 +17,5 @@ void Label::Set(std::string label, GtkWidget* fixed, int x, int y, int w, int h)
     //gtk_button_set_label(GTK_BUTTON(m_handle), m_label.c_str());
     gtk_widget_set_size_request(m_handle, w, h);
     this->PutFixedAt(fixed, x, y);
+    
 }

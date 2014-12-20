@@ -78,6 +78,18 @@
     <ClInclude Include="..\..\include\client\TcpClient.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Menu.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\StatusBar.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\UIManager.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\RtpReceiver.cpp">

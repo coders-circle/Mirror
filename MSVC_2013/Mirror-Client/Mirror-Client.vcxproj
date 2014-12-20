@@ -78,8 +78,12 @@
     <ClInclude Include="..\..\include\client\UI\Button.h" />
     <ClInclude Include="..\..\include\client\UI\Control.h" />
     <ClInclude Include="..\..\include\client\UI\Label.h" />
+    <ClInclude Include="..\..\include\client\UI\Menu.h" />
     <ClInclude Include="..\..\include\client\UI\Page.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h" />
+    <ClInclude Include="..\..\include\client\UI\StatusBar.h" />
     <ClInclude Include="..\..\include\client\UI\TextEdit.h" />
+    <ClInclude Include="..\..\include\client\UI\UIManager.h" />
     <ClInclude Include="..\..\include\client\VideoCapture.h" />
     <ClInclude Include="..\..\include\common\common.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />

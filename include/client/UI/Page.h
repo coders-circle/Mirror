@@ -38,8 +38,22 @@ public:
     // shows all controls within the page
     void ShowControls();
 
+    // called when an event by controls within occurs 
+    // to be implemented by derived class
+    virtual void OnControlEvent(int control_id);
 
     void Initialize(GtkWidget* parentWindow, GtkWidget* fixed);
+
+    // TODO: move the function implementation to .cpp
+    // TODO: add proper exception
+    Control* GetControlByID(unsigned int control_id)
+    {
+        if (control_id >= 0 && control_id < m_controls.size())
+        {
+            return m_controls[control_id];
+        }
+        throw "invalid control ID";
+    }
 
     // Handles the events for the controls in the page
     static void ControlEventHandler(GtkWidget* widget, gpointer data);
@@ -53,6 +67,16 @@ protected:
 
     GtkWidget* m_fixed;
     GtkWidget* m_parentWindow;
+
+    enum ControlEvent{BUTTON_CLICK = 0};
+
+    struct EventData
+    {
+        Page* page;
+        Control* control;
+        int event_id;
+        EventData(Page* page, Control* control, int event_id) :page(page), control(control), event_id(event_id){}
+    };
 };
 
 #endif
