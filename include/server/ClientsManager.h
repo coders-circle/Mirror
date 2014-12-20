@@ -1,7 +1,7 @@
 #pragma once
-#include <common/TcpListener.h>
+#include <common/TcpAcceptor.h>
 #include <common/TcpHandler.h>
-#include <common/RequestHandler.h>
+#include <common/TcpRequest.h>
 
 struct ClientInfo
 {
@@ -24,8 +24,8 @@ public:
    
 private:
     boost::asio::io_service &m_ioService;
-    TcpListener m_listener;
-    RequestHandler m_requests;
+    TcpAcceptor m_acceptor;
+    TcpRequest m_requests;
     boost::mutex m_mutex;
 
     // Clients List

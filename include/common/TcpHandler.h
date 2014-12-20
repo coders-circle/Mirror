@@ -1,8 +1,5 @@
 #pragma once
 
-//don't use pragma, use standard header guard technique
-class Exception;
-
 class TcpHandlerException : public Exception
 {
 	public:
@@ -33,6 +30,8 @@ class TcpHandler
         size_t Available();
 
         std::string GetDestinationAddress() const;
+        std::string GetIp() const { return m_socket->remote_endpoint().address().to_string(); }
+        uint16_t GetPort() const { return m_socket->remote_endpoint().port(); }
         boost::shared_ptr<tcp::socket> GetSocket() const { return m_socket; }
 
 	private:

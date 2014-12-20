@@ -12,7 +12,7 @@ public:
     void SetMessage(const std::string& message) { m_body = message; }
 
     void Send(TcpHandler &tcpHandler);
-    void Receive(TcpHandler &tcpHandler);
+    void Receive(TcpHandler &tcpHandler, uint32_t size);
 
 private:;
     std::string m_body;

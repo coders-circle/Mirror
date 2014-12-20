@@ -1,24 +1,18 @@
 #pragma once
 
-class TcpListenerException : public Exception
+class TcpAcceptor
 {
 public:
-    TcpListenerException(const std::string &errorString)
-        : Exception("TCP Listener Error: " + errorString)
-    {}
-};
+    TcpAcceptor(boost::asio::io_service &io);
+    ~TcpAcceptor();
 
-class TcpListener
-{
-public:
-    TcpListener(boost::asio::io_service &io);
-    ~TcpListener();
-
-    // Initialize the listener to listen at given local endpoint
+    // Initialize the acceptor to listen at given local endpoint
     uint16_t Initialize(const tcp::endpoint &localEndpoint);
     // Listen for incomming connections in a new thread 
     //  and call 'callback' for each connection
     void Listen(boost::function<void(boost::shared_ptr<tcp::socket>)> callback);
+
+    tcp::acceptor &GetSocket() { return m_acceptor; }
 
 private:
     tcp::acceptor m_acceptor;
