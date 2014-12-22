@@ -25,6 +25,9 @@
     <Filter Include="src\UI">
       <UniqueIdentifier>{ac82514a-e491-4024-93fe-1552d69bc617}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\UI\pages">
+      <UniqueIdentifier>{64b73a62-e967-4ba7-8d9d-35d4344a9f93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\common\common.h">
@@ -78,9 +81,6 @@
     <ClInclude Include="..\..\include\client\TcpClient.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\UI\Menu.h">
       <Filter>include\UI</Filter>
     </ClInclude>
@@ -89,6 +89,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\client\UI\UIManager.h">
       <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\HomePage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\SignupPage.h">
+      <Filter>include\UI\pages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +145,15 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
       <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Menu.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Statusbar.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\UIManager.cpp">
+      <Filter>src\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,62 +1,60 @@
 #pragma once
 
+#include "common/Exception.h"
+
 #include <vector>
 #include <string>
 #include <gtk/gtk.h>
 
-
+// class to represent individual menu items
 class MenuItem
 {
 public:
     MenuItem() :m_handle(0){}
-    void Create(const std::string& label)
-    {
-        m_handle = gtk_menu_item_new_with_label(label.c_str());
-    }
-    GtkWidget* GetHandle()
-    {
-        return m_handle;
-    }
+
+    // creates a menu item with given label
+    void Create(const std::string& label);
+
+    // returns a widget handle representing the item
+    GtkWidget* GetHandle();
 private:
     GtkWidget* m_handle;
 };
 
+
+// class to represent group of menu items
+// i.e a single menu
 class Menu
 {
 public:
     Menu() :m_handle(0), m_menu(0){}
-    void Create(const std::string& label)
-    {
-        m_handle = gtk_menu_new();
-        m_menu = gtk_menu_item_new_with_label(label.c_str());
-        gtk_menu_item_set_submenu(GTK_MENU_ITEM(m_menu), m_handle);
-    }
-    int AddItem(const std::string& label)
-    {
-        m_items.resize(m_items.size() + 1);
-        m_items[m_items.size() - 1].Create(label);
-        //gtk_menu_attach(GTK_MENU(m_handle), m_items[m_items.size() - 1].GetHandle(), 0, 0, 0, 0);
-        gtk_menu_shell_append(GTK_MENU_SHELL(m_handle), m_items[m_items.size() - 1].GetHandle());
-        return (m_items.size() - 1);
-    }
-    GtkWidget* GetItemHandle(int index)
-    {
-        return m_items[index].GetHandle();
-    }
-    GtkWidget* GetHandle()
-    {
-        return m_handle;
-    }
-    GtkWidget* GetMenu()
-    {
-        return m_menu;
-    }
+
+    // creates a menu with specified label
+    void Create(const std::string& label);
+
+    // adds  an item to the menu,
+    // returns the id for the current item in the menu
+    // id is the index of the item starting from zero
+    int AddItem(const std::string& label);
+
+    // returns a widget handle representing a specfic item
+    // specified by 'index' 
+    // index and id are the same
+    GtkWidget* GetItemHandle(unsigned int index);
+
+    // return handle to the widget representing the menu list
+    GtkWidget* GetHandle();
+
+    // return handle to the widget representing the menu itself
+    GtkWidget* GetMenu();
 private:
     GtkWidget* m_handle;
     GtkWidget* m_menu;
     std::vector<MenuItem> m_items;
 };
 
+
+// class to represent a menu bar
 class MenuBar
 {
 public:
@@ -69,45 +67,22 @@ public:
             menuItemID(menuItemID), uiManager(uiManager){}
     };
     MenuBar() :m_handle(0), m_parent(0), m_menuEventHandler(0){}
-    void FixedPut(GtkWidget* fixed)
-    {
-        gtk_fixed_put(GTK_FIXED(fixed), m_handle, 0, 0);
-    }
-    void Initialize(GtkWidget* parent)
-    {
-        m_parent = parent;
-        m_handle = gtk_menu_bar_new();
-        //gtk_container_add(GTK_CONTAINER(m_parent), m_handle);
-    }
-    void AddMenu(std::string label)
-    {
-        m_menus.resize(m_menus.size() + 1);
-        m_menus[m_menus.size() - 1].Create(label);
-        gtk_menu_shell_append(GTK_MENU_SHELL(m_handle), m_menus[m_menus.size() - 1].GetMenu());
-    }
-    void AddMenuItem(unsigned int menuID, std::string itemLabel)
-    {
-        
-        if (menuID >= 0 && menuID < m_menus.size())
-        {
-            int itemID = m_menus[menuID].AddItem(itemLabel);
-            g_signal_connect(G_OBJECT(m_menus[menuID].GetItemHandle(itemID)),
-                "activate", m_menuEventHandler, new MenuEventData(menuID, itemID, m_eventData));
-        }
-        else
-        {
-            throw "invalid menu ID";
-        }
-    }
-    void Show()
-    {
-        gtk_widget_show_all(m_handle);
-    }
-    void SetEventHandler(GCallback eventHandler, void* data)
-    {
-        m_menuEventHandler = eventHandler;
-        m_eventData = data;
-    }
+
+    void FixedPut(GtkWidget* fixed);
+    void Initialize(GtkWidget* parent);
+
+    // Adds a menu
+    void AddMenu(std::string label);
+
+    // Adds an item to a specific menu
+    void AddMenuItem(unsigned int menuID, std::string itemLabel);
+
+    // shows all the menu
+    void Show();
+
+    // sets the event handler function 
+    // and the data to be passed withing the handler
+    void SetEventHandler(GCallback eventHandler, void* data);
 private:
     GtkWidget* m_handle;
     GtkWidget* m_parent;

@@ -4,8 +4,6 @@ Button::Button()
 {
     m_handle = gtk_button_new();
     m_type = Control::BUTTON;
-    //gtk_button_set
-    //gtk_widget_set_size_request
 }
 
 void Button::Set(std::string label, GtkWidget* fixed, int x, int y, int w, int h)

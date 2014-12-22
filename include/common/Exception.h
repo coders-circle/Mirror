@@ -1,5 +1,8 @@
 #ifndef __EXCEPTION__
 #define __EXCEPTION__
+
+#include <iostream>
+
 class Exception : public std::runtime_error
 {
 public:

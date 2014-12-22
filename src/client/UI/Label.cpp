@@ -13,8 +13,10 @@ void Label::Set(std::string label, GtkWidget* fixed, int x, int y, int w, int h)
     m_w = w;
     m_h = h;
     m_label = label;
+
+    // enables the label to contain some markup syntax
     gtk_label_set_markup(GTK_LABEL(m_handle), m_label.c_str());
-    //gtk_button_set_label(GTK_BUTTON(m_handle), m_label.c_str());
+
     gtk_widget_set_size_request(m_handle, w, h);
     this->PutFixedAt(fixed, x, y);
     

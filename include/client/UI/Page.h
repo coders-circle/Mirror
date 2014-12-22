@@ -1,9 +1,6 @@
-#ifndef __PAGE__
-#define __PAGE__
+#pragma once
 
-#ifdef _WIN32
-#define _CRT_SECURE_NO_WARNINGS 1
-#endif
+#include "common/Exception.h"
 
 #include "Control.h"
 #include "Button.h"
@@ -44,16 +41,8 @@ public:
 
     void Initialize(GtkWidget* parentWindow, GtkWidget* fixed);
 
-    // TODO: move the function implementation to .cpp
-    // TODO: add proper exception
-    Control* GetControlByID(unsigned int control_id)
-    {
-        if (control_id >= 0 && control_id < m_controls.size())
-        {
-            return m_controls[control_id];
-        }
-        throw "invalid control ID";
-    }
+    //return a control specified by the id
+    Control* GetControlByID(unsigned int controlID);
 
     // Handles the events for the controls in the page
     static void ControlEventHandler(GtkWidget* widget, gpointer data);
@@ -70,6 +59,8 @@ protected:
 
     enum ControlEvent{BUTTON_CLICK = 0};
 
+
+    // A struct to wrap the data passed to event handler
     struct EventData
     {
         Page* page;
@@ -78,5 +69,3 @@ protected:
         EventData(Page* page, Control* control, int event_id) :page(page), control(control), event_id(event_id){}
     };
 };
-
-#endif

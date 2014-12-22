@@ -13,8 +13,19 @@ void Page::AllocateNewControl(Control::ControlType type)
 }
 
 
-// TODO: may be design a file format for the page
 
+Control* Page::GetControlByID(unsigned int controlID)
+{
+    if (controlID >= 0 && controlID < m_controls.size())
+    {
+        return m_controls[controlID];
+    }
+    throw Exception("invalid value of controlID");
+}
+
+
+
+// TODO: may be design a file format for the page
 void Page::LoadFromFile(std::string fileName)
 {
     //FILE* fp = fopen(fileName.c_str(), "r");
