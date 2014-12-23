@@ -11,6 +11,21 @@
 #include <vector>
 #include <stdio.h>
 
+class Page;
+
+
+struct ControlEventData
+{
+    Page* page;
+    Control* control;
+    int event_id;
+    ControlEventData(Page* page, Control* control, int event_id) :page(page), control(control), event_id(event_id){}
+};
+
+typedef void(*PageEventCallBack)(ControlEventData*);
+
+
+
 class Page
 {
 public:
@@ -35,6 +50,9 @@ public:
     // shows all controls within the page
     void ShowControls();
 
+    // hide all controls within the page
+    void HideControls();
+
     // called when an event by controls within occurs 
     // to be implemented by derived class
     virtual void OnControlEvent(int control_id);
@@ -46,6 +64,14 @@ public:
 
     // Handles the events for the controls in the page
     static void ControlEventHandler(GtkWidget* widget, gpointer data);
+
+    void SetEventHandler(PageEventCallBack eventHandler);
+
+    int GetID();
+
+    
+
+    
 protected:
     // Allocates memory for a specified new control to be added,
     // also sets a unique id to that control starting from 0
@@ -59,13 +85,12 @@ protected:
 
     enum ControlEvent{BUTTON_CLICK = 0};
 
+    PageEventCallBack m_pageEventHandler;
+    // A struct to wrap the data passed to event handler to the pages
 
-    // A struct to wrap the data passed to event handler
-    struct EventData
-    {
-        Page* page;
-        Control* control;
-        int event_id;
-        EventData(Page* page, Control* control, int event_id) :page(page), control(control), event_id(event_id){}
-    };
+    int m_ID;
+    
 };
+
+enum PAGE { LOGINPAGE = 0, SIGNUPPAGE, SETTINGSPAGE, ABOUTPAGE };
+

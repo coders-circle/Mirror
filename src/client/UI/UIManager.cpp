@@ -1,31 +1,43 @@
 #include "client/UI/UIManager.h"
 
+UIManager* UIManager::m_uiManager = 0;
 
 void UIManager::MenuItemEventHandler(GtkWidget* widget, gpointer data)
 {
     MenuBar::MenuEventData *eventData = static_cast<MenuBar::MenuEventData*>(data);
-    UIManager* uiManager = static_cast<UIManager*>(eventData->uiManager);
+    
     switch (eventData->menuID)
     {
-    case UIManager::CONNECTIONSMENU:
+    case MENU::CONNECTIONSMENU:
         if (eventData->menuItemID == 0) std::cout << "So, connect to a server eh!";
         else std::cout << "You want to disconnect?? :/";
         break;
-    case UIManager::TOOLSMENU:
+    case MENU::TOOLSMENU:
         std::cout << "What do you prefer? :v";
         break;
-    case UIManager::HELPMENU:
+    case MENU::HELPMENU:
         std::cout << "About us? we are Mirrors!";
     }
     std::cout << std::endl;
 }
+
+
+void UIManager::PageEventHandler(ControlEventData* eventData)
+{
+    if (eventData->page->GetID() == PAGE::LOGINPAGE)
+        m_uiManager->NavigateTo(PAGE::SIGNUPPAGE);
+    else
+        m_uiManager->NavigateTo(PAGE::LOGINPAGE);
+}
+
+
 
 void UIManager::Initialize(GtkWidget* parent, GtkWidget* fixed)
 {
     m_parent = parent;
     m_fixed = fixed;
     m_menubar.Initialize(parent);
-    m_menubar.SetEventHandler(G_CALLBACK(MenuItemEventHandler), this);
+    m_menubar.SetEventHandler(G_CALLBACK(MenuItemEventHandler));
     m_menubar.AddMenu("Connections");
     m_menubar.AddMenuItem(MENU::CONNECTIONSMENU, "Connect to a server");
     m_menubar.AddMenuItem(MENU::CONNECTIONSMENU, "Disconnect");
@@ -36,16 +48,20 @@ void UIManager::Initialize(GtkWidget* parent, GtkWidget* fixed)
     m_menubar.FixedPut(fixed);
     m_menubar.Show();
 
-    m_pages.resize(1);
+    m_pages.resize(2);
     m_pages[0] = new LoginPage(m_parent, m_fixed);
     LoginPage* loginPage = static_cast<LoginPage*>(m_pages[0]);
+    loginPage->SetEventHandler(PageEventHandler);
+    m_pages[1] = new SignupPage(m_parent, m_fixed);
+    SignupPage* signupPage = static_cast<SignupPage*>(m_pages[1]);
+    signupPage->SetEventHandler(PageEventHandler);
 }
 
 void UIManager::NavigateTo(int page)
 {
     if (m_currentPage)
     {
-        //code to hide the page
+        m_currentPage->HideControls();
     }
     m_currentPage = m_pages[page];
     m_currentPage->ShowControls();
@@ -53,6 +69,11 @@ void UIManager::NavigateTo(int page)
 
 UIManager::UIManager()
 {
+    if (m_uiManager)
+    {
+        throw "can't create multiple objects of the UIManager class";
+    }
+    m_uiManager = this;
     m_parent = 0;
     m_fixed = 0;
     m_currentPage = 0;

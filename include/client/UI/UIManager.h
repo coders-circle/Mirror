@@ -4,6 +4,7 @@
 #include "client/UI/Menu.h"
 
 #include "client/UI/pages/LoginPage.h"
+#include "client/UI/pages/SignupPage.h"
 
 // UIManager: a custom class to handle pages and menu,
 // only one object of the class should be created,
@@ -12,8 +13,8 @@
 class UIManager
 {
 public:
-    enum MENU { CONNECTIONSMENU = 0, TOOLSMENU, HELPMENU};
-    enum PAGE { LOGINPAGE = 0, SETTINGSPAGE, ABOUTPAGE };
+    
+    
 
     // Creates and initializes the menus and pages used
     // in the application
@@ -28,10 +29,14 @@ public:
     // called when any menu item is pressed
     // data is a pointer of MenuBar::MenuEventData type
     static void MenuItemEventHandler(GtkWidget* widget, gpointer data);
+
+
+    static void PageEventHandler(ControlEventData* eventData);
 private:
     GtkWidget* m_parent;
     GtkWidget* m_fixed;
     std::vector<Page*> m_pages;
     MenuBar m_menubar;
     Page* m_currentPage;
+    static UIManager* m_uiManager;
 };

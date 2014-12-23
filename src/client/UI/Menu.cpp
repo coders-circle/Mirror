@@ -89,7 +89,7 @@ void MenuBar::AddMenuItem(unsigned int menuID, std::string itemLabel)
     {
         int itemID = m_menus[menuID].AddItem(itemLabel);
         g_signal_connect(G_OBJECT(m_menus[menuID].GetItemHandle(itemID)),
-            "activate", m_menuEventHandler, new MenuEventData(menuID, itemID, m_eventData));
+            "activate", m_menuEventHandler, new MenuEventData(menuID, itemID));
     }
     else
     {
@@ -101,8 +101,7 @@ void MenuBar::Show()
 {
     gtk_widget_show_all(m_handle);
 }
-void MenuBar::SetEventHandler(GCallback eventHandler, void* data)
+void MenuBar::SetEventHandler(GCallback eventHandler)
 {
     m_menuEventHandler = eventHandler;
-    m_eventData = data;
 }

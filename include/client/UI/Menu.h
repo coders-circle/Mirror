@@ -6,6 +6,9 @@
 #include <string>
 #include <gtk/gtk.h>
 
+
+
+
 // class to represent individual menu items
 class MenuItem
 {
@@ -62,9 +65,8 @@ public:
     {
         int menuID;
         int menuItemID;
-        void* uiManager;
-        MenuEventData(int menuID, int menuItemID, void* uiManager) :menuID(menuID),
-            menuItemID(menuItemID), uiManager(uiManager){}
+        MenuEventData(int menuID, int menuItemID) :menuID(menuID),
+            menuItemID(menuItemID){}
     };
     MenuBar() :m_handle(0), m_parent(0), m_menuEventHandler(0){}
 
@@ -81,12 +83,12 @@ public:
     void Show();
 
     // sets the event handler function 
-    // and the data to be passed withing the handler
-    void SetEventHandler(GCallback eventHandler, void* data);
+    void SetEventHandler(GCallback eventHandler);
 private:
     GtkWidget* m_handle;
     GtkWidget* m_parent;
     std::vector<Menu> m_menus;
     GCallback m_menuEventHandler;
-    void* m_eventData;
 };
+
+enum MENU { CONNECTIONSMENU = 0, TOOLSMENU, HELPMENU };

@@ -23,6 +23,7 @@ public:
     }
     LoginPage(GtkWidget* parentWindow, GtkWidget* fixed)
     {
+        this->m_ID = PAGE::LOGINPAGE;
         this->Initialize(parentWindow, fixed);
         this->AddLabel("<span font='22'>Welcome to</span>",     150, 100, 200, 50);
         this->AddLabel("<span font='16'>The Mirrors</span>",    150, 150, 200, 50);

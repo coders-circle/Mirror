@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
     UIManager uiManager;
     uiManager.Initialize(mainWindow, fixed);
-    uiManager.NavigateTo(UIManager::LOGINPAGE);
+    uiManager.NavigateTo(PAGE::LOGINPAGE);
 
     
     
