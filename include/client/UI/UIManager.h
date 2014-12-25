@@ -5,6 +5,7 @@
 
 #include "client/UI/pages/LoginPage.h"
 #include "client/UI/pages/SignupPage.h"
+#include "client/UI/pages/AboutPage.h"
 
 // UIManager: a custom class to handle pages and menu,
 // only one object of the class should be created,

@@ -16,7 +16,8 @@ void UIManager::MenuItemEventHandler(GtkWidget* widget, gpointer data)
         std::cout << "What do you prefer? :v";
         break;
     case MENU::HELPMENU:
-        std::cout << "About us? we are Mirrors!";
+        m_uiManager->NavigateTo(PAGE::ABOUTPAGE);
+        break;
     }
     std::cout << std::endl;
 }
@@ -38,6 +39,11 @@ void UIManager::Initialize(GtkWidget* parent, GtkWidget* fixed)
     m_fixed = fixed;
     m_menubar.Initialize(parent);
     m_menubar.SetEventHandler(G_CALLBACK(MenuItemEventHandler));
+
+    // Important!
+    // The order of creation for menu and page,
+    // should match the enum for MENU & PAGE respectively
+
     m_menubar.AddMenu("Connections");
     m_menubar.AddMenuItem(MENU::CONNECTIONSMENU, "Connect to a server");
     m_menubar.AddMenuItem(MENU::CONNECTIONSMENU, "Disconnect");
@@ -48,13 +54,16 @@ void UIManager::Initialize(GtkWidget* parent, GtkWidget* fixed)
     m_menubar.FixedPut(fixed);
     m_menubar.Show();
 
-    m_pages.resize(2);
+    m_pages.resize(3);
     m_pages[0] = new LoginPage(m_parent, m_fixed);
     LoginPage* loginPage = static_cast<LoginPage*>(m_pages[0]);
     loginPage->SetEventHandler(PageEventHandler);
     m_pages[1] = new SignupPage(m_parent, m_fixed);
     SignupPage* signupPage = static_cast<SignupPage*>(m_pages[1]);
     signupPage->SetEventHandler(PageEventHandler);
+    m_pages[2] = new AboutPage(m_parent, m_fixed);
+    AboutPage* aboutPage = static_cast<AboutPage*>(m_pages[2]);
+    aboutPage->SetEventHandler(PageEventHandler);
 }
 
 void UIManager::NavigateTo(int page)

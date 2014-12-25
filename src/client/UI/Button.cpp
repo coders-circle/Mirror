@@ -3,7 +3,7 @@
 Button::Button()
 {
     m_handle = gtk_button_new();
-    m_type = Control::BUTTON;
+    m_type = CONTROL::BUTTON;
 }
 
 void Button::Set(std::string label, GtkWidget* fixed, int x, int y, int w, int h)

@@ -41,7 +41,7 @@ public:
     // Adds a text label with specified text in the specified coordinate,
     // the text can contain certain markups,
     // returns a unique ID for the control in the page
-    int AddLabel(std::string text, int x, int y, int w, int h);
+    int AddLabel(std::string text, int x, int y, int w = 0, int h = 0, int justification = GTK_JUSTIFY_CENTER);
 
     // Adds a Edit Box in the specified coordinate,
     // returns a unique ID for the control in the page
@@ -55,7 +55,7 @@ public:
 
     // called when an event by controls within occurs 
     // to be implemented by derived class
-    virtual void OnControlEvent(int control_id);
+    virtual void OnControlEvent(Control*, int eventID);
 
     void Initialize(GtkWidget* parentWindow, GtkWidget* fixed);
 
@@ -75,7 +75,7 @@ public:
 protected:
     // Allocates memory for a specified new control to be added,
     // also sets a unique id to that control starting from 0
-    void AllocateNewControl(Control::ControlType type);
+    void AllocateNewControl(int type);
 
     // Array of controls present in the page
     std::vector<Control*> m_controls;
@@ -92,5 +92,5 @@ protected:
     
 };
 
-enum PAGE { LOGINPAGE = 0, SIGNUPPAGE, SETTINGSPAGE, ABOUTPAGE };
+enum PAGE { LOGINPAGE = 0, SIGNUPPAGE, ABOUTPAGE };
 

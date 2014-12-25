@@ -3,7 +3,7 @@
 Label::Label()
 {
     m_handle = gtk_label_new(NULL);
-    m_type = Control::LABEL;
+    m_type = CONTROL::LABEL;
 }
 
 void Label::Set(std::string label, GtkWidget* fixed, int x, int y, int w, int h)

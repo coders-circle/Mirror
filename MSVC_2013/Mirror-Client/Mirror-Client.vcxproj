@@ -80,6 +80,7 @@
     <ClInclude Include="..\..\include\client\UI\Label.h" />
     <ClInclude Include="..\..\include\client\UI\Menu.h" />
     <ClInclude Include="..\..\include\client\UI\Page.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\AboutPage.h" />
     <ClInclude Include="..\..\include\client\UI\pages\HomePage.h" />
     <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h" />
     <ClInclude Include="..\..\include\client\UI\pages\SignupPage.h" />

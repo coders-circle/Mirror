@@ -3,7 +3,7 @@
 TextEdit::TextEdit()
 {
     m_handle = gtk_entry_new();
-    m_type = Control::TEXTEDIT;
+    m_type = CONTROL::TEXTEDIT;
 }
 
 void TextEdit::Set( GtkWidget* fixed, int x, int y, int w, int h)

@@ -1,7 +1,7 @@
 #ifndef __BUTTON__
 #define __BUTTON__
 
-#include "Control.h"
+#include "client/UI/Control.h"
 
 class Button : public Control
 {

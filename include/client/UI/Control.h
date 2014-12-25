@@ -4,11 +4,13 @@
 #include <gtk/gtk.h>
 #include <string>
 
+enum CONTROL{ BUTTON, LABEL, TEXTEDIT, STATUSBAR};
+
 // base class for UI control elements
 class Control
 {
 public:
-    enum ControlType{ BUTTON, LABEL, TEXTEDIT };
+    
     Control() :m_handle(0){}
     void SetID(int id);
     int GetID();
@@ -22,7 +24,7 @@ protected:
     GtkWidget* m_handle;
     int m_x, m_y, m_w, m_h;
     std::string m_label;
-    ControlType m_type;
+    int m_type;
     int m_id;
 };
 

@@ -1,13 +1,13 @@
 #include "client/UI/Page.h"
 
-void Page::AllocateNewControl(Control::ControlType type)
+void Page::AllocateNewControl(int type)
 {
     m_controls.resize(m_controls.size() + 1);
     switch (type)
     {
-    case Control::BUTTON:   m_controls[m_controls.size() - 1] = new Button();   break;
-    case Control::LABEL:    m_controls[m_controls.size() - 1] = new Label();    break;
-    case Control::TEXTEDIT: m_controls[m_controls.size() - 1] = new TextEdit();   break;
+    case CONTROL::BUTTON:   m_controls[m_controls.size() - 1] = new Button();   break;
+    case CONTROL::LABEL:    m_controls[m_controls.size() - 1] = new Label();    break;
+    case CONTROL::TEXTEDIT: m_controls[m_controls.size() - 1] = new TextEdit();   break;
     }
     m_controls[m_controls.size() - 1]->SetID(m_controls.size() - 1);
 }
@@ -33,22 +33,25 @@ void Page::LoadFromFile(std::string fileName)
 
 int Page::AddButton(std::string label, int x, int y, int w, int h)
 {
-    this->AllocateNewControl(Control::BUTTON);
+    this->AllocateNewControl(CONTROL::BUTTON);
     //EventData ev(this, m_controls[m_controls.size() - 1], ControlEvent::BUTTON_CLICK);
     ((Button*)m_controls[m_controls.size() - 1])->Set(label, m_fixed, x, y, w, h);
     g_signal_connect(G_OBJECT(m_controls[m_controls.size() - 1]->GetHandle()), "clicked", 
         G_CALLBACK(ControlEventHandler), new ControlEventData(this, m_controls[m_controls.size() - 1], ControlEvent::BUTTON_CLICK));
     return m_controls[m_controls.size() - 1]->GetID();
 }
-int Page::AddLabel(std::string label, int x, int y, int w, int h)
+
+int Page::AddLabel(std::string label, int x, int y, int w, int h, int justification)
 {
-    this->AllocateNewControl(Control::LABEL);
+    this->AllocateNewControl(CONTROL::LABEL);
     ((Label*)m_controls[m_controls.size() - 1])->Set(label, m_fixed, x, y, w, h);
+    ((Label*)m_controls[m_controls.size() - 1])->SetJustify(justification);
     return m_controls[m_controls.size() - 1]->GetID();
 }
+
 int Page::AddTextEdit(int x, int y, int w, int h)
 {
-    this->AllocateNewControl(Control::TEXTEDIT);
+    this->AllocateNewControl(CONTROL::TEXTEDIT);
     ((TextEdit*)m_controls[m_controls.size() - 1])->Set(m_fixed, x, y, w, h);
     return m_controls[m_controls.size() - 1]->GetID();
 }
@@ -75,7 +78,7 @@ void Page::Initialize(GtkWidget* parentWindow, GtkWidget* fixed)
     m_fixed = fixed;
 }
 
-void Page::OnControlEvent(int control_id)
+void Page::OnControlEvent(Control*, int eventID)
 {
 }
 
@@ -84,7 +87,7 @@ void Page::ControlEventHandler(GtkWidget* widget, gpointer data)
     ControlEventData* eventData = static_cast<ControlEventData*> (data);
     Page* parentPage = eventData->page;
     Control* ctrl = eventData->control;
-    parentPage->OnControlEvent(ctrl->GetID());
+    parentPage->OnControlEvent(ctrl, eventData->event_id);
     (*(parentPage->m_pageEventHandler))(new ControlEventData(parentPage, ctrl, eventData->event_id));
 }
 
