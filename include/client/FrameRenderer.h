@@ -9,7 +9,7 @@ class FrameRenderer
 public:
     FrameRenderer() :m_parentWindow(0), m_drawingArea(0), m_rgbData(0), m_rgbImage(0){}
     void SetRGBData(unsigned char* rgbData);
-    void Initialize(GtkWidget* parentWindow, GtkWidget* fixed, int x, int y, int fw, int fh);
+    void Initialize(GtkWidget* parentWindow, int x, int y, int fw, int fh);
     static gboolean OnDraw(GtkWidget* widget, cairo_t* cr, gpointer frPointer);
 private:
     GtkWidget* m_parentWindow;
