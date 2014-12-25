@@ -11,7 +11,7 @@ uint16_t TcpAcceptor::Initialize(const tcp::endpoint &localEndpoint)
 {
     // Open and bind the tcp acceptor to the local endpoint
     m_acceptor.open(localEndpoint.protocol());
-    m_acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+    //m_acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
     m_acceptor.bind(localEndpoint);
     // Prepare to listen
     m_acceptor.listen();
