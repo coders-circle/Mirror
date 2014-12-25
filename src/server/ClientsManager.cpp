@@ -59,7 +59,7 @@ void ClientsManager::ProcessClients()
 
                     switch (m_requests.GetRequestType())
                     {
-                    // Request to join chat, since this is the sever, this is a request to join a group chat
+                    // Request to join chat, since this is the server, this is a request to join a group chat
                     case TcpRequest::JOIN_CHAT:
                         id = m_requests.GetGroupId();
                         // push the client id to the group
