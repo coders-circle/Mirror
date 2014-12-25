@@ -10,14 +10,16 @@ public:
     TcpClient(boost::asio::io_service &io);
     ~TcpClient();
 
+    // Start listening for incoming connections in a new thread
+    void StartAccepting();
     // Connect to a peer/server
     void Connect(const tcp::endpoint& peer, bool joinChat = false);
     // Connect to a peer/server asynchronously
     void ConnectAsync(const tcp::endpoint& peer, bool joinChat = false);
+    // Handle all requests that the client gets
+    void HandleRequests();
     // Connect to a peer through server
     void Connect(uint32_t clientId);
-    // Start handling all requests that the client gets
-    void HandleRequests();
 
     // Join chat
     void JoinChat(uint32_t connectionId, uint32_t groupId);
@@ -40,22 +42,17 @@ private:
     };
 
     boost::asio::io_service &m_io;
+    TcpAcceptor m_acceptor;
 
-    // List of the connections
     std::vector<Connection> m_connections;
-    // Mutex to lock 'm_connections' list as well as 'm_request' request-processor
-    boost::mutex m_mutex;
+    // Mutex to lock m_connections vector
+    boost::mutex m_connectionsMutex;
 
     TcpRequest m_request;
     std::string m_name;
 
-    // For P2P:
-    bool m_p2pConnected;
-    void HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint);
-    void HandleP2PRequestAsync(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint);
-    boost::shared_ptr<tcp::acceptor> m_acceptor;
-    void P2PListen(const tcp::endpoint &localEndpoint);
-    void P2PConnect(tcp::endpoint &remoteEndpoint);
+    void AcceptorHandler(boost::shared_ptr<tcp::socket> socket);
+
 
     // For console:
     int m_currentConnection;

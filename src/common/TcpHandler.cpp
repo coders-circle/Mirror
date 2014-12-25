@@ -25,8 +25,7 @@ void TcpHandler::Initialize(const tcp::endpoint &destEndpoint)
 {
     if (m_socket)
         throw TcpHandlerException("Socket alread created");
-	m_socket.reset(new tcp::socket(m_ioService, destEndpoint.protocol()));
-    m_socket->set_option(tcp::socket::reuse_address(true));
+	m_socket.reset(new tcp::socket(m_ioService));
     m_socket->connect(destEndpoint);
 }
 

@@ -15,7 +15,7 @@ public:
     enum REQUEST_TYPE{ 
         INAVLID_TYPE = 0, 
         JOIN_CHAT, CHAT_MESSAGE, 
-        P2P_TCP,
+        SEND_CLIENT_ADDR, RECEIVE_CLIENT_ADDR,
     };
 
     TcpRequest();
@@ -25,10 +25,12 @@ public:
     void JoinChat(TcpHandler &tcpHandler, uint32_t groupId = 0);
     // Request to wait for incoming chat message
     void ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, uint32_t groupId = 0);
-    // Request to establish a P2P TCP connection with a client
-    // Contains private and public addess-port pairs and client-id
-    void P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::string &privateIp, uint16_t privatePort, const std::string &publicIp = "", uint16_t publicPort = 0);
-
+    // Request to send a client address (ip and port)
+    // For server, provide a valid clientId
+    void SendClientAddr(TcpHandler &tcpHandler, uint32_t clientId);
+    // Request to receive a client address (ip and port) as response for a SEND_CLIENT_ADDR request
+    // For server, provide a valid clientId
+    void ReceiveClientAddr(TcpHandler &tcpHandler, uint32_t clientId, const std::string &ip, uint16_t port);
     // Receive a request 
     void ReceiveRequest(TcpHandler &tcpHandler);
 
@@ -37,10 +39,8 @@ public:
     uint32_t GetGroupId();
     uint32_t GetMessageSize();
     uint32_t GetClientId();
-    std::string GetPrivateIp();
-    uint16_t GetPrivatePort();
-    std::string GetPublicIp();
-    uint16_t GetPublicPort();
+    std::string GetIp();
+    uint16_t GetPort();
 private:
     // The Json Document that holds the request
     rapidjson::Document m_document;

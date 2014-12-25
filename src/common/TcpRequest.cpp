@@ -66,27 +66,19 @@ void TcpRequest::ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, uint3
     tcpHandler.Send(request, REQUEST_MAX_SIZE);
 }
 
-void TcpRequest::P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::string &privateIp, uint16_t privatePort, const std::string &publicIp, uint16_t publicPort)
+void TcpRequest::SendClientAddr(TcpHandler &tcpHandler, uint32_t clientId)
 {
     m_document = Document();    // New Document
     /*
     Example:
         {
             Request-Type: 3
-            Client-Id: 32
-            Private-IP: 1.2.3.4
-            Private-Port: 1234
-            Public-IP: 2.3.5.6
-            Public-Port: 2356
+            Client-Id: 5
         }
     */
     m_document.SetObject();
-    m_document.AddMember("Request-Type", Value((int)P2P_TCP), m_document.GetAllocator());
+    m_document.AddMember("Request-Type", Value((int)SEND_CLIENT_ADDR), m_document.GetAllocator());
     m_document.AddMember("Client-Id", Value(clientId), m_document.GetAllocator());
-    m_document.AddMember("Private-IP", Value(privateIp.c_str(), m_document.GetAllocator()), m_document.GetAllocator());
-    m_document.AddMember("Private-Port", Value((unsigned int)privatePort), m_document.GetAllocator());
-    m_document.AddMember("Public-IP", Value(publicIp.c_str(), m_document.GetAllocator()), m_document.GetAllocator());
-    m_document.AddMember("Public-Port", Value((unsigned int)publicPort), m_document.GetAllocator());
 
     // Send the "fixed-size" request
     char request[REQUEST_MAX_SIZE];
@@ -94,6 +86,29 @@ void TcpRequest::P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::st
     tcpHandler.Send(request, REQUEST_MAX_SIZE);
 }
 
+void TcpRequest::ReceiveClientAddr(TcpHandler &tcpHandler, uint32_t clientId, const std::string &ip, uint16_t port)
+{
+    m_document = Document();    // New Document
+    /*
+    Example:
+        {
+            Request-Type: 4
+            Client-Id: 5
+            IP: 23.123.2.3
+            Port: 23456
+        }
+    */
+    m_document.SetObject();
+    m_document.AddMember("Request-Type", Value((int)RECEIVE_CLIENT_ADDR), m_document.GetAllocator());
+    m_document.AddMember("Client-Id", Value(clientId), m_document.GetAllocator());
+    m_document.AddMember("IP", Value(ip.c_str(), m_document.GetAllocator()), m_document.GetAllocator());
+    m_document.AddMember("Port", Value((unsigned int)port), m_document.GetAllocator());
+
+    // Send the "fixed-size" request
+    char request[REQUEST_MAX_SIZE];
+    strcpy(request, GetJsonString().c_str());
+    tcpHandler.Send(request, REQUEST_MAX_SIZE);
+}
 
 void TcpRequest::ReceiveRequest(TcpHandler &tcpHandler)
 {
@@ -134,27 +149,17 @@ uint32_t TcpRequest::GetMessageSize()
     return GetValue("Message-Size").GetUint();;
 }
 
+uint16_t TcpRequest::GetPort()
+{
+    return GetValue("Port").GetUint();
+}
+
 uint32_t TcpRequest::GetClientId()
 {
     return GetValue("Client-Id").GetUint();
 }
 
-std::string TcpRequest::GetPrivateIp()
+std::string TcpRequest::GetIp()
 {
-    return GetValue("Private-IP").GetString();
-}
-
-uint16_t TcpRequest::GetPrivatePort()
-{
-    return GetValue("Private-Port").GetUint();
-}
-
-std::string TcpRequest::GetPublicIp()
-{
-    return GetValue("Public-IP").GetString();
-}
-
-uint16_t TcpRequest::GetPublicPort()
-{
-    return GetValue("Public-Port").GetUint();
+    return GetValue("IP").GetString();
 }

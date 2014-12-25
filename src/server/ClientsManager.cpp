@@ -72,20 +72,16 @@ void ClientsManager::ProcessClients()
                         // receive the chat message
                         ReceiveChat(i, id);
                         break;
-                    
-                    // Request for a p2p tcp connection to another client
-                    case TcpRequest::P2P_TCP:
+                    // Request to send a client address
+                    case TcpRequest::SEND_CLIENT_ADDR:
                         id = m_requests.GetClientId();
                         if (id <= m_clients.size())
                         {
-                            // Send request to second client
-                            m_requests.P2PTcp(m_clients[id].connection, i, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
-                                m_clients[i].connection.GetIp(), m_clients[i].connection.GetPort());
-                            // Receive the return request
+                            // Request the client for the address
+                            m_requests.SendClientAddr(m_clients[id].connection, id);
                             m_requests.ReceiveRequest(m_clients[id].connection);
-                            // Send back the return request to first client
-                            m_requests.P2PTcp(m_clients[i].connection, id, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
-                                m_clients[id].connection.GetIp(), m_clients[id].connection.GetPort());
+                            // Send back a request filled with required info
+                            m_requests.ReceiveClientAddr(m_clients[i].connection, id, m_clients[id].connection.GetIp(), m_requests.GetPort());
                         }
                         break;
 
