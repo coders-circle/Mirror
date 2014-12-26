@@ -35,13 +35,12 @@ void TcpClient::ConnectAsync(const tcp::endpoint& peer, bool joinChat)
 // Use server to connect to a client (for P2P)
 void TcpClient::Connect(uint32_t clientId)
 {
-    m_p2pConnected = false;
     // make sure no requests are being processed during this time
     boost::lock_guard<boost::mutex> guard(m_mutex);
 
     // First send a P2P tcp connection request to server and receive back the returning request
     TcpHandler& handler = m_connections[0].tcpHandler;
-    m_request.P2PTcp(handler, clientId, handler.GetSocket()->local_endpoint().address().to_string(), handler.GetSocket()->local_endpoint().port());
+    m_request.P2PTcp(handler, clientId, handler.GetIp(), handler.GetPort());
     m_request.ReceiveRequest(handler);
 
     HandleP2PRequest(m_request.GetClientId(), 
@@ -55,8 +54,7 @@ void TcpClient::HandleP2PRequest(uint32_t clientId, const tcp::endpoint &private
     // Start listening at same local endpoint as which is connected to the server
     boost::thread t1(boost::bind(&TcpClient::P2PListen, this, _1), handler.GetSocket()->local_endpoint());
     // Try connecting to both private and public endpoints of other peer
-    if (privateEndpoint!=publicEndpoint)
-        boost::thread t2(boost::bind(&TcpClient::P2PConnect, this, _1), privateEndpoint);
+    boost::thread t2(boost::bind(&TcpClient::P2PConnect, this, _1), privateEndpoint);
     boost::thread t3(boost::bind(&TcpClient::P2PConnect, this, _1), publicEndpoint);
 
     while (!m_p2pConnected);
@@ -68,15 +66,8 @@ void TcpClient::HandleP2PRequestAsync(uint32_t clientId, const tcp::endpoint &pr
 {
     boost::thread t([this, clientId, privateEndpoint, publicEndpoint]()
     {
-        try
-        {
-            boost::lock_guard<boost::mutex> guard(m_mutex);
-            HandleP2PRequest(clientId, privateEndpoint, publicEndpoint);
-        }
-        catch (std::exception &ex)
-        {
-            std::cout << ex.what() << std::endl;
-        }
+        boost::lock_guard<boost::mutex> guard(m_mutex);
+        HandleP2PRequest(clientId, privateEndpoint, publicEndpoint);
     });
 }
 
@@ -89,8 +80,7 @@ void TcpClient::P2PListen(const tcp::endpoint &localEndpoint)
         boost::shared_ptr<tcp::socket> socket(new tcp::socket(m_acceptor->get_io_service()));
         // Wait for a connection and accept at the socket
         m_acceptor->accept(*socket);
-        if (m_p2pConnected) return;   
-
+        
         /*
         TODO: Need to verify if this is the required peer
         */
@@ -98,10 +88,12 @@ void TcpClient::P2PListen(const tcp::endpoint &localEndpoint)
         c.tcpHandler.Initialize(socket);
         m_connections.push_back(c);
         m_p2pConnected = true;
+
+        m_acceptor.reset();
     }
     catch (std::exception &ex)
     {
-        std::cout << ex.what() << std::endl;
+        //std::cout << ex.what() << std::endl;
     }
 }
 ;
@@ -114,15 +106,13 @@ void TcpClient::P2PConnect(tcp::endpoint &remoteEndpoint)
             // Try connecting at the given remote endpoint
             Connection c(m_io);
             c.tcpHandler.Initialize(remoteEndpoint);
-            if (m_p2pConnected) return;
-
             m_connections.push_back(c);
             m_p2pConnected = true;
             JoinChat(m_connections.size() - 1, 0);
         }
         catch (std::exception &ex)
         {
-            std::cout << ex.what() << std::endl;
+            //std::cout << ex.what() << std::endl;
         }
     }
 }
@@ -165,13 +155,11 @@ void TcpClient::HandleRequests()
                     // Request for a p2p tcp connection
                     case TcpRequest::P2P_TCP:
                         id = m_request.GetClientId();
-                        m_p2pConnected = false;
                         HandleP2PRequestAsync(id,
                             tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPrivateIp()), m_request.GetPrivatePort()),
                             tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPublicIp()), m_request.GetPublicPort()));
                         m_request.P2PTcp(m_connections[0].tcpHandler, id,
-                            m_connections[0].tcpHandler.GetSocket()->local_endpoint().address().to_string(), m_connections[0].tcpHandler.GetSocket()->local_endpoint().port()
-                        );
+                            m_connections[0].tcpHandler.GetIp(), m_connections[0].tcpHandler.GetPort());
                         break;
                     default:
                         std::cout << "Invalid Request " << m_request.GetRequestType() << std::endl;

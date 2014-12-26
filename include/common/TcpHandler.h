@@ -17,7 +17,7 @@ class TcpHandler
 
 		// Initialize with an already created socket
 		void Initialize(boost::shared_ptr<tcp::socket> socket);
-		// Connect to given endpoint and initialize by creating new socket
+		// Connect to given endpoint and initialize by creating new socker
 		void Initialize(const tcp::endpoint &destEndpoint);
 
         // Send data of given size

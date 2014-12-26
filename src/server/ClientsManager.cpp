@@ -59,7 +59,7 @@ void ClientsManager::ProcessClients()
 
                     switch (m_requests.GetRequestType())
                     {
-                    // Request to join chat, since this is the server, this is a request to join a group chat
+                    // Request to join chat, since this is the sever, this is a request to join a group chat
                     case TcpRequest::JOIN_CHAT:
                         id = m_requests.GetGroupId();
                         // push the client id to the group
@@ -72,16 +72,20 @@ void ClientsManager::ProcessClients()
                         // receive the chat message
                         ReceiveChat(i, id);
                         break;
-                    // Request to send a client address
-                    case TcpRequest::SEND_CLIENT_ADDR:
+                    
+                    // Request for a p2p tcp connection to another client
+                    case TcpRequest::P2P_TCP:
                         id = m_requests.GetClientId();
                         if (id <= m_clients.size())
                         {
-                            // Request the client for the address
-                            m_requests.SendClientAddr(m_clients[id].connection, id);
+                            // Send request to second client
+                            m_requests.P2PTcp(m_clients[id].connection, i, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
+                                m_clients[i].connection.GetIp(), m_clients[i].connection.GetPort());
+                            // Receive the return request
                             m_requests.ReceiveRequest(m_clients[id].connection);
-                            // Send back a request filled with required info
-                            m_requests.ReceiveClientAddr(m_clients[i].connection, id, m_clients[id].connection.GetIp(), m_requests.GetPort());
+                            // Send back the return request to first client
+                            m_requests.P2PTcp(m_clients[i].connection, id, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
+                                m_clients[id].connection.GetIp(), m_clients[id].connection.GetPort());
                         }
                         break;
 

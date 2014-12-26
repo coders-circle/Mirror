@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     {
         boost::asio::io_service io;
         TcpClient client(io);
-        client.StartAccepting();
+        //client.StartAccepting();
 
         // Connect to another peer
         /*{
