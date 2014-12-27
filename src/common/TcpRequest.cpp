@@ -24,29 +24,37 @@ std::string TcpRequest::GetJsonString()
     return buffer.GetString();
 }
 
-void TcpRequest::JoinChat(TcpHandler &tcpHandler, uint32_t groupId)
+void TcpRequest::New()
 {
-    m_document = Document();    // New Document
-    /*
-    Example:
-        {
-            Request-Type: 1
-            Group-Id: 20
-        }
-    */
-    m_document.SetObject();     
-    m_document.AddMember("Request-Type", Value((int)JOIN_CHAT), m_document.GetAllocator());
-    m_document.AddMember("Group-Id", Value(groupId), m_document.GetAllocator());
-    
+    m_document = Document();
+    m_document.SetObject();
+}
+
+void TcpRequest::Send(TcpHandler& tcpHandler)
+{
     // Send the "fixed-size" request
     char request[REQUEST_MAX_SIZE];
     strcpy(request, GetJsonString().c_str());
     tcpHandler.Send(request, REQUEST_MAX_SIZE);
 }
 
+void TcpRequest::JoinChat(TcpHandler &tcpHandler, uint32_t groupId)
+{
+    /*
+    Example:
+        {
+            Request-Type: 1
+            Group-Id: 20
+        }
+    */  
+    New();
+    m_document.AddMember("Request-Type", Value((int)JOIN_CHAT), m_document.GetAllocator());
+    m_document.AddMember("Group-Id", Value(groupId), m_document.GetAllocator());
+    Send(tcpHandler);
+}
+
 void TcpRequest::ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, uint32_t groupId)
 {
-    m_document = Document();    // New Document
     /*
     Example:
         {
@@ -55,20 +63,15 @@ void TcpRequest::ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, uint3
             Message-Size: 50
         }
     */
-    m_document.SetObject();
+    New();
     m_document.AddMember("Request-Type", Value((int)CHAT_MESSAGE), m_document.GetAllocator());
     m_document.AddMember("Group-Id", Value(groupId), m_document.GetAllocator());
     m_document.AddMember("Message-Size", Value(messageSize), m_document.GetAllocator());
-
-    // Send the "fixed-size" request
-    char request[REQUEST_MAX_SIZE];
-    strcpy(request, GetJsonString().c_str());
-    tcpHandler.Send(request, REQUEST_MAX_SIZE);
+    Send(tcpHandler);;
 }
 
 void TcpRequest::P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::string &privateIp, uint16_t privatePort, const std::string &publicIp, uint16_t publicPort)
 {
-    m_document = Document();    // New Document
     /*
     Example:
         {
@@ -80,20 +83,28 @@ void TcpRequest::P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::st
             Public-Port: 2356
         }
     */
-    m_document.SetObject();
+    New();
     m_document.AddMember("Request-Type", Value((int)P2P_TCP), m_document.GetAllocator());
     m_document.AddMember("Client-Id", Value(clientId), m_document.GetAllocator());
     m_document.AddMember("Private-IP", Value(privateIp.c_str(), m_document.GetAllocator()), m_document.GetAllocator());
     m_document.AddMember("Private-Port", Value((unsigned int)privatePort), m_document.GetAllocator());
     m_document.AddMember("Public-IP", Value(publicIp.c_str(), m_document.GetAllocator()), m_document.GetAllocator());
     m_document.AddMember("Public-Port", Value((unsigned int)publicPort), m_document.GetAllocator());
-
-    // Send the "fixed-size" request
-    char request[REQUEST_MAX_SIZE];
-    strcpy(request, GetJsonString().c_str());
-    tcpHandler.Send(request, REQUEST_MAX_SIZE);
+    Send(tcpHandler);
 }
 
+void TcpRequest::Invalid(TcpHandler& tcpHandler)
+{
+    /*
+    Example:
+        {
+            Request-Type: 0
+        }
+    */
+    New();
+    m_document.AddMember("Request-Type", Value((int)INAVLID_TYPE), m_document.GetAllocator());
+    Send(tcpHandler);
+}
 
 void TcpRequest::ReceiveRequest(TcpHandler &tcpHandler)
 {

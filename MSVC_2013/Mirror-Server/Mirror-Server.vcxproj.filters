@@ -36,10 +36,10 @@
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpAcceptor.cpp">
+    <ClCompile Include="..\..\src\common\TcpRequest.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpRequest.cpp">
+    <ClCompile Include="..\..\src\common\TcpAcceptor.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,10 +62,10 @@
     <ClInclude Include="..\..\include\common\TcpHandler.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpAcceptor.h">
+    <ClInclude Include="..\..\include\common\TcpRequest.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpRequest.h">
+    <ClInclude Include="..\..\include\common\TcpAcceptor.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
   </ItemGroup>

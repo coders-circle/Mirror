@@ -59,7 +59,7 @@ void ClientsManager::ProcessClients()
 
                     switch (m_requests.GetRequestType())
                     {
-                    // Request to join chat, since this is the sever, this is a request to join a group chat
+                    // Request to join chat, since this is the server, this is a request to join a group chat
                     case TcpRequest::JOIN_CHAT:
                         id = m_requests.GetGroupId();
                         // push the client id to the group
@@ -76,7 +76,7 @@ void ClientsManager::ProcessClients()
                     // Request for a p2p tcp connection to another client
                     case TcpRequest::P2P_TCP:
                         id = m_requests.GetClientId();
-                        if (id <= m_clients.size())
+                        if (id < m_clients.size() && id != i)
                         {
                             // Send request to second client
                             m_requests.P2PTcp(m_clients[id].connection, i, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
@@ -86,6 +86,11 @@ void ClientsManager::ProcessClients()
                             // Send back the return request to first client
                             m_requests.P2PTcp(m_clients[i].connection, id, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
                                 m_clients[id].connection.GetIp(), m_clients[id].connection.GetPort());
+                        }
+                        else
+                        {
+                            // Send an invalid request
+                            m_requests.Invalid(m_clients[i].connection);
                         }
                         break;
 

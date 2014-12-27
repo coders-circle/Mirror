@@ -28,6 +28,8 @@ public:
     // Request to establish a P2P TCP connection with a client
     // Contains private and public addess-port pairs and client-id
     void P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::string &privateIp, uint16_t privatePort, const std::string &publicIp = "", uint16_t publicPort = 0);
+    // Send an invalid request
+    void Invalid(TcpHandler& tcpHandler);
 
     // Receive a request 
     void ReceiveRequest(TcpHandler &tcpHandler);
@@ -48,4 +50,8 @@ private:
     std::string GetJsonString();
     // Helper function get a json value from a request
     inline rapidjson::Value& GetValue(const std::string &key);
+    // Helper function to initialize new request
+    inline void New();
+    // Helper function to send the request
+    inline void Send(TcpHandler& tcpHandler);
 };

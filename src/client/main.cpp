@@ -1,15 +1,14 @@
 /* Client - main.cpp */
 
 #include <common/common.h>
-#include <client/TcpClient.h>
+#include <client/Client.h>
 
 
 int main(int argc, char *argv[])
 {
     try
     {
-        boost::asio::io_service io;
-        TcpClient client(io);
+        Client client;
         //client.StartAccepting();
 
         // Connect to another peer
@@ -49,7 +48,12 @@ int main(int argc, char *argv[])
             {
                 uint32_t cid;
                 std::cout << "Enter client-id of peer: "; std::cin >> cid;
-                client.Connect(cid);
+                bool successfull;
+                uint32_t id = client.Connect(cid, &successfull);
+                if (successfull)
+                    client.JoinChat(id);
+                else
+                    std::cout << "Invalid peer; couldn't connect" << std::endl;
             }
             client.StartChatInput(groupId);
             client.HandleRequests();

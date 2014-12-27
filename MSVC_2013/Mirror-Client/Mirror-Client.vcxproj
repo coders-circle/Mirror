@@ -73,23 +73,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\client\TcpClient.h" />
+    <ClInclude Include="..\..\include\client\Client.h" />
     <ClInclude Include="..\..\include\common\ChatMessage.h" />
     <ClInclude Include="..\..\include\common\common.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
+    <ClInclude Include="..\..\include\common\TcpAcceptor.h" />
     <ClInclude Include="..\..\include\common\TcpRequest.h" />
     <ClInclude Include="..\..\include\common\RtpHandler.h" />
     <ClInclude Include="..\..\include\common\TcpHandler.h" />
-    <ClInclude Include="..\..\include\common\TcpAcceptor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\main.cpp" />
-    <ClCompile Include="..\..\src\client\TcpClient.cpp" />
+    <ClCompile Include="..\..\src\client\Client.cpp" />
     <ClCompile Include="..\..\src\common\ChatMessage.cpp" />
+    <ClCompile Include="..\..\src\common\TcpAcceptor.cpp" />
     <ClCompile Include="..\..\src\common\TcpRequest.cpp" />
     <ClCompile Include="..\..\src\common\RtpHandler.cpp" />
     <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
-    <ClCompile Include="..\..\src\common\TcpAcceptor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
