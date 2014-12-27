@@ -39,7 +39,7 @@ void AudioStream::SetRecordStreamParameters(int numChannels, portaudio::SampleDa
 	m_paramsRecord = paramsRecord;
 }
 
-/* now create playback stream
+/* now create record stream
 	m_streamRecord must be a singleton object
 	in the entire progra.
 	so create it only once.
