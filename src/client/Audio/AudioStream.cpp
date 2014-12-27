@@ -41,7 +41,7 @@ void AudioStream::SetRecordStreamParameters(int numChannels, portaudio::SampleDa
 
 /* now create record stream
 	m_streamRecord must be a singleton object
-	in the entire progra.
+	in the entire program.
 	so create it only once.
 
 	m_streamRecord is the pointer to the member function callback for record
