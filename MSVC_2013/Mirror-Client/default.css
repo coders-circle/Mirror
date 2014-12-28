@@ -1,0 +1,24 @@
+/* The following are all equivalent ways to use the color blue as the background color, each overrides the last so the end result is the same, a blue background. */
+
+.entry{
+	font: Segoe UI;
+}
+
+GtkToolbar{
+	background:transparent;
+}
+
+GtkWindow {
+background: -gtk-gradient (linear,
+               0 0, 0 1,
+               color-stop(0, #f8f8f8),
+               color-stop(0.2, #eee),
+               color-stop(1, #aaa));
+}
+
+GtkLabel{
+font: Segoe UI;
+padding-bottom:6px;
+padding-top:2px;
+
+}

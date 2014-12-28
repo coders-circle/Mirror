@@ -66,7 +66,8 @@ GtkWidget* Menu::GetMenu()
 
 void MenuBar::FixedPut(GtkWidget* fixed)
 {
-    gtk_fixed_put(GTK_FIXED(fixed), m_handle, 0, 0);
+    //gtk_fixed_put(GTK_FIXED(fixed), m_handle, 0, 0);
+    gtk_container_add(GTK_CONTAINER(fixed), m_handle);
 }
 
 void MenuBar::Initialize(GtkWidget* parent)

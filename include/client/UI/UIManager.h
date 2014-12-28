@@ -6,6 +6,11 @@
 #include "client/UI/pages/LoginPage.h"
 #include "client/UI/pages/SignupPage.h"
 #include "client/UI/pages/AboutPage.h"
+#include "client/UI/pages/SVConnectPage.h"
+
+#include "client/UI/Toolbar.h"
+
+#include <stack>
 
 // UIManager: a custom class to handle pages and menu,
 // only one object of the class should be created,
@@ -31,13 +36,18 @@ public:
     // data is a pointer of MenuBar::MenuEventData type
     static void MenuItemEventHandler(GtkWidget* widget, gpointer data);
 
+    static void ToolItemEventHandler(GtkWidget* widget, gpointer data);
 
     static void PageEventHandler(ControlEventData* eventData);
+
+    void NavigateBack();
 private:
     GtkWidget* m_parent;
     GtkWidget* m_fixed;
     std::vector<Page*> m_pages;
     MenuBar m_menubar;
+    Toolbar m_toolbar;
     Page* m_currentPage;
     static UIManager* m_uiManager;
+    std::stack<Page*> m_pageHistory;
 };

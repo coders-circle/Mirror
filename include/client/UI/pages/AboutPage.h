@@ -23,7 +23,7 @@ public:
         this->AddLabel("<span font='13'><b>Mirrors</b>\n"
             "Copyright (c) 2015 Authors. All rights reserved (Just Kidding).\n"
             "This software is released under the <a href='http://www.gnu.org/copyleft/gpl.html#content'>GNU General Public License</a>.\n\n"
-            "Mirrors is made possible by the <a href='http://www.boost.org'>Boost</a> and other open source libraries</span>",
+            "Mirrors is made possible by the <a href='http://www.boost.org'>Boost</a>, GTK+ and other open source libraries</span>",
             sx, sy + 250);
 
     }

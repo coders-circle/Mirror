@@ -38,6 +38,8 @@
 //
 
 
+
+
 int main(int argc, char *argv[])
 {
     GtkWidget *mainWindow;
@@ -78,7 +80,7 @@ int main(int argc, char *argv[])
     //////////////////////////////////////////////////////////////////////////////
 
     
-
+    
 
     GtkWidget* fixed = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(mainWindow), fixed);
@@ -105,9 +107,9 @@ int main(int argc, char *argv[])
 #pragma comment(lib, "cairo.lib")
 #pragma comment(lib, "glib-2.0.lib")
 #pragma comment(lib, "gdk-win32-3.0.lib")
-#pragma comment(lib, "opencv_highgui245d.lib")
-#pragma comment(lib, "opencv_core245d.lib")
-#pragma comment(lib, "opencv_imgproc245d.lib")
+#pragma comment(lib, "opencv_highgui245.lib")
+#pragma comment(lib, "opencv_core245.lib")
+#pragma comment(lib, "opencv_imgproc245.lib")
 
 #endif
 

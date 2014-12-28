@@ -84,9 +84,6 @@
     <ClInclude Include="..\..\include\client\UI\Menu.h">
       <Filter>include\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\StatusBar.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\UI\UIManager.h">
       <Filter>include\UI</Filter>
     </ClInclude>
@@ -100,6 +97,15 @@
       <Filter>include\UI\pages</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\client\UI\pages\AboutPage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Statusbar.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Toolbar.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\SVConnectPage.h">
       <Filter>include\UI\pages</Filter>
     </ClInclude>
   </ItemGroup>
