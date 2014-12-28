@@ -1,0 +1,12 @@
+INC_DIR = include
+SRC_DIR = src
+
+CC = g++
+CFLAG = `pkg-config --cflags gtk+-3.0`
+LDFLAGS = -lrt -lasound -ljack
+PALDFLAGS = -lportaudio -lportaudiocpp
+
+SOURCES = AudioBuffer.cpp AudioStream.cpp
+
+audio:
+	 $(CC) $(LDFLAGS) -o audiotest -I./include $(SRC_DIR)/client/Audio/*.cpp $(PALDFLAGS)
