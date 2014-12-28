@@ -74,7 +74,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\client\FrameRenderer.h" />
-    <ClInclude Include="..\..\include\client\TcpClient.h" />
     <ClInclude Include="..\..\include\client\UI\Button.h" />
     <ClInclude Include="..\..\include\client\UI\Control.h" />
     <ClInclude Include="..\..\include\client\UI\Label.h" />
@@ -92,13 +91,6 @@
     <ClInclude Include="..\..\include\client\VideoCapture.h" />
     <ClInclude Include="..\..\include\common\common.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
-    <ClInclude Include="..\..\include\common\RTPCommon.h" />
-    <ClInclude Include="..\..\include\common\RtpReceiver.h" />
-    <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
-    <ClInclude Include="..\..\include\common\TcpHandler.h" />
-    <ClInclude Include="..\..\include\common\TcpListener.h" />
-    <ClInclude Include="..\..\include\common\TcpReceiver.h" />
-    <ClInclude Include="..\..\include\common\TcpTransmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />

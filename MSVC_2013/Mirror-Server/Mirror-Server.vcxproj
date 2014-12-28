@@ -72,20 +72,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\common\common.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
-    <ClInclude Include="..\..\include\common\RTPCommon.h" />
-    <ClInclude Include="..\..\include\common\RtpReceiver.h" />
-    <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
-    <ClInclude Include="..\..\include\common\TcpHandler.h" />
-    <ClInclude Include="..\..\include\common\TcpReceiver.h" />
-    <ClInclude Include="..\..\include\common\TcpTransmitter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\client\TcpClient.cpp" />
-    <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
-    <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
-    <ClCompile Include="..\..\src\common\TcpListener.cpp" />
-    <ClCompile Include="..\..\src\common\TcpReceiver.cpp" />
-    <ClCompile Include="..\..\src\common\TcpTransmitter.cpp" />
     <ClCompile Include="..\..\src\server\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
