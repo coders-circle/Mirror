@@ -1,4 +1,5 @@
 #pragma once
+#include "UdpHandler.h"
 
 class RtpTransmissionException : public Exception
 {
@@ -22,7 +23,7 @@ public:
     RtpHandler();
     ~RtpHandler();
 
-    void Initialize(boost::shared_ptr<udp::socket> socket, const udp::endpoint &remoteEndpoint);
+    void Initialize(boost::shared_ptr<UdpHandler> udpHandler, const udp::endpoint &remoteEndpoint);
     void CleanUp();
 
     int GetTimeStamp() const { return m_timeStamp; }
@@ -42,7 +43,7 @@ public:
     void Send(const char *data, size_t size);
     void Receive(char* data, size_t maxSize = 1500);
 private:
-    boost::shared_ptr<udp::socket> m_socket;
+    boost::shared_ptr<UdpHandler> m_udpHandler;
     udp::endpoint m_remoteEndpoint;
 
     uint16_t m_sequenceNumber;

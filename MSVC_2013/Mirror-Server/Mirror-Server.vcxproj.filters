@@ -42,6 +42,9 @@
     <ClCompile Include="..\..\src\common\TcpAcceptor.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\UdpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Server\ClientsManager.h">
@@ -66,6 +69,9 @@
       <Filter>include\common\Network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\common\TcpAcceptor.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\UdpHandler.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
   </ItemGroup>

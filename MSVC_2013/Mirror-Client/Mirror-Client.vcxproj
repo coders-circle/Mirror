@@ -81,6 +81,7 @@
     <ClInclude Include="..\..\include\common\TcpRequest.h" />
     <ClInclude Include="..\..\include\common\RtpHandler.h" />
     <ClInclude Include="..\..\include\common\TcpHandler.h" />
+    <ClInclude Include="..\..\include\common\UdpHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\main.cpp" />
@@ -90,6 +91,7 @@
     <ClCompile Include="..\..\src\common\TcpRequest.cpp" />
     <ClCompile Include="..\..\src\common\RtpHandler.cpp" />
     <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
+    <ClCompile Include="..\..\src\common\UdpHandler.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

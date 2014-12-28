@@ -80,12 +80,12 @@ void ClientsManager::ProcessClients()
                         {
                             // Send request to second client
                             m_requests.P2PTcp(m_clients[id].connection, i, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
-                                m_clients[i].connection.GetIp(), m_clients[i].connection.GetPort());
+                                m_clients[i].connection.GetRemoteIp(), m_clients[i].connection.GetRemotePort());
                             // Receive the return request
                             m_requests.ReceiveRequest(m_clients[id].connection);
                             // Send back the return request to first client
                             m_requests.P2PTcp(m_clients[i].connection, id, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
-                                m_clients[id].connection.GetIp(), m_clients[id].connection.GetPort());
+                                m_clients[id].connection.GetRemoteIp(), m_clients[id].connection.GetRemotePort());
                         }
                         else
                         {

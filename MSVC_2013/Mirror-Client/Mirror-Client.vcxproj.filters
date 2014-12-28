@@ -45,6 +45,9 @@
     <ClInclude Include="..\..\include\client\Client.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\common\UdpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\main.cpp">
@@ -67,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\client\Client.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\UdpHandler.cpp">
+      <Filter>src\common\Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
