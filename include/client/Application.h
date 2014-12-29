@@ -1,7 +1,7 @@
 #pragma once
 
 #include "client/UI/UIManager.h"
-//#include "client/Client.h"
+#include "client/Client.h"
 
 #include "client/UI/pages/LoginPage.h"
 #include "client/UI/pages/SignupPage.h"
@@ -43,17 +43,28 @@ public:
         case EVENT::BUTTONCLICK:
             if (eventData->controlID == app->svConnectPage->connectButton)
             {
-                //app->client.SetName(app->svConnectPage->GetName());
-                //app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
-                //app->client.JoinChat(0, 1);
+                app->client.SetName(app->svConnectPage->GetName());
+                app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
+                app->client.JoinChat(0);
                 app->uiManager.NavigateTo(PAGE::HOMEPAGE);
-                //app->client.Connect()
+                app->client.SetMessageEventHandler(ClientMessageEventHandler);
+                app->client.HandleRequests();
+            }
+            else if (eventData->controlID == app->homePage->sendBttn)
+            {
+                app->client.SendMessageA(0, app->homePage->GetMsg());
             }
             break;
         default:
             break;
         }
         std::cout << "Some shit just happened";
+    }
+    static void ClientMessageEventHandler(MessageEventData& eventData)
+    {
+        char temp[128];
+        sprintf(temp, "%d: %s", eventData.senderId, eventData.message.c_str());
+        app->homePage->msgHistory->AppendToNewLine(std::string(temp));
     }
     void Initialize(GtkWidget* parent, GtkWidget* fixed)
     {
@@ -99,7 +110,7 @@ private:
     HomePage* homePage;
     static Application* app;
     UIManager uiManager;
-    //Client client;
+    Client client;
 };
 
 Application* Application::app = 0;
