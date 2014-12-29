@@ -3,10 +3,6 @@
 #include "client/UI/Page.h"
 #include "client/UI/Menu.h"
 
-#include "client/UI/pages/LoginPage.h"
-#include "client/UI/pages/SignupPage.h"
-#include "client/UI/pages/AboutPage.h"
-#include "client/UI/pages/SVConnectPage.h"
 
 #include "client/UI/Toolbar.h"
 

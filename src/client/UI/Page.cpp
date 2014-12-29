@@ -55,6 +55,13 @@ Control* Page::AddLabel(std::string label, int x, int y, int w, int h, int justi
     return m_controls[m_controls.size() - 1];
 }
 
+Control* Page::AddLabel(int id, int x, int y)
+{
+    this->AllocateNewControl(CONTROL::LABEL, id);
+    ((Label*)m_controls[m_controls.size() - 1])->Set(id, m_fixed, x, y);
+    return m_controls[m_controls.size() - 1];
+}
+
 Control* Page::AddTextEdit(int id, int x, int y, int w, int h)
 {
     this->AllocateNewControl(CONTROL::TEXTEDIT, id);

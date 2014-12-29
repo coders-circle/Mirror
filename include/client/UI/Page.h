@@ -44,6 +44,7 @@ public:
     // the text can contain certain markups,
     // returns a unique ID for the control in the page
     Control* AddLabel(std::string text, int x, int y, int w = 0, int h = 0, int justification = GTK_JUSTIFY_CENTER);
+    Control* AddLabel(int id, int x, int y);
 
     // Adds a Edit Box in the specified coordinate,
     // returns a unique ID for the control in the page
@@ -92,5 +93,5 @@ protected:
     
 };
 
-enum PAGE { LOGINPAGE = 0, SIGNUPPAGE, ABOUTPAGE, SVCONNECTPAGE};
+enum PAGE { LOGINPAGE = 0, SIGNUPPAGE, ABOUTPAGE, SVCONNECTPAGE, HOMEPAGE};
 

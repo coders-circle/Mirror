@@ -10,5 +10,9 @@ public:
     void Set(GtkWidget* fixed, int x, int y, int w, int h);
     void SetPasswordMode(bool isPassword = true);
     const gchar* GetText();
+    void Clear()
+    {
+        gtk_entry_set_text(GTK_ENTRY(m_handle), "");
+    }
 private:
 };

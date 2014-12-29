@@ -1,5 +1,4 @@
-#ifndef __EXCEPTION__
-#define __EXCEPTION__
+#pragma once
 
 #include <iostream>
 
@@ -10,4 +9,3 @@ public:
         : std::runtime_error(errorString)
     {}
 };
-#endif

@@ -1,6 +1,13 @@
 #pragma once
 
 #include "client/UI/UIManager.h"
+//#include "client/Client.h"
+
+#include "client/UI/pages/LoginPage.h"
+#include "client/UI/pages/SignupPage.h"
+#include "client/UI/pages/AboutPage.h"
+#include "client/UI/pages/SVConnectPage.h"
+#include "client/UI/pages/HomePage.h"
 
 // A specific class to handle overall operations
 
@@ -18,10 +25,7 @@ public:
         }
         app = this;
     }
-    static void EventHandler()
-    {
-
-    }
+ 
     static void UIEventHandler(UIEventData* eventData)
     {
         switch (eventData->event)
@@ -34,6 +38,16 @@ public:
                 break;
             default:
                 break;
+            }
+            break;
+        case EVENT::BUTTONCLICK:
+            if (eventData->controlID == app->svConnectPage->connectButton)
+            {
+                //app->client.SetName(app->svConnectPage->GetName());
+                //app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
+                //app->client.JoinChat(0, 1);
+                app->uiManager.NavigateTo(PAGE::HOMEPAGE);
+                //app->client.Connect()
             }
             break;
         default:
@@ -58,9 +72,17 @@ public:
         uiManager.AddMenu("Help", MENU::HELP);
         uiManager.AddMenuItem(MENU::HELP, "About", MENUITEM::ABOUT);
 
-        uiManager.AddPage(new LoginPage(parent, fixed));
-        uiManager.AddPage(new AboutPage(parent, fixed));
-        uiManager.AddPage(new SVConnectPage(parent, fixed));
+        loginPage = new LoginPage(parent, fixed);
+        aboutPage = new AboutPage(parent, fixed);
+        svConnectPage = new SVConnectPage(parent, fixed);
+        homePage = new HomePage(parent, fixed);
+
+        uiManager.AddPage(loginPage);
+        uiManager.AddPage(aboutPage);
+        uiManager.AddPage(svConnectPage);
+        uiManager.AddPage(homePage);
+
+        
 
         uiManager.AddToolItemFromStock(GTK_STOCK_GO_BACK, TOOLITEM::BACK);
 
@@ -71,8 +93,13 @@ public:
     }
 
 private:
+    LoginPage* loginPage;
+    AboutPage* aboutPage;
+    SVConnectPage* svConnectPage;
+    HomePage* homePage;
     static Application* app;
     UIManager uiManager;
+    //Client client;
 };
 
 Application* Application::app = 0;
