@@ -11,11 +11,11 @@ public:
     Label* msgHistory;
     void OnControlEvent(Control* control, int eventID)
     {
-        TextEdit* msg = static_cast<TextEdit*>(this->GetControlByID(msgText));
+        /*TextEdit* msg = static_cast<TextEdit*>(this->GetControlByID(msgText));
         std::string tmp = "You: ";
         tmp += msg->GetText();
         msgHistory->AppendToNewLine(tmp);
-        msg->Clear();
+        msg->Clear();*/
     }
     std::string GetMsg()
     {

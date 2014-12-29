@@ -47,12 +47,13 @@ public:
                 app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
                 app->client.JoinChat(0);
                 app->uiManager.NavigateTo(PAGE::HOMEPAGE);
-                app->client.SetMessageEventHandler(ClientMessageEventHandler);
+                app->client.SetMessageEventHandler((ClientMessageEventHandler));
                 app->client.HandleRequestsAsync();
             }
             else if (eventData->controlID == app->homePage->sendBttn)
             {
                 app->client.SendMessageA(0, app->homePage->GetMsg());
+                app->homePage->msgHistory->AppendToNewLine(std::string("You: ") + app->homePage->GetMsg());
             }
             break;
         default:
