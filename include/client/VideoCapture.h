@@ -12,7 +12,7 @@ class VideoCaptureDevice
 };
 
 
-
+/*
 
 class VideoCapture
 {
@@ -36,4 +36,5 @@ private:
     double m_fps;
 };
 
+*/
 #endif

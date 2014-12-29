@@ -13,14 +13,11 @@
     <Filter Include="src\common">
       <UniqueIdentifier>{74895e6c-3a19-4821-9b35-9a46ae109ac1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\UI">
-      <UniqueIdentifier>{637617ae-ac52-4d8c-8fda-a3c9bd66ebda}</UniqueIdentifier>
+    <Filter Include="include\common\Network">
+      <UniqueIdentifier>{9c21b098-89eb-42ac-a5b6-3b2b2d9e0348}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\UI">
-      <UniqueIdentifier>{ac82514a-e491-4024-93fe-1552d69bc617}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\UI\pages">
-      <UniqueIdentifier>{64b73a62-e967-4ba7-8d9d-35d4344a9f93}</UniqueIdentifier>
+    <Filter Include="src\common\Network">
+      <UniqueIdentifier>{7ad2755b-7297-4301-a7ca-de728d42e37d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,94 +27,52 @@
     <ClInclude Include="..\..\include\common\Exception.h">
       <Filter>include\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\FrameRenderer.h">
+    <ClInclude Include="..\..\include\common\TcpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\ChatMessage.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpRequest.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpAcceptor.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\Client.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\VideoCapture.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\Button.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\Control.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\Label.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\Page.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\TextEdit.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\Menu.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\UIManager.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\pages\HomePage.h">
-      <Filter>include\UI\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h">
-      <Filter>include\UI\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\pages\SignupPage.h">
-      <Filter>include\UI\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\pages\AboutPage.h">
-      <Filter>include\UI\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\Statusbar.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\Toolbar.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\UI\pages\SVConnectPage.h">
-      <Filter>include\UI\pages</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\Application.h">
-      <Filter>include</Filter>
+    <ClInclude Include="..\..\include\common\UdpHandler.h">
+      <Filter>include\common\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\client\FrameRenderer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\client\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\VideoCapture.cpp">
+    <ClCompile Include="..\..\src\common\TcpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\ChatMessage.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\RtpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpRequest.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpAcceptor.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\Client.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\Button.cpp">
-      <Filter>src\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\Control.cpp">
-      <Filter>src\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\Page.cpp">
-      <Filter>src\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\Label.cpp">
-      <Filter>src\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\TextEdit.cpp">
-      <Filter>src\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\Menu.cpp">
-      <Filter>src\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\Statusbar.cpp">
-      <Filter>src\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\UIManager.cpp">
-      <Filter>src\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\Application.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\..\src\common\UdpHandler.cpp">
+      <Filter>src\common\Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

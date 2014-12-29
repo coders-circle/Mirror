@@ -4,27 +4,75 @@
     <Filter Include="include">
       <UniqueIdentifier>{901cda44-2609-4a20-bf53-fff3e0af9875}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\common">
-      <UniqueIdentifier>{468317da-7019-44a9-9204-ec31406d9baf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{34d0d713-51c2-4570-b77a-9ac3a2176ef1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\common">
+      <UniqueIdentifier>{bbe44c9a-c61f-4631-ae70-3fef070c8d54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\common\Network">
+      <UniqueIdentifier>{2ffe0197-9872-4f66-bdb0-39679890bd27}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\common">
-      <UniqueIdentifier>{66d0e2a1-f6cd-48cb-b33c-ec7dbdec73da}</UniqueIdentifier>
+      <UniqueIdentifier>{455b913e-44bb-450f-a4f9-b338c96aeafe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common\Network">
+      <UniqueIdentifier>{f47d1eec-76a8-4eff-b258-08e70341305e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\server\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Server\ClientsManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\ChatMessage.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\RtpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpRequest.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpAcceptor.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\UdpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Server\ClientsManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\common\common.h">
       <Filter>include\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\common\Exception.h">
       <Filter>include\common</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\src\server\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
+    <ClInclude Include="..\..\include\common\ChatMessage.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpRequest.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpAcceptor.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\UdpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

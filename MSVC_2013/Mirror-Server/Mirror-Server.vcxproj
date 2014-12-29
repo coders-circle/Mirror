@@ -45,7 +45,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(OPENCV_ROOT)\include;$(GTKDIR)\include\gail-3.0;$(GTKDIR)\include\atk-1.0;$(GTKDIR)\include\gdk-pixbuf-2.0;$(SolutionDir)\..\include;$(BOOST_ROOT);$(GTKDIR)\include\gtk-3.0;$(GTKDIR)\include\glib-2.0;$(GTKDIR)\include\pango-1.0;$(GTKDIR)\lib\glib-2.0\include;$(GTKDIR)\include\cairo</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -60,7 +60,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\include;$(BOOST_ROOT);</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -70,11 +70,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\common\ChatMessage.cpp" />
+    <ClCompile Include="..\..\src\common\RtpHandler.cpp" />
+    <ClCompile Include="..\..\src\common\TcpAcceptor.cpp" />
+    <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
+    <ClCompile Include="..\..\src\common\TcpRequest.cpp" />
+    <ClCompile Include="..\..\src\common\UdpHandler.cpp" />
+    <ClCompile Include="..\..\src\Server\ClientsManager.cpp" />
+    <ClCompile Include="..\..\src\server\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\common\ChatMessage.h" />
     <ClInclude Include="..\..\include\common\common.h" />
     <ClInclude Include="..\..\include\common\Exception.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\server\main.cpp" />
+    <ClInclude Include="..\..\include\common\RtpHandler.h" />
+    <ClInclude Include="..\..\include\common\TcpAcceptor.h" />
+    <ClInclude Include="..\..\include\common\TcpHandler.h" />
+    <ClInclude Include="..\..\include\common\TcpRequest.h" />
+    <ClInclude Include="..\..\include\common\UdpHandler.h" />
+    <ClInclude Include="..\..\include\Server\ClientsManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
