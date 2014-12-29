@@ -32,7 +32,7 @@ public:
     void HandleRequestsAsync() { boost::thread t(boost::bind(&Client::HandleRequests, this)); }
 
     // Set the event handler to handle incoming chat messages
-    void SetMessageEventHandler(std::function<void(MessageEventData&)> handler) { m_messageHandler = handler; }
+    void SetMessageEventHandler(std::function<void(boost::shared_ptr<MessageEventData>)> handler) { m_messageHandler = handler; }
     // Send chat message to a connection (receiverId = 0 for server)
     void SendMessage(size_t receiverId, const std::string& message, uint32_t groupId = 0);
     // Event handler to handle a join chat request from a peer (for p2p only)
@@ -47,7 +47,7 @@ public:
 private:
     boost::asio::io_service m_io;
     // Event handlers
-    std::function<void(MessageEventData&)> m_messageHandler;
+    std::function<void(boost::shared_ptr<MessageEventData>)> m_messageHandler;
     std::function<bool(size_t)> m_joinChatHandler;
 
     // Connection representing a tcp-connection with a peer/server
