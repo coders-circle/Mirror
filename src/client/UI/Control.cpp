@@ -1,3 +1,4 @@
+#include <common/common.h>
 #include "client/UI/Control.h"
 
 void Control::PutFixedAt(GtkWidget *fixed, int x, int y)

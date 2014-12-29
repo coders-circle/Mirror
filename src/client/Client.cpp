@@ -29,7 +29,7 @@ size_t Client::Connect(const tcp::endpoint& peer, bool* successful)
 // Perform above function asynchronously
 void Client::ConnectAsync(const tcp::endpoint& peer, bool* successful)
 {
-    boost::thread t(boost::bind((uint32_t(Client::*)(const tcp::endpoint&, bool*))&Client::Connect, this, _1, _2), peer, successful);
+    boost::thread t(boost::bind((size_t(Client::*)(const tcp::endpoint&, bool*))&Client::Connect, this, _1, _2), peer, successful);
 }
 
 // Use server to connect to a client (for P2P)

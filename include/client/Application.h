@@ -52,7 +52,7 @@ public:
             }
             else if (eventData->controlID == app->homePage->sendBttn)
             {
-                app->client.SendMessageA(0, app->homePage->GetMsg());
+                app->client.SendMessage(0, app->homePage->GetMsg());
                 app->homePage->msgHistory->AppendToNewLine(std::string("You: ") + app->homePage->GetMsg());
             }
             break;

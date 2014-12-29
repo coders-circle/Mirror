@@ -1,3 +1,4 @@
+#include <common/common.h>
 #include "client/UI/UIManager.h"
 
 UIManager* UIManager::m_uiManager = 0;

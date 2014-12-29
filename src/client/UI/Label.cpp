@@ -1,3 +1,4 @@
+#include <common/common.h>
 #include "client/UI/Label.h"
 
 Label::Label()

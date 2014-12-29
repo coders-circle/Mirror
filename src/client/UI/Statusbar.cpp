@@ -1,3 +1,4 @@
+#include <common/common.h>
 #include "client/UI/StatusBar.h"
 
 Statusbar::Statusbar()
