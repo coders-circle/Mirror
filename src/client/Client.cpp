@@ -193,9 +193,9 @@ void Client::HandleRequests()
                         chat.Receive(m_connections[i].tcpHandler, m_request.GetMessageSize());
                         if (m_messageHandler)
                         {
-                            MessageEventData msgData;
-                            msgData.senderId = i;
-                            msgData.message = chat.GetMessage();
+                            boost::shared_ptr<MessageEventData> msgData(new MessageEventData);
+                            msgData->senderId = i;
+                            msgData->message = chat.GetMessage();
                             m_messageHandler(msgData);
                         }
                         break;
