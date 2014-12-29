@@ -76,11 +76,15 @@ size_t Client::HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateE
     try
     {
         if (m_acceptor)
-            m_acceptor->cancel();
+            m_acceptor->close();
     }
     catch (...) {}
     // Set successful variable to true
-    if (successful) *successful = true;
+    if (successful)
+    {
+        *successful = true;
+        std::cout << "Connected to client #" << clientId << " at connection: #" << m_connections.size() - 1;
+    }
     return m_connections.size() - 1;
 }
 
@@ -104,8 +108,6 @@ void Client::P2PListen(const tcp::endpoint &localEndpoint)
 {
     try
     {
-        if (m_acceptor)
-            m_acceptor->cancel();
         m_acceptor.reset(new tcp::acceptor(m_io, localEndpoint, true));
         // Create a new socket to represent a new connection
         boost::shared_ptr<tcp::socket> socket(new tcp::socket(m_acceptor->get_io_service()));
@@ -121,9 +123,9 @@ void Client::P2PListen(const tcp::endpoint &localEndpoint)
         m_connections.push_back(c);
         m_p2pConnecting = false;
     }
-    catch (std::exception &ex)
+    catch (/*std::exception &ex*/...)
     {
-        std::cout << ex.what() << std::endl;
+        //std::cout << "Listener: " << ex.what() << std::endl;
     }
 }
 ;
@@ -141,9 +143,9 @@ void Client::P2PConnect(tcp::endpoint &remoteEndpoint)
             m_connections.push_back(c);
             m_p2pConnecting = false;
         }
-        catch (std::exception &ex)
+        catch (/*std::exception &ex*/...)
         {
-            std::cout << ex.what() << std::endl;
+            //std::cout << "Connector: " << ex.what() << std::endl;
         }
     }
 }

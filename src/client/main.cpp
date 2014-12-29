@@ -56,10 +56,10 @@ int main(int argc, char *argv[])
             /* For p2p request, first connect to the peer...*/
             uint32_t cid;
             std::cout << "Enter client-id of peer: "; std::cin >> cid;
-            bool successfull;
-            uint32_t id = client.Connect(cid, &successfull);
-            /* ... and if successfull, send JOIN_CHAT request to it*/
-            if (successfull)
+            bool successful;
+            uint32_t id = client.Connect(cid, &successful);
+            /* ... and if successful, send JOIN_CHAT request to it*/
+            if (successful)
             {
                 if (!client.JoinChat(id))  // this is handled in other peer through JoinChatEventHandler
                     std::cout << "Couldn't connect; other side may not have accepted the request" << std::endl;
@@ -89,7 +89,7 @@ bool JoinChatEventHandler(size_t id)
 {
     char c;
     std::cout << "Connection #" << id << " wants to join a conversation. Accept? (y/n) "; std::cin >> c;
-    if (c == 'y')
+    if (c != 'n')
     {
         chatConnectionId = id;
         return true;
