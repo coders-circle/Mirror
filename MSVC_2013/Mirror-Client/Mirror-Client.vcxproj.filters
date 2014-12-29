@@ -13,9 +13,6 @@
     <Filter Include="src\common">
       <UniqueIdentifier>{74895e6c-3a19-4821-9b35-9a46ae109ac1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\common\Network">
-      <UniqueIdentifier>{7ad2755b-7297-4301-a7ca-de728d42e37d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\UI">
       <UniqueIdentifier>{637617ae-ac52-4d8c-8fda-a3c9bd66ebda}</UniqueIdentifier>
     </Filter>
@@ -81,20 +78,11 @@
     <ClInclude Include="..\..\include\client\UI\pages\SVConnectPage.h">
       <Filter>include\UI\pages</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\Application.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\common\RtpReceiver.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\RtpTransmitter.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpReceiver.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpTransmitter.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -119,15 +107,6 @@
     <ClCompile Include="..\..\src\client\UI\TextEdit.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\TcpClient.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpListener.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpHandler.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\client\UI\Menu.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
@@ -136,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\client\UI\UIManager.cpp">
       <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\Application.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

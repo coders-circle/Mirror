@@ -38,10 +38,10 @@ public:
         gtk_toolbar_set_style(GTK_TOOLBAR(m_handle), GTK_TOOLBAR_ICONS);
         gtk_container_set_border_width(GTK_CONTAINER(m_handle), 2);
     }
-    void AddButtonFromStock(const gchar* stockID)
+    void AddButtonFromStock(const gchar* stockID, int itemID)
     {
         m_items.resize(m_items.size() + 1);
-        m_items[m_items.size() - 1].Set(stockID, m_items.size() - 1, m_toolItemEventHandler);
+        m_items[m_items.size() - 1].Set(stockID, itemID, m_toolItemEventHandler);
         gtk_toolbar_insert(GTK_TOOLBAR(m_handle), m_items[m_items.size() - 1].GetItemHandle(), -1);
     }
     void SetEventHandler(GCallback toolItemEventHandler)

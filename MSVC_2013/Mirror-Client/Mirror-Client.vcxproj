@@ -73,6 +73,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\client\Application.h" />
     <ClInclude Include="..\..\include\client\FrameRenderer.h" />
     <ClInclude Include="..\..\include\client\UI\Button.h" />
     <ClInclude Include="..\..\include\client\UI\Control.h" />
@@ -93,6 +94,7 @@
     <ClInclude Include="..\..\include\common\Exception.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\client\Application.cpp" />
     <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
     <ClCompile Include="..\..\src\client\UI\Button.cpp" />
@@ -102,15 +104,8 @@
     <ClCompile Include="..\..\src\client\UI\Page.cpp" />
     <ClCompile Include="..\..\src\client\UI\Statusbar.cpp" />
     <ClCompile Include="..\..\src\client\UI\TextEdit.cpp" />
-    <ClCompile Include="..\..\src\client\TcpClient.cpp" />
     <ClCompile Include="..\..\src\client\UI\UIManager.cpp" />
     <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
-    <ClCompile Include="..\..\src\common\RtpReceiver.cpp" />
-    <ClCompile Include="..\..\src\common\RtpTransmitter.cpp" />
-    <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
-    <ClCompile Include="..\..\src\common\TcpListener.cpp" />
-    <ClCompile Include="..\..\src\common\TcpReceiver.cpp" />
-    <ClCompile Include="..\..\src\common\TcpTransmitter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

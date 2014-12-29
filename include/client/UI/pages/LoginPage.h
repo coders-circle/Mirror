@@ -29,11 +29,14 @@ public:
     {
         this->m_ID = PAGE::LOGINPAGE;
         this->Initialize(parentWindow, fixed);
+        m_usernameText = 0;
+        m_passwordText = 1;
+        m_loginButton = 2;
 
-        m_usernameText = this->AddTextEdit(600, 150, 200, 25);
-        m_passwordText = this->AddTextEdit(600, 220, 200, 25);
+        this->AddTextEdit(m_usernameText, 600, 150, 200, 25);
+        this->AddTextEdit(m_passwordText, 600, 220, 200, 25);
         
-        m_loginButton = this->AddButton("Log In", 460, 320, 340, 35);
+        this->AddButton(m_loginButton, "Log In", 460, 320, 340, 35);
 
         ((TextEdit*)this->GetControlByID(m_passwordText))->SetPasswordMode();
 

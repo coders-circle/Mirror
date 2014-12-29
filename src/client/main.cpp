@@ -3,15 +3,7 @@
 
 
 #include <common/common.h>
-#include "client/FrameRenderer.h"
-#include "client/VideoCapture.h"
-#include "client/UI/Page.h"
-
-#include "client/UI/pages/LoginPage.h"
-#include "client/UI/Menu.h"
-#include "client/UI/UIManager.h"
-
-#include "client/UI/StatusBar.h"
+#include "client/Application.h"
 
 
 //FrameRenderer fr;
@@ -89,9 +81,12 @@ int main(int argc, char *argv[])
     //fr.Initialize(mainWindow, fixed, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());
     gtk_widget_show_all(mainWindow);
 
-    UIManager uiManager;
+    Application app;
+    app.Initialize(mainWindow, fixed);
+
+    /*UIManager uiManager;
     uiManager.Initialize(mainWindow, fixed);
-    uiManager.NavigateTo(PAGE::LOGINPAGE);
+    uiManager.NavigateTo(PAGE::LOGINPAGE);*/
     
     
     gtk_main();

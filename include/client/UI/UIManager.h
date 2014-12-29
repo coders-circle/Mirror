@@ -12,6 +12,18 @@
 
 #include <stack>
 
+enum EVENT{BUTTONCLICK, MENUITEMCLICK, TOOLITEMCLICK};
+
+struct UIEventData
+{
+    int event;
+    int controlID;
+    UIEventData(int event, int controlID) :event(event), controlID(controlID){}
+};
+
+typedef void(*UIEventCallBack)(UIEventData*);
+
+
 // UIManager: a custom class to handle pages and menu,
 // only one object of the class should be created,
 // addition and removal of pages and menus can be 
@@ -19,12 +31,14 @@
 class UIManager
 {
 public:
-    
-    
-
     // Creates and initializes the menus and pages used
     // in the application
     void Initialize(GtkWidget* parent, GtkWidget* fixed);
+    void AddPage(Page* page);
+
+    void AddMenu(std::string label, int id);
+    void AddMenuItem(int menuID, std::string label, int itemID);
+    void AddToolItemFromStock(const gchar* stockID, int itemID);
 
     // Makes transition between pages
     // 'page' should be one of the value in enum 'PAGE'
@@ -35,10 +49,37 @@ public:
     // called when any menu item is pressed
     // data is a pointer of MenuBar::MenuEventData type
     static void MenuItemEventHandler(GtkWidget* widget, gpointer data);
-
     static void ToolItemEventHandler(GtkWidget* widget, gpointer data);
-
     static void PageEventHandler(ControlEventData* eventData);
+
+    Page* GetPageByID(int id)
+    {
+        int pageIndex = -1;
+        for (int i = 0, lim = m_pages.size(); i < lim; i++)
+        {
+            if (m_pages[i]->GetID() == id)
+            {
+                pageIndex = i;
+                break;
+            }
+        }
+        if (pageIndex == -1) throw Exception("Invalid page id");
+        return m_pages[pageIndex];
+    }
+
+    static void SetEventHandler(UIEventCallBack eventHandler)
+    {
+        m_eventHandler = eventHandler;
+    }
+
+    void ShowMenu()
+    {
+        m_menubar.Show();
+    }
+    void ShowToolbar()
+    {
+        m_toolbar.Show();
+    }
 
     void NavigateBack();
 private:
@@ -50,4 +91,5 @@ private:
     Page* m_currentPage;
     static UIManager* m_uiManager;
     std::stack<Page*> m_pageHistory;
+    static UIEventCallBack m_eventHandler;
 };

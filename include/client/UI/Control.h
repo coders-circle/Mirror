@@ -10,7 +10,6 @@ enum CONTROL{ BUTTON, LABEL, TEXTEDIT, STATUSBAR};
 class Control
 {
 public:
-    
     Control() :m_handle(0){}
     void SetID(int id);
     int GetID();
@@ -19,7 +18,6 @@ public:
     void Show();
     void Hide();
     GtkWidget* GetHandle();
-    // void SetEventHandler();
 protected:
     GtkWidget* m_handle;
     int m_x, m_y, m_w, m_h;

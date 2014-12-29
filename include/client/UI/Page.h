@@ -18,11 +18,13 @@ struct ControlEventData
 {
     Page* page;
     Control* control;
-    int event_id;
-    ControlEventData(Page* page, Control* control, int event_id) :page(page), control(control), event_id(event_id){}
+    int eventID;
+    ControlEventData(Page* page, Control* control, int event_id) :page(page), control(control), eventID(eventID){}
 };
 
 typedef void(*PageEventCallBack)(ControlEventData*);
+
+enum CONTROLEVENT{CLICKED};
 
 
 
@@ -36,16 +38,16 @@ public:
 
     // Adds a button with specified label in the specified coordinate,
     // returns a unique ID for the control in the page
-    int AddButton(std::string label, int x, int y, int w, int h);
+    Control* AddButton(int id, std::string label, int x, int y, int w, int h);
 
     // Adds a text label with specified text in the specified coordinate,
     // the text can contain certain markups,
     // returns a unique ID for the control in the page
-    int AddLabel(std::string text, int x, int y, int w = 0, int h = 0, int justification = GTK_JUSTIFY_CENTER);
+    Control* AddLabel(std::string text, int x, int y, int w = 0, int h = 0, int justification = GTK_JUSTIFY_CENTER);
 
     // Adds a Edit Box in the specified coordinate,
     // returns a unique ID for the control in the page
-    int AddTextEdit(int x, int y, int w, int h);
+    Control* AddTextEdit(int id, int x, int y, int w, int h);
 
     // shows all controls within the page
     void ShowControls();
@@ -75,15 +77,13 @@ public:
 protected:
     // Allocates memory for a specified new control to be added,
     // also sets a unique id to that control starting from 0
-    void AllocateNewControl(int type);
+    void AllocateNewControl(int type, int id);
 
     // Array of controls present in the page
     std::vector<Control*> m_controls;
 
     GtkWidget* m_fixed;
     GtkWidget* m_parentWindow;
-
-    enum ControlEvent{BUTTON_CLICK = 0};
 
     PageEventCallBack m_pageEventHandler;
     // A struct to wrap the data passed to event handler to the pages
