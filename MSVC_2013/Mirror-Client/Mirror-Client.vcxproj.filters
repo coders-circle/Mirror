@@ -60,9 +60,6 @@
     <ClInclude Include="..\..\include\client\UI\Menu.h">
       <Filter>include\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\Page.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\UI\Page.h">
       <Filter>include\UI</Filter>
     </ClInclude>

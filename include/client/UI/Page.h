@@ -93,5 +93,5 @@ protected:
     
 };
 
-enum PAGE { LOGINPAGE = 0, SIGNUPPAGE, ABOUTPAGE, SVCONNECTPAGE, HOMEPAGE};
+
 
