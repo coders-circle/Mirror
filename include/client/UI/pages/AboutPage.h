@@ -1,6 +1,7 @@
 #pragma once
 
 #include "client/UI/Page.h"
+#include "client/UI/pages/pages.h"
 
 class AboutPage: public Page
 {
