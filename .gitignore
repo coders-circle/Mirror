@@ -4,7 +4,8 @@
 #linux executables and object files
 *.out
 *.o
-
+#swp files
+*.swp
 # User-specific files
 *.suo
 *.user

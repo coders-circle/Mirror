@@ -1,36 +1,36 @@
 #include <common/common.h>
-#include <common/TcpListener.h>
+#include <common/TcpAcceptor.h>
 
-TcpListener::TcpListener(boost::asio::io_service &io) : m_acceptor(io)
+TcpAcceptor::TcpAcceptor(boost::asio::io_service &io) : m_acceptor(io)
 {}
 
-TcpListener::~TcpListener()
+TcpAcceptor::~TcpAcceptor()
 {}
 
-uint16_t TcpListener::Initialize(const tcp::endpoint &localEndpoint)
+uint16_t TcpAcceptor::Initialize(const tcp::endpoint &localEndpoint)
 {
     // Open and bind the tcp acceptor to the local endpoint
     m_acceptor.open(localEndpoint.protocol());
-    m_acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+    //m_acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
     m_acceptor.bind(localEndpoint);
     // Prepare to listen
     m_acceptor.listen();
     return m_acceptor.local_endpoint().port();
 }
 
-void TcpListener::Listen(boost::function<void(boost::shared_ptr<tcp::socket>)> callback)
+void TcpAcceptor::Listen(boost::function<void(boost::shared_ptr<tcp::socket>)> callback)
 {
     m_callback = callback;
     StartListening();
 }
 
 // Create new thread to listen for incomming connections
-void TcpListener::StartListening()
+void TcpAcceptor::StartListening()
 {
-    boost::thread t(boost::bind(&TcpListener::ListeningThread, this));
+    boost::thread t(boost::bind(&TcpAcceptor::ListeningThread, this));
 }
 
-void TcpListener::ListeningThread()
+void TcpAcceptor::ListeningThread()
 {
     try
     {

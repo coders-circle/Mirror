@@ -9,17 +9,13 @@ ChatMessage::~ChatMessage()
 
 void ChatMessage::Send(TcpHandler &tcpHandler)
 {
-    uint32_t body_size = m_body.size() + 1;
-    tcpHandler.Send((char*)&body_size, sizeof(body_size));
-    tcpHandler.Send(m_body.c_str(), body_size); 
+    tcpHandler.Send(m_body.c_str(), m_body.size() + 1);
 }
 
-void ChatMessage::Receive(TcpHandler &tcpHandler)
+void ChatMessage::Receive(TcpHandler &tcpHandler, uint32_t size)
 {
-    uint32_t body_size;
-    tcpHandler.Receive((char*)&body_size, sizeof(body_size));
-    char * data = new char[body_size];
-    tcpHandler.Receive(data, body_size);
+    char * data = new char[size];
+    tcpHandler.Receive(data, size);
     m_body = std::string(data);
     delete[] data;
 }

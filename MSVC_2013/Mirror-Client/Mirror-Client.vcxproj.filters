@@ -30,30 +30,27 @@
     <ClInclude Include="..\..\include\common\TcpHandler.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpListener.h">
-      <Filter>include\common\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\TcpClient.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\common\ChatMessage.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\common\RtpHandler.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\RequestHandler.h">
+    <ClInclude Include="..\..\include\common\TcpRequest.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpAcceptor.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\Client.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\UdpHandler.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\TcpListener.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\TcpClient.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
@@ -65,7 +62,16 @@
     <ClCompile Include="..\..\src\common\RtpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\RequestHandler.cpp">
+    <ClCompile Include="..\..\src\common\TcpRequest.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\TcpAcceptor.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\Client.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\UdpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
   </ItemGroup>

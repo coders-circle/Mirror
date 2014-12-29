@@ -1,19 +1,15 @@
 /* Client - main.cpp */
 
 #include <common/common.h>
-#include <client/TcpClient.h>
+#include <client/Client.h>
 
 
 int main(int argc, char *argv[])
 {
     try
     {
-        boost::asio::io_service io;
-        TcpClient client(io);
-        //uint16_t port;
-        //std::cout << "Enter port of this client: ";
-        //std::cin >> port;
-        client.StartListening(/*tcp::endpoint(tcp::v4(), port)*/);
+        Client client;
+        //client.StartAccepting();
 
         // Connect to another peer
         /*{
@@ -26,22 +22,42 @@ int main(int argc, char *argv[])
         // Connect to server
         {
             std::string ip, name;
-            std::cout << "Enter ip of server: "; std::cin >> ip;
-            client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011/*8183*/));  // 10011 for Ankit's Server
-            uint32_t groupId;
-            std::cout << "Enter group-id to join: ";
-            std::cin >> groupId;
             std::cout << "Enter name: ";
             std::fflush(stdin);
             char namec[200];
             std::cin.getline(namec, 200);
             name = std::string(namec);
-            client.JoinGroup(groupId, name);
-            client.StartChatSession(groupId);
+            client.SetName(name);
+
+
+            std::cout << "Enter ip of server: "; std::cin >> ip;
+            client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011));
+
+            int choice;
+            std::cout << "Enter 0 for group chat, 1 for P2P, 2 to just wait: ";
+            std::cin >> choice;
+
+            uint32_t groupId = 0;
+            if (choice == 0)
+            {
+                std::cout << "Enter group-id to join: ";
+                std::cin >> groupId;
+                client.JoinChat(0, groupId);
+            }
+            else if (choice == 1)
+            {
+                uint32_t cid;
+                std::cout << "Enter client-id of peer: "; std::cin >> cid;
+                bool successfull;
+                uint32_t id = client.Connect(cid, &successfull);
+                if (successfull)
+                    client.JoinChat(id);
+                else
+                    std::cout << "Invalid peer; couldn't connect" << std::endl;
+            }
+            client.StartChatInput(groupId);
+            client.HandleRequests();
             
-            while (true)
-                boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-                ;
         }
     }
     catch (std::exception &ex)

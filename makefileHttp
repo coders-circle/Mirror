@@ -1,0 +1,22 @@
+INC_DIR = include
+SRC_DIR = src
+
+CFLAG = `pkg-config --cflags gtk+-3.0`
+CFLAGS = --std=c++11
+
+CC = clang++
+
+#for common
+SOURCES_COMM = TcpHandler.cpp TcpListener.cpp RequestHandler.cpp ChatMessage.cpp
+HEADERS_COMM = TcpHandler.h TcpListner.h RequestHandler.h
+OBJECTS_COMM = $(SOURCES_COMM:.cpp=.o)
+FSOURCES_COMM := $(addprefix $(SRC_DIR)/common/, $(SOURCES_COMM))
+FHEADERS_COMM := $(addprefix $(INC_DIR)/common/, $(HEADERS_COMM))
+
+LDFLAGS_COMM = -lboost_system -lboost_thread -lpthread
+
+all:  HttpHandler.o
+	$(CC) -o http $(SRC_DIR)/common/main.cpp $< -Iinclude/ $(CFLAGS) $(CFLAG) $(LDFLAGS_COMM)
+
+HttpHandler.o :  src/common/HttpHandler.cpp 
+	$(CC) -c -o $@ $< $(LDFLAGS_COMM) -Iinclude/ $(CFLAG) $(CFLAGS)
