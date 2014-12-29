@@ -28,6 +28,8 @@ public:
     size_t Connect(uint32_t clientId, bool* successful = NULL);
     // Start handling all requests that the client gets
     void HandleRequests();
+    // Start handling all requests asynchronously
+    void HandleRequestsAsync() { boost::thread t(boost::bind(&Client::HandleRequests, this)); }
 
     // Set the event handler to handle incoming chat messages
     void SetMessageEventHandler(std::function<void(MessageEventData&)> handler) { m_messageHandler = handler; }

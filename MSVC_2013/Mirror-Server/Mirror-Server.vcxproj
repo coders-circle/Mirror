@@ -85,7 +85,6 @@
     <ClInclude Include="..\..\include\common\Exception.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\server\main.cpp" />
     <ClInclude Include="..\..\include\common\RtpHandler.h" />
     <ClInclude Include="..\..\include\common\TcpAcceptor.h" />
     <ClInclude Include="..\..\include\common\TcpHandler.h" />
