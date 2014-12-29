@@ -34,7 +34,7 @@ public:
     uint16_t GetRemotePort() const { return m_socket->remote_endpoint().port(); }
     boost::shared_ptr<tcp::socket> GetSocket() const { return m_socket; }
 
-private:
+protected:
 	boost::shared_ptr<tcp::socket> m_socket;
 	boost::asio::io_service &m_ioService;
 };

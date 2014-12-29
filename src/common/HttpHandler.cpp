@@ -1,8 +1,8 @@
-#include <common/common.h>
+#include "common/common.h"
 #include "common/HttpHandler.h"
 
 // the construtor, takes reference to io_service as argument
-HttpHandler::HttpHandler(boost::asio::io_service& ioService):m_ioService(ioService), TcpHandler(ioService)
+HttpHandler::HttpHandler(boost::asio::io_service& ioService):TcpHandler(ioService)
 {
 }
 
@@ -14,7 +14,7 @@ HttpHandler::~HttpHandler()
 void HttpHandler:: SendGetRequest(std::string location)
 {
 	// create a GET request
-	std::string requestStr = "GET " + location + " HTTP/1.1\r\n";
+	std::string requestStr = "GET " + location + " HTTP/1.0\r\n";
 	requestStr += "Host: " + m_hostName + "\r\n";
 	requestStr += "Accept: */*\r\n";
 	requestStr += "Connection: Keep-Alive\r\n\r\n";
@@ -40,19 +40,18 @@ boost::shared_ptr<tcp::socket> HttpHandler::CreateSocket(boost::asio::io_service
 	tcp::resolver::iterator end;
 
 	//try each endpoint until we successfully establish a connection
-	tcp::socket socket(ioService);
+	boost::shared_ptr<tcp::socket> sptr(new tcp::socket(ioService));
 	boost::system::error_code error  = boost::asio::error::host_not_found;
 	
 	while (error && endpt_iterator != end)
 	{
-		socket.close();
-		socket.connect(*endpt_iterator++, error);
+		(*sptr).close();
+		(*sptr).connect(*endpt_iterator++, error);
 	}
 	if (error)
 	{
 		throw boost::system::system_error(error);
 	}
-	boost::shared_ptr<tcp::socket> sptr(&socket);
 	return sptr;
 }
 // the initialize function
@@ -69,3 +68,47 @@ void HttpHandler::Initialize(std::string hostName, std::string port)
 }
 
 
+// sending the post request
+void HttpHandler::SendPostRequest(std::string location, std::string jsonString)
+{
+	std::string requestStr = "POST " + location + " HTTP/1.0\r\n";
+	requestStr += "Host: " + m_hostName + "\r\n";
+	requestStr += "Content-Type: application/jsonrequest\r\n";
+	requestStr += "Accept: */*\r\n";
+	requestStr += "Content-Length: " + std::to_string(jsonString.length()) + "\r\n";
+	requestStr += "Connection: Keep-Alive\r\n\r\n";
+	requestStr += jsonString;
+	
+	// convert requestStr to char*
+	int length  = requestStr.length() + 1;
+	// first create a temporary char* 
+	char *temp = new char[length];
+	strcpy(temp, requestStr.c_str());
+	// convert it to const char* bacause base class's Send requires const char*
+	const char*postRequest = (const char*)temp;
+
+	// send through base class's send method
+	TcpHandler::Send(postRequest, length);
+	//std::cout << Available() << std::endl;
+}
+
+
+// response after a GET or POST
+void HttpHandler::GetResponse()
+{
+	try
+	{
+		boost::asio::read_until(*m_socket, m_serverResponse, "\r\n\r\n");
+	}
+	catch (Exception &e)
+	{
+		boost::asio::read_until(*m_socket, m_serverResponse, "\r\n");
+	}
+	// following printing is just for the test purpose
+	std::istream responseStream(&m_serverResponse);
+	std::string test;
+	while(!std::getline(responseStream, test).eof())
+	{
+		std::cout << test << std::endl;
+	}
+}

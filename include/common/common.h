@@ -9,7 +9,7 @@
 #include <boost/array.hpp>
 #include <boost/random.hpp>
 
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
 //#include <opencv2/opencv.hpp>
 
 

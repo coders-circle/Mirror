@@ -26,13 +26,13 @@ class HttpHandler : public TcpHandler
 		// send the GET request
 		void SendGetRequest(std::string location);
 		// send the POST request
-		void SendPostRequest(std::string location, rapidjson::Document d);
+		void SendPostRequest(std::string location, std::string jsonString);
 		// get the response
 		void GetResponse();
 
 	private:
-		boost::asio::io_service& m_ioService;
-		boost::shared_ptr<tcp::socket> m_socket;
+		//boost::asio::io_service& m_ioService;
+		//boost::shared_ptr<tcp::socket> m_socket;
 		boost::asio::streambuf m_serverResponse;
 		std::string m_hostName, m_port;
 };
