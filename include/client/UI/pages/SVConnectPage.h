@@ -1,27 +1,23 @@
 #pragma once
 
 #include "client/UI/Page.h"
+#include "client/UI/pages/pages.h"
 
 class SVConnectPage: public Page
 {
 public:
-    int connectButton;
-    int ipText;
-    int nameText;
-    int grpIDText;
-
     void OnControlEvent(Control* control, int eventID)
     {
         
     }
     std::string GetName()
     {
-        TextEdit* name = static_cast<TextEdit*>(this->GetControlByID(nameText));
+        TextEdit* name = static_cast<TextEdit*>(this->GetControlByID(PAGECONTROL::SCP_NAMETEXT));
         return name->GetText();
     }
     std::string GetIP()
     {
-        TextEdit* ip = static_cast<TextEdit*>(this->GetControlByID(ipText));
+        TextEdit* ip = static_cast<TextEdit*>(this->GetControlByID(PAGECONTROL::SCP_IPTEXT));
         return ip->GetText();
     }
     SVConnectPage(GtkWidget* parentWindow, GtkWidget* fixed)
@@ -30,11 +26,6 @@ public:
         this->Initialize(parentWindow, fixed);
 
         int x = 300, y = 100;
-        connectButton = 0;
-        ipText = 1;
-        nameText = 2;
-        grpIDText = 3;
-
         
         this->AddLabel("<span font='22'>Connect to a Server</span>", x, y);
         this->AddLabel("<span font='14'>Name:</span> ", x, y + 100);
@@ -43,11 +34,11 @@ public:
         this->AddLabel("<span font='14'>Group ID:</span> ", x, y + 200);
 
         
-        this->AddTextEdit(nameText, x + 150, y + 100, 200, 30);
-        this->AddTextEdit(ipText, x + 150, y + 150, 200, 30);
-        this->AddTextEdit(grpIDText, x + 150, y + 200, 200, 30);
+        this->AddTextEdit(PAGECONTROL::SCP_NAMETEXT,    x + 150, y + 100, 200, 30);
+        this->AddTextEdit(PAGECONTROL::SCP_IPTEXT,      x + 150, y + 150, 200, 30);
+        this->AddTextEdit(PAGECONTROL::SCP_GROUPIDTEXT, x + 150, y + 200, 200, 30);
 
-        this->AddButton(connectButton, "Connect", x, y + 300, 350, 30);
+        this->AddButton(PAGECONTROL::SCP_CONNECTBUTTON, "Connect", x, y + 300, 350, 30);
     }
 private:
 };

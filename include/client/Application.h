@@ -9,14 +9,15 @@
 #include "client/UI/pages/SVConnectPage.h"
 #include "client/UI/pages/HomePage.h"
 
-// A specific class to handle overall operations
 
+// A specific class to handle overall operations
 class Application
 {
 public:
     enum MENU{ CONNECTIONS = 0, TOOLS, HELP };
     enum MENUITEM{ SVCONNECT = 0, DISCONNECT, PREFERENCE, ABOUT };
     enum TOOLITEM{ BACK = 0 };
+
     Application()
     {
         if (app)
@@ -25,23 +26,34 @@ public:
         }
         app = this;
     }
- 
-    static void UIEventHandler(UIEventData* eventData)
+
+    void OnMenuItemClick(int menuItemID)
     {
-        switch (eventData->event)
+        switch (menuItemID)
         {
-        case EVENT::MENUITEMCLICK:
-            switch (eventData->controlID)
-            {
-            case MENUITEM::ABOUT:
-                app->uiManager.NavigateTo(PAGE::ABOUTPAGE);
-                break;
-            default:
-                break;
-            }
+        case MENUITEM::SVCONNECT:
             break;
-        case EVENT::BUTTONCLICK:
-            if (eventData->controlID == app->svConnectPage->connectButton)
+        case MENUITEM::DISCONNECT:
+            break;
+        case MENUITEM::PREFERENCE:
+            break;
+        case MENUITEM::ABOUT:
+            break;
+        default:
+            break;
+            // may be throw something
+        }
+    }
+    void OnButtonEvent(int buttonID)
+    {
+        switch (buttonID)
+        {
+        case PAGECONTROL::LP_LOGINBUTTON:
+            break;
+        case PAGECONTROL::SP_SIGNUPBUTTON:
+            break;
+        case PAGECONTROL::SCP_CONNECTBUTTON:
+            try
             {
                 app->client.SetName(app->svConnectPage->GetName());
                 app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
@@ -50,16 +62,50 @@ public:
                 app->client.SetMessageEventHandler((ClientMessageEventHandler));
                 app->client.HandleRequestsAsync();
             }
-            else if (eventData->controlID == app->homePage->sendBttn)
+            catch (std::exception err)
             {
-                app->client.SendMessageA(0, app->homePage->GetMsg());
-                app->homePage->msgHistory->AppendToNewLine(std::string("You: ") + app->homePage->GetMsg());
+                std::cout << "oops! something bad happened\n" << err.what();
+                std::cout << std::endl;
             }
+            break;
+        case PAGECONTROL::HP_SENDBUTTON:
+            app->client.SendMessageA(0, app->homePage->GetMsg());
+            app->homePage->msgHistory->AppendToNewLine(std::string("You: ") + app->homePage->GetMsg());
+            app->homePage->ClearMsgText();
+            break;
+        default:
+            break;
+            // may be throw something
+        }
+    }
+    void OnToolItemClick(int toolItemID)
+    {
+        switch (toolItemID)
+        {
+        case TOOLITEM::BACK:
+            break;
+        default:
+            break;
+            // may be throw something
+        }
+    }
+ 
+    static void UIEventHandler(UIEventData* eventData)
+    {
+        switch (eventData->event)
+        {
+        case EVENT::MENUITEMCLICK:
+            app->OnMenuItemClick(eventData->controlID);
+            break;
+        case EVENT::BUTTONCLICK:
+            app->OnButtonEvent(eventData->controlID);
+            break;
+        case EVENT::TOOLITEMCLICK:
+            app->OnToolItemClick(eventData->controlID);
             break;
         default:
             break;
         }
-        std::cout << "Some shit just happened";
     }
     static void ClientMessageEventHandler(boost::shared_ptr<MessageEventData> eventData)
     {
@@ -69,8 +115,6 @@ public:
     }
     void Initialize(GtkWidget* parent, GtkWidget* fixed)
     {
-        
-
         uiManager.Initialize(parent, fixed);
         uiManager.SetEventHandler(UIEventHandler);
 
@@ -105,13 +149,15 @@ public:
     }
 
 private:
-    LoginPage* loginPage;
-    AboutPage* aboutPage;
-    SVConnectPage* svConnectPage;
-    HomePage* homePage;
+    LoginPage*      loginPage;
+    AboutPage*      aboutPage;
+    SVConnectPage*  svConnectPage;
+    HomePage*       homePage;
+
     static Application* app;
-    UIManager uiManager;
-    Client client;
+
+    UIManager   uiManager;
+    Client      client;
 };
 
 Application* Application::app = 0;

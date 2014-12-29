@@ -83,10 +83,6 @@ int main(int argc, char *argv[])
 
     Application app;
     app.Initialize(mainWindow, fixed);
-
-    /*UIManager uiManager;
-    uiManager.Initialize(mainWindow, fixed);
-    uiManager.NavigateTo(PAGE::LOGINPAGE);*/
     
     
     gtk_main();

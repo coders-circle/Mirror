@@ -45,9 +45,6 @@
     <ClInclude Include="..\..\include\client\Client.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\Application.h">
-      <Filter>include\UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\UI\Button.h">
       <Filter>include\UI</Filter>
     </ClInclude>
@@ -129,6 +126,9 @@
     <ClInclude Include="..\..\include\common\UdpHandler.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\Application.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
@@ -149,10 +149,6 @@
     <ClCompile Include="..\..\src\common\UdpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\UI\Statusbar.cpp" />
-    <ClCompile Include="..\..\src\client\UI\TextEdit.cpp" />
-    <ClCompile Include="..\..\src\client\UI\UIManager.cpp" />
-    <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
     <ClCompile Include="..\..\src\client\UI\Button.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
@@ -178,6 +174,18 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\client\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Statusbar.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\TextEdit.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\UIManager.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\VideoCapture.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
