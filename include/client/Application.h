@@ -64,7 +64,7 @@ public:
     static void ClientMessageEventHandler(boost::shared_ptr<MessageEventData> eventData)
     {
         char temp[128];
-        sprintf(temp, "%d: %s", eventData->senderId, eventData->message.c_str());
+        sprintf(temp, "%s: %s", eventData->senderId.c_str(), eventData->message.c_str());
         app->homePage->msgHistory->AppendToNewLine(std::string(temp));
     }
     void Initialize(GtkWidget* parent, GtkWidget* fixed)

@@ -33,17 +33,41 @@
     <ClInclude Include="..\..\include\common\ChatMessage.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\RtpHandler.h">
-      <Filter>include\common\Network</Filter>
+    <ClInclude Include="..\..\include\client\Client.h">
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpRequest.h">
+    <ClInclude Include="..\..\include\client\Application.h" />
+    <ClInclude Include="..\..\include\client\FrameRenderer.h" />
+    <ClInclude Include="..\..\include\client\UI\Button.h" />
+    <ClInclude Include="..\..\include\client\UI\Control.h" />
+    <ClInclude Include="..\..\include\client\UI\Label.h" />
+    <ClInclude Include="..\..\include\client\UI\Menu.h" />
+    <ClInclude Include="..\..\include\client\UI\Page.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\AboutPage.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\HomePage.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\SignupPage.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\SVConnectPage.h" />
+    <ClInclude Include="..\..\include\client\UI\Statusbar.h" />
+    <ClInclude Include="..\..\include\client\UI\TextEdit.h" />
+    <ClInclude Include="..\..\include\client\UI\Toolbar.h" />
+    <ClInclude Include="..\..\include\client\UI\UIManager.h" />
+    <ClInclude Include="..\..\include\client\VideoCapture.h" />
+    <ClInclude Include="..\..\include\common\Page.h" />
+    <ClInclude Include="..\..\include\common\RTPCommon.h" />
+    <ClInclude Include="..\..\include\common\RtpReceiver.h" />
+    <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
+    <ClInclude Include="..\..\include\common\TcpListener.h" />
+    <ClInclude Include="..\..\include\common\TcpReceiver.h" />
+    <ClInclude Include="..\..\include\common\TcpTransmitter.h" />
+    <ClInclude Include="..\..\include\common\RtpHandler.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\common\TcpAcceptor.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\Client.h">
-      <Filter>include</Filter>
+    <ClInclude Include="..\..\include\common\TcpRequest.h">
+      <Filter>include\common\Network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\common\UdpHandler.h">
       <Filter>include\common\Network</Filter>
@@ -74,5 +98,16 @@
     <ClCompile Include="..\..\src\common\UdpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\client\Application.cpp" />
+    <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Button.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Control.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Label.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Menu.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Page.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Statusbar.cpp" />
+    <ClCompile Include="..\..\src\client\UI\TextEdit.cpp" />
+    <ClCompile Include="..\..\src\client\UI\UIManager.cpp" />
+    <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
   </ItemGroup>
 </Project>

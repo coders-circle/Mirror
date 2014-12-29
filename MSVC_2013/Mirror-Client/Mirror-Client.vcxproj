@@ -96,12 +96,16 @@
     <ClInclude Include="..\..\include\common\Exception.h" />
     <ClInclude Include="..\..\include\common\Page.h" />
     <ClInclude Include="..\..\include\common\RTPCommon.h" />
+    <ClInclude Include="..\..\include\common\RtpHandler.h" />
     <ClInclude Include="..\..\include\common\RtpReceiver.h" />
     <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
+    <ClInclude Include="..\..\include\common\TcpAcceptor.h" />
     <ClInclude Include="..\..\include\common\TcpHandler.h" />
     <ClInclude Include="..\..\include\common\TcpListener.h" />
     <ClInclude Include="..\..\include\common\TcpReceiver.h" />
+    <ClInclude Include="..\..\include\common\TcpRequest.h" />
     <ClInclude Include="..\..\include\common\TcpTransmitter.h" />
+    <ClInclude Include="..\..\include\common\UdpHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\Application.cpp" />

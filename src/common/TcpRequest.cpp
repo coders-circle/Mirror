@@ -53,18 +53,20 @@ void TcpRequest::JoinChat(TcpHandler &tcpHandler, uint32_t groupId)
     Send(tcpHandler);
 }
 
-void TcpRequest::ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, uint32_t groupId)
+void TcpRequest::ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, const std::string &userId, uint32_t groupId)
 {
     /*
     Example:
         {
             Request-Type: 2
+            User-Id: bibek@dahal.com
             Group-Id: 20
             Message-Size: 50
         }
     */
     New();
     m_document.AddMember("Request-Type", Value((int)CHAT_MESSAGE), m_document.GetAllocator());
+    m_document.AddMember("User-Id", Value(userId.c_str(), m_document.GetAllocator()), m_document.GetAllocator());
     m_document.AddMember("Group-Id", Value(groupId), m_document.GetAllocator());
     m_document.AddMember("Message-Size", Value(messageSize), m_document.GetAllocator());
     Send(tcpHandler);;
@@ -168,4 +170,9 @@ std::string TcpRequest::GetPublicIp()
 uint16_t TcpRequest::GetPublicPort()
 {
     return GetValue("Public-Port").GetUint();
+}
+
+std::string TcpRequest::GetUserId()
+{
+    return GetValue("User-Id").GetString();
 }
