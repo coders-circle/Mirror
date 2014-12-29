@@ -62,6 +62,7 @@ void ClientsManager::ProcessClients()
                     // Request to join chat, since this is the server, this is a request to join a group chat
                     case TcpRequest::JOIN_CHAT:
                         id = m_requests.GetGroupId();
+                        m_requests.JoinChat(m_clients[i].connection, id);
                         // push the client id to the group
                         m_groups[id].push_back(i);
                         std::cout << "Connected client #" << i << " to group #" << id << std::endl;

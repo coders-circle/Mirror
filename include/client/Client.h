@@ -2,7 +2,15 @@
 #include <common/TcpHandler.h>
 #include <common/TcpRequest.h>
 
+/* Data passed to the message event handler */
+struct MessageEventData
+{
+    /* peer-id; 0 is for server itself */
+    size_t senderId;
+    std::string message;
+};
 
+/* Class to handle networking connections in client application */
 class Client
 {
 public:
@@ -21,16 +29,25 @@ public:
     // Start handling all requests that the client gets
     void HandleRequests();
 
-    // Join chat, for p2p set groupId to 0
-    void JoinChat(uint32_t connectionId, uint32_t groupId = 0);
+    // Set the event handler to handle incoming chat messages
+    void SetMessageEventHandler(std::function<void(MessageEventData&)> handler) { m_messageHandler = handler; }
+    // Send chat message to a connection (receiverId = 0 for server)
+    void SendMessage(size_t receiverId, const std::string& message, uint32_t groupId = 0);
+    // Event handler to handle a join chat request from a peer (for p2p only)
+    void SetJoinChatEventHandler(std::function<bool(size_t)> handler) { m_joinChatHandler = handler; }
+
+    // Send a join chat request; on successful returns true
+    bool JoinChat(uint32_t connectionId, uint32_t groupId = 0);
     // Set username to use while sending messages
     void SetName(const std::string &name) { m_name = name; }
-
-    // For console:
-    // Start Chat Input in a separate thread
-    void StartChatInput(uint32_t groupId);
+    const std::string& GetName() { return m_name; }
 
 private:
+    boost::asio::io_service m_io;
+    // Event handlers
+    std::function<void(MessageEventData&)> m_messageHandler;
+    std::function<bool(size_t)> m_joinChatHandler;
+
     // Connection representing a tcp-connection with a peer/server
     struct Connection
     {
@@ -40,8 +57,6 @@ private:
         TcpHandler tcpHandler;
         // maybe store userid and other stuffs here...
     };
-
-    boost::asio::io_service m_io;
 
     // List of the connections
     std::vector<Connection> m_connections;
@@ -59,8 +74,4 @@ private:
     void P2PListen(const tcp::endpoint &localEndpoint);
     void P2PConnect(tcp::endpoint &remoteEndpoint);
 
-    // For console:
-    int m_currentConnection;
-    // Separate thread for inputting chat messages
-    void ChatInput(uint32_t groupId);
 };

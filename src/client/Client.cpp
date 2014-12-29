@@ -3,7 +3,6 @@
 #include <common/ChatMessage.h>
 
 Client::Client()
-: m_currentConnection(-1)
 {}
 
 Client::~Client()
@@ -105,6 +104,8 @@ void Client::P2PListen(const tcp::endpoint &localEndpoint)
 {
     try
     {
+        if (m_acceptor)
+            m_acceptor->cancel();
         m_acceptor.reset(new tcp::acceptor(m_io, localEndpoint, true));
         // Create a new socket to represent a new connection
         boost::shared_ptr<tcp::socket> socket(new tcp::socket(m_acceptor->get_io_service()));
@@ -166,6 +167,7 @@ void Client::HandleRequests()
                 size_t bytes = m_connections[i].tcpHandler.Available();
                 ChatMessage chat;
                 uint32_t id;
+                bool joinChat;
                 // if so, process accordingly
                 if (bytes > 0)
                 {
@@ -174,14 +176,26 @@ void Client::HandleRequests()
                     {
                     // Request to join chat conversation
                     case TcpRequest::JOIN_CHAT:
-                        m_currentConnection = i;
+                        if (m_joinChatHandler)
+                            joinChat = m_joinChatHandler(i);
+                        else
+                            joinChat = true;
+                        if (joinChat)
+                            m_request.JoinChat(m_connections[i].tcpHandler, m_request.GetGroupId());
+                        else
+                            m_request.Invalid(m_connections[i].tcpHandler);
                         break;
 
                     // Request to receive an incoming chat message
                     case TcpRequest::CHAT_MESSAGE:
                         chat.Receive(m_connections[i].tcpHandler, m_request.GetMessageSize());
-                        m_currentConnection = i;
-                        std::cout << "\n\n" << chat.GetMessage() << "\n\nYou: ";
+                        if (m_messageHandler)
+                        {
+                            MessageEventData msgData;
+                            msgData.senderId = i;
+                            msgData.message = chat.GetMessage();
+                            m_messageHandler(msgData);
+                        }
                         break;
 
                     // Request for a p2p tcp connection
@@ -208,36 +222,23 @@ void Client::HandleRequests()
     }
 }
 
-void Client::StartChatInput(uint32_t groupId)
-{
-    boost::thread t(boost::bind(&Client::ChatInput, this, _1), groupId);
-}
-
-void Client::JoinChat(uint32_t connectionId, uint32_t groupId)
+bool Client::JoinChat(uint32_t connectionId, uint32_t groupId)
 {
     m_request.JoinChat(m_connections[connectionId].tcpHandler, groupId);
-    m_currentConnection = connectionId;
+    // We need a JOIN_CHAT request back from other peer/server to ensure chat is joined
+    m_request.ReceiveRequest(m_connections[connectionId].tcpHandler);
+    if (m_request.GetRequestType() != TcpRequest::JOIN_CHAT)
+        return false;
+    return true;
 }
 
-void Client::ChatInput(uint32_t groupId)
+void Client::SendMessage(size_t receiverId, const std::string& message, uint32_t groupId)
 {
-    while (true)
-    {
-        while (m_currentConnection == -1)
-            boost::this_thread::sleep(boost::posix_time::milliseconds(500));
-
-        // Take input
-        std::cout << "\nYou: ";
-        fflush(stdin);
-        char input[1024];
-
-        std::cin.getline(input, 1024);
-        std::string message = m_name + ": " + input;
-
-        // Send the chat message after a GROUP_CHAT request
-        m_request.ChatMessage(m_connections[m_currentConnection].tcpHandler, message.size() + 1, groupId);
-        ChatMessage chat;
-        chat.SetMessage(message);
-        chat.Send(m_connections[m_currentConnection].tcpHandler);
-    }
+    if (receiverId >= m_connections.size())
+        throw Exception("Invalid Connection-Id to send message to");
+    // Send the chat message after a CHAT_MESSAGE request
+    m_request.ChatMessage(m_connections[receiverId].tcpHandler, message.size() + 1, groupId);
+    ChatMessage chat;
+    chat.SetMessage(message);
+    chat.Send(m_connections[receiverId].tcpHandler);
 }
