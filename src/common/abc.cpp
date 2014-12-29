@@ -12,9 +12,14 @@ int main()
 	std::string port = "8000";
 	
 	httpHandler.Initialize(host, port);
-	std::string json = "{\"username\" : \"bpandey\",\"password\" : \"mysql\"}";
-	httpHandler.SendPostRequest("/test/process-login/", json);
+	std::string json = "name=bpandey&password=mysql";
+	//httpHandler.SendPostRequest("/test/process-login/", json);
+	httpHandler.SendGetRequest("/test/");
 	httpHandler.GetResponse();
+	}
+	catch(Exception &ex)
+	{
+		std::cout << ex.what();
 	}
 	catch(int a)
 	{

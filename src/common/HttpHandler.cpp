@@ -73,14 +73,14 @@ void HttpHandler::SendPostRequest(std::string location, std::string jsonString)
 {
 	std::string requestStr = "POST " + location + " HTTP/1.0\r\n";
 	requestStr += "Host: " + m_hostName + "\r\n";
-	requestStr += "Content-Type: application/jsonrequest\r\n";
+	requestStr += "Content-Type: application/x-www-form-urlencoded\r\n";
 	requestStr += "Accept: */*\r\n";
 	requestStr += "Content-Length: " + std::to_string(jsonString.length()) + "\r\n";
 	requestStr += "Connection: Keep-Alive\r\n\r\n";
 	requestStr += jsonString;
 	
 	// convert requestStr to char*
-	int length  = requestStr.length() + 1;
+	int length  = requestStr.length();
 	// first create a temporary char* 
 	char *temp = new char[length];
 	strcpy(temp, requestStr.c_str());
@@ -98,11 +98,11 @@ void HttpHandler::GetResponse()
 {
 	try
 	{
-		boost::asio::read_until(*m_socket, m_serverResponse, "\r\n\r\n");
+		boost::asio::read_until(*m_socket, m_serverResponse, "</html>"); 
 	}
 	catch (Exception &e)
 	{
-		boost::asio::read_until(*m_socket, m_serverResponse, "\r\n");
+		boost::asio::read_until(*m_socket, m_serverResponse, "\r\n\r\n");
 	}
 	// following printing is just for the test purpose
 	std::istream responseStream(&m_serverResponse);
