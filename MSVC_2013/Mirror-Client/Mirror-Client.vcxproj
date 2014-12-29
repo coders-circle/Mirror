@@ -83,6 +83,7 @@
     <ClInclude Include="..\..\include\client\UI\pages\AboutPage.h" />
     <ClInclude Include="..\..\include\client\UI\pages\HomePage.h" />
     <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\pages.h" />
     <ClInclude Include="..\..\include\client\UI\pages\SignupPage.h" />
     <ClInclude Include="..\..\include\client\UI\pages\SVConnectPage.h" />
     <ClInclude Include="..\..\include\client\UI\Statusbar.h" />

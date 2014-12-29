@@ -19,6 +19,15 @@
     <Filter Include="src\common\Network">
       <UniqueIdentifier>{7ad2755b-7297-4301-a7ca-de728d42e37d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\UI">
+      <UniqueIdentifier>{f2d9ac6f-78dd-41fa-8c99-b674474212de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\UI\pages">
+      <UniqueIdentifier>{173bf3bb-df8f-4435-8da3-8640b84b69ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\UI">
+      <UniqueIdentifier>{639609fc-2ce0-49ee-a412-7904e176086f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\common\common.h">
@@ -33,26 +42,86 @@
     <ClInclude Include="..\..\include\common\ChatMessage.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\RtpHandler.h">
-      <Filter>include\common\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpRequest.h">
-      <Filter>include\common\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpAcceptor.h">
-      <Filter>include\common\Network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\Client.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\UdpHandler.h">
-      <Filter>include\common\Network</Filter>
+    <ClInclude Include="..\..\include\client\Application.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Button.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Control.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Label.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Menu.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\Page.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Page.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Statusbar.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\TextEdit.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Toolbar.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\UIManager.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\SVConnectPage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\SignupPage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\LoginPage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\HomePage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\AboutPage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\FrameRenderer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RTPCommon.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpReceiver.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpTransmitter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpListener.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpReceiver.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpTransmitter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\VideoCapture.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\pages.h">
+      <Filter>include\UI\pages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\client\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
@@ -68,11 +137,39 @@
     <ClCompile Include="..\..\src\common\TcpAcceptor.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\UdpHandler.cpp">
+      <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Statusbar.cpp" />
+    <ClCompile Include="..\..\src\client\UI\TextEdit.cpp" />
+    <ClCompile Include="..\..\src\client\UI\UIManager.cpp" />
+    <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
+    <ClCompile Include="..\..\src\client\UI\Button.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Control.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Label.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Menu.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\UI\Page.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\Application.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\client\Client.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\UdpHandler.cpp">
-      <Filter>src\common\Network</Filter>
+    <ClCompile Include="..\..\src\client\FrameRenderer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\main.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
