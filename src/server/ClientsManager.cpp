@@ -122,7 +122,7 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
         {
             if (m_groups[group][i] != client)
             {
-                m_requests.ChatMessage(m_clients[i].connection, chat.GetMessage().size() + 1);
+                m_requests.ChatMessage(m_clients[i].connection, chat.GetMessage().size() + 1, m_requests.GetUserId());
                 chat.Send(m_clients[m_groups[group][i]].connection);
             }
         }

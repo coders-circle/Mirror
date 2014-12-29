@@ -194,7 +194,8 @@ void Client::HandleRequests()
                         if (m_messageHandler)
                         {
                             boost::shared_ptr<MessageEventData> msgData(new MessageEventData);
-                            msgData->senderId = i;
+                            msgData->senderId = m_request.GetUserId();
+                            msgData->connectionId = i;
                             msgData->message = chat.GetMessage();
                             m_messageHandler(msgData);
                         }
@@ -239,7 +240,7 @@ void Client::SendMessage(size_t receiverId, const std::string& message, uint32_t
     if (receiverId >= m_connections.size())
         throw Exception("Invalid Connection-Id to send message to");
     // Send the chat message after a CHAT_MESSAGE request
-    m_request.ChatMessage(m_connections[receiverId].tcpHandler, message.size() + 1, groupId);
+    m_request.ChatMessage(m_connections[receiverId].tcpHandler, message.size() + 1, m_name, groupId);
     ChatMessage chat;
     chat.SetMessage(message);
     chat.Send(m_connections[receiverId].tcpHandler);

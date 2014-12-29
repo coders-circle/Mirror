@@ -5,8 +5,8 @@
 /* Data passed to the message event handler */
 struct MessageEventData
 {
-    /* peer-id; 0 is for server itself */
-    size_t senderId;
+    size_t connectionId;
+    std::string senderId;
     std::string message;
 };
 
