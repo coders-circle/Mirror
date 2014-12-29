@@ -96,29 +96,41 @@
     <ClInclude Include="..\..\include\client\FrameRenderer.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\common\RTPCommon.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\RtpReceiver.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\RtpTransmitter.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpListener.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpReceiver.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\common\TcpTransmitter.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\VideoCapture.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\client\UI\pages\pages.h">
       <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RTPCommon.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpHandler.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpReceiver.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\RtpTransmitter.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpAcceptor.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpListener.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpReceiver.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpRequest.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\TcpTransmitter.h">
+      <Filter>include\common\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\common\UdpHandler.h">
+      <Filter>include\common\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
