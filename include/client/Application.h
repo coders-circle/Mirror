@@ -48,7 +48,7 @@ public:
                 app->client.JoinChat(0);
                 app->uiManager.NavigateTo(PAGE::HOMEPAGE);
                 app->client.SetMessageEventHandler(ClientMessageEventHandler);
-                //app->client.HandleRequests();
+                app->client.HandleRequestsAsync();
             }
             else if (eventData->controlID == app->homePage->sendBttn)
             {
