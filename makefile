@@ -1,26 +1,51 @@
-LIBFLAGS = `pkg-config --libs gtk+-3.0`
-CFLAG = `pkg-config --cflags gtk+-3.0`
+## Directories to search include and source files
+INC_DIR := include
+COMMON_SRC_DIRS := common
+CLIENT_SRC_DIRS := client client/UI
+SERVER_SRC_DIRS := server
 
-INC_DIR = include
-SRC_DIR = src
+## Directories to build files into
+OBJ_DIR := obj
+BIN_DIR := bin
 
-CC = g++
-CFLAGS = --std=c++11
+## List of all c++ files to compile
+COMMON_CPP_FILES := $(wildcard $(COMMON_SRC_DIRS:%=src/%/*.cpp))
+CLIENT_CPP_FILES := $(wildcard $(CLIENT_SRC_DIRS:%=src/%/*.cpp)) $(COMMON_CPP_FILES)
+SERVER_CPP_FILES := $(wildcard $(SERVER_SRC_DIRS:%=src/%/*.cpp)) $(COMMON_CPP_FILES)
 
-#sources for common
-SOURCES_COM = TcpHandler.cpp TcpListener.cpp
-HEADERS_COM = TcpHandler.h TcpListener.h
-OBJECTS_COM = $(SOURCES_COM:.cpp=.o)
-FSOURCES_COM := $(addprefix $(SRC_DIR)/common/,$(SOURCES_COM))
-FHEADERS_COM := $(addprefix $(INC_DIR)/common/,$(HEADERS_FILE))
+## List of all object files to generate
+CLIENT_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(CLIENT_CPP_FILES:src/%.cpp=%.o))
+SERVER_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(SERVER_CPP_FILES:src/%.cpp=%.o))
 
-LDFLAGS_COM = -lboost_system -lboost_thread -lpthread
+## Compiler, compiler and linker flags and libaries to use
+CXX := g++
+CXXLIBS := `pkg-config --cflags gtk+-3.0 opencv`
+LDLIBS := `pkg-config --libs gtk+-3.0 opencv` -lboost_system -lboost_thread -lpthread
+CXXFLAGS := -I $(INC_DIR) -MMD --std=c++11 $(CXXLIBS) -Wno-deprecated-declarations
+LDFLAGS := --std=c++11 $(LDLIBS)
 
-client:  tcplistener.o tcphandler.o
-	$(CC) main.cpp -o $@ $(CFLAGS)
+## Build client and server applications
+all: bin/client bin/server
 
-tcphandler.o : $(FHEADERS_COM)
-	$(CC) -c $(CFLAGS) $(SRC_DIR)/common/TcpHandler.cpp -g -o $@ -I$(INC_DIR) $(LDFLAGS_COM) $(CFLAG)
+$(BIN_DIR)/client: $(CLIENT_OBJ_FILES) | $(BIN_DIR)
+	$(CXX) -o $@ $^ $(LDFLAGS)
+$(BIN_DIR)/server: $(SERVER_OBJ_FILES) | $(BIN_DIR)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-tcplistener.o : $(FHEADERS_COM)
-	$(CC) -c $(CFLAGS) $(SRC_DIR)/common/TcpListener.cpp -g -o $@ -I$(INC_DIR) $(LDFLAGS_COM) $(CFLAG)
+$(OBJ_DIR)/%.o: src/%.cpp | $(OBJ_DIR)
+	$(CXX) -c -o $@ $< $(CXXFLAGS) 
+
+$(BIN_DIR):
+	mkdir $(BIN_DIR)
+
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR) $(CLIENT_SRC_DIRS:%=$(OBJ_DIR)/%) $(COMMON_SRC_DIRS:%=$(OBJ_DIR)/%) $(SERVER_SRC_DIRS:%=$(OBJ_DIR)/%)
+	
+## Clean up everything and make necessary directories
+clean:
+	rm -rf obj
+	rm -rf bin
+
+## Include auto-generated dependencies rules
+OBJFILES := $(CLIENT_OBJ_FILES) $(SERVER_OBJ_FILES)
+-include $(OBJFILES:.o=.d)

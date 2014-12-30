@@ -1,3 +1,4 @@
+#include <common/common.h>
 #include "client/UI/Page.h"
 
 void Page::AllocateNewControl(int type, int id)
