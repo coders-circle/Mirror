@@ -182,6 +182,8 @@ void Client::HandleRequests()
         {
             try
             {
+                // Sleep some time to save CPU usage
+                boost::this_thread::sleep(boost::posix_time::milliseconds(200));
                 // See if any request is incomming for this connection
                 size_t bytes = m_connections[i].tcpHandler.Available();
                 ChatMessage chat;
