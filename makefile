@@ -1,26 +1,31 @@
-LIBFLAGS = `pkg-config --libs gtk+-3.0`
-CFLAG = `pkg-config --cflags gtk+-3.0`
-
 INC_DIR = include
 SRC_DIR = src
 
-CC = g++
+CFLAG = `pkg-config --cflags gtk+-3.0`
 CFLAGS = --std=c++11
 
-#sources for common
-SOURCES_COM = TcpHandler.cpp TcpListener.cpp
-HEADERS_COM = TcpHandler.h TcpListener.h
-OBJECTS_COM = $(SOURCES_COM:.cpp=.o)
-FSOURCES_COM := $(addprefix $(SRC_DIR)/common/,$(SOURCES_COM))
-FHEADERS_COM := $(addprefix $(INC_DIR)/common/,$(HEADERS_FILE))
+CC = g++
 
-LDFLAGS_COM = -lboost_system -lboost_thread -lpthread
+#for common
+SOURCES_COMM = TcpHandler.cpp HttpHandler.cpp
+HEADERS_COMM = TcpHandler.h HttpHandler.h
+OBJECTS_COMM = $(SOURCES_COMM:.cpp=.o)
+FSOURCES_COMM := $(addprefix $(SRC_DIR)/common/, $(SOURCES_COMM))
+FHEADERS_COMM := $(addprefix $(INC_DIR)/common/, $(HEADERS_COMM))
 
-client:  tcplistener.o tcphandler.o
-	$(CC) main.cpp -o $@ $(CFLAGS)
+LDFLAGS_COMM = -lboost_system -lboost_thread -lpthread
 
-tcphandler.o : $(FHEADERS_COM)
-	$(CC) -c $(CFLAGS) $(SRC_DIR)/common/TcpHandler.cpp -g -o $@ -I$(INC_DIR) $(LDFLAGS_COM) $(CFLAG)
+all: common
+	$(CC) -o output $(SRC_DIR)/common/abc.cpp *.o -Iinclude/ $(CFLAGS) $(CFLAG) $(LDFLAGS_COMM)
 
-tcplistener.o : $(FHEADERS_COM)
-	$(CC) -c $(CFLAGS) $(SRC_DIR)/common/TcpListener.cpp -g -o $@ -I$(INC_DIR) $(LDFLAGS_COM) $(CFLAG)
+common: $(OBJECTS_COMM)
+	$(CC) -c -o common.o $<
+
+%.o :  src/common/%.cpp 
+	$(CC) -c -o $@ $< $(LDFLAGS_COMM) -Iinclude/ $(CFLAG) $(CFLAGS)
+
+client.o: src/client/TcpClient.cpp
+	$(CC)  -c -o $@ $< -Iinclude/ $(CFLAG) $(CFLAGS)
+	
+clean:
+	rm *.o

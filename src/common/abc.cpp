@@ -12,9 +12,7 @@ int main()
 	std::string port = "8000";
 	
 	httpHandler.Initialize(host, port);
-	std::string json = "name=bpandey&password=mysql";
-	//httpHandler.SendPostRequest("/test/process-login/", json);
-	httpHandler.SendGetRequest("/test/");
+	httpHandler.SendGetRequest("/test/process-login/");
 	httpHandler.GetResponse();
 	}
 	catch(Exception &ex)
