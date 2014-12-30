@@ -101,7 +101,7 @@ void Application::OnButtonEvent(int buttonID)
         }
         break;
     case PAGECONTROL::HP_SENDBUTTON:
-        app->client.SendMessageA(0, app->homePage->GetMsg());
+        app->client.SendMessage(0, app->homePage->GetMsg());
         app->homePage->msgHistory->AppendToNewLine(std::string("You: ") + app->homePage->GetMsg());
         app->homePage->ClearMsgText();
         break;
