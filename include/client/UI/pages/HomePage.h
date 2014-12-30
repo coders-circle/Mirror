@@ -28,8 +28,8 @@ public:
 
         
         int x = 150, y = 100;
-        this->AddTextEdit(PAGECONTROL::HP_MSGTEXT, x, y, 300, 40);
-        this->AddButton(PAGECONTROL::HP_SENDBUTTON, "Send", x + 320, y, 100, 25);
-        msgHistory = static_cast<Label*>(this->AddLabel(2, x, y + 50));
+        this->AddTextEdit(PAGECONTROL::HP_MSGTEXT, x, y + 410, 590, 40);
+        this->AddButton(PAGECONTROL::HP_SENDBUTTON, "Send", x + 600, y + 410, 100, 25);
+        msgHistory = static_cast<Label*>(this->AddLabel(PAGECONTROL::HP_MSGHISTORYLABEL, x, y, 700, 400));
     }
 };

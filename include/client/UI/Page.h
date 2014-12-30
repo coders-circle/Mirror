@@ -53,7 +53,7 @@ public:
     // the text may contain pango markup syntax,
     // returns a pointer to the created object
     // typecast to Label*
-    Control* AddLabel(int id, int x, int y);
+    Control* AddLabel(int id, int x, int y, int w, int h);
 
     // Adds a Edit Box in the specified coordinate,
     // id = unique identifier for the control

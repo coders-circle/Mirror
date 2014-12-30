@@ -15,7 +15,7 @@ public:
     int GetID();
     void PutFixedAt(GtkWidget *fixed, int x, int y);
     void PutFixedRelativeTo(Control* obj, GtkWidget* fixed, int xOffset, int yOffset);
-    void Show();
+    virtual void Show();
     void Hide();
     GtkWidget* GetHandle();
 protected:

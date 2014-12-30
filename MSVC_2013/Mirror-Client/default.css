@@ -4,6 +4,10 @@
 	font: Segoe UI;
 }
 
+GtkScrolledWindow{
+	background:transparent;
+}
+
 GtkToolbar{
 	background:transparent;
 }
@@ -13,12 +17,13 @@ background: -gtk-gradient (linear,
                0 0, 0 1,
                color-stop(0, #f8f8f8),
                color-stop(0.2, #eee),
-               color-stop(1, #aaa));
+               color-stop(1, #bbb));
 }
 
 GtkLabel{
 font: Segoe UI;
 padding-bottom:6px;
 padding-top:2px;
-
+padding-left:5px;
+padding-right:5px;
 }

@@ -63,6 +63,15 @@ public:
         return m_pages[pageIndex];
     }
 
+    int GetCurrentPageID()
+    {
+        if (m_currentPage)
+        {
+            return m_currentPage->GetID();
+        }
+        return -1;
+    }
+
     static void SetEventHandler(UIEventCallBack eventHandler)
     {
         m_eventHandler = eventHandler;
