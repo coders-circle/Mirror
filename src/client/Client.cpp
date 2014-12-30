@@ -27,9 +27,13 @@ size_t Client::Connect(const tcp::endpoint& peer, bool* successful)
 }
 
 // Perform above function asynchronously
-void Client::ConnectAsync(const tcp::endpoint& peer, bool* successful)
+void Client::ConnectAsync(const tcp::endpoint& peer, bool* successful, size_t* connectionId)
 {
-    boost::thread t(boost::bind((size_t(Client::*)(const tcp::endpoint&, bool*))&Client::Connect, this, _1, _2), peer, successful);
+    boost::thread t([this, peer, successful, connectionId](){
+        size_t id = Connect(peer, successful);
+        if (connectionId)
+            *connectionId = id;
+    });
 }
 
 // Use server to connect to a client (for P2P)
@@ -57,6 +61,14 @@ size_t Client::Connect(uint32_t clientId, bool* successful)
         tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPublicIp()), m_request.GetPublicPort()), successful);
 }
 
+void Client::ConnectAsync(uint32_t clientId, bool* successful, size_t* connectionId)
+{
+    boost::thread t([this, clientId, successful, connectionId](){
+        size_t id = Connect(clientId, successful);
+        if (connectionId)
+            *connectionId = id;
+    });
+}
 size_t Client::HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint, bool* successful)
 {
     m_p2pConnecting = true;
@@ -148,6 +160,11 @@ void Client::P2PConnect(tcp::endpoint &remoteEndpoint)
             //std::cout << "Connector: " << ex.what() << std::endl;
         }
     }
+}
+
+void Client::HandleRequestsAsync() 
+{ 
+    boost::thread t(boost::bind(&Client::HandleRequests, this));
 }
 
 // An infinite loop to handle incoming requests

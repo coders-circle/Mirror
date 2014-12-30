@@ -23,13 +23,15 @@ public:
     // Connect to a peer/server,
     size_t Connect(const tcp::endpoint& peer, bool* successful = NULL);
     // Connect to a peer/server asynchronously
-    void ConnectAsync(const tcp::endpoint& peer, bool* successful = NULL);
+    void ConnectAsync(const tcp::endpoint& peer, bool* successful = NULL, size_t* connectionId = NULL);
     // Connect to a peer through server
     size_t Connect(uint32_t clientId, bool* successful = NULL);
+    // Connect to a peer through server asynchronously
+    void ConnectAsync(uint32_t clientId, bool* successful = NULL, size_t* connectionId = NULL);
     // Start handling all requests that the client gets
     void HandleRequests();
     // Start handling all requests asynchronously
-    void HandleRequestsAsync() { boost::thread t(boost::bind(&Client::HandleRequests, this)); }
+    void HandleRequestsAsync();
 
     // Set the event handler to handle incoming chat messages
     void SetMessageEventHandler(std::function<void(boost::shared_ptr<MessageEventData>)> handler) { m_messageHandler = handler; }
