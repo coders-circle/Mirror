@@ -18,8 +18,7 @@ public:
         m_w = w;
         m_h = h;
 
-        
-        //gtk_widget_set_size_request(m_handle, m_w - 50, m_h-50);
+       
         scw = gtk_scrolled_window_new(NULL, NULL);
         gtk_scrolled_window_set_min_content_width(GTK_SCROLLED_WINDOW(scw), m_w);
         gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scw), m_h);
