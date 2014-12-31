@@ -17,11 +17,11 @@ public:
 };
 
 const size_t RTP_HEADER_SIZE = 12;
-class RtpHandler
+class RtpPacket
 {
 public:
-    RtpHandler();
-    ~RtpHandler();
+    RtpPacket();
+    ~RtpPacket();
 
     void Initialize(boost::shared_ptr<UdpHandler> udpHandler, const udp::endpoint &remoteEndpoint);
     void CleanUp();

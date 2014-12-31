@@ -28,13 +28,20 @@ size_t Client::Connect(const tcp::endpoint& peer)
 void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* connectionId)
 {
     boost::thread t([this, peer, threadEnd, connectionId](){
-        if (threadEnd)
-            *threadEnd = false;
-        size_t id = Connect(peer);
-        if (connectionId)
-            *connectionId = id;
-        if (threadEnd)
-            *threadEnd = true;
+        try
+        {
+            if (threadEnd)
+                *threadEnd = false;
+            size_t id = Connect(peer);
+            if (connectionId)
+                *connectionId = id;
+            if (threadEnd)
+                *threadEnd = true;
+        }
+        catch (std::exception &ex)
+        {
+            std::cout << ex.what() << std::endl;
+        }
     });
 }
 
@@ -62,13 +69,20 @@ size_t Client::Connect(uint32_t clientId)
 void Client::ConnectAsync(uint32_t clientId, bool* threadEnd, size_t* connectionId)
 {
     boost::thread t([this, clientId, threadEnd, connectionId](){
-        if (threadEnd)
-            *threadEnd = false;
-        size_t id = Connect(clientId);
-        if (connectionId)
-            *connectionId = id;
-        if (threadEnd)
-            *threadEnd = true;
+        try
+        {
+            if (threadEnd)
+                *threadEnd = false;
+            size_t id = Connect(clientId);
+            if (connectionId)
+                *connectionId = id;
+            if (threadEnd)
+                *threadEnd = true;
+        }
+        catch (std::exception &ex)
+        {
+            std::cout << ex.what() << std::endl;
+        }
     });
 }
 size_t Client::HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint)
