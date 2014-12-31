@@ -12,13 +12,13 @@ class TcpHandlerException : public Exception
 class TcpHandler
 {
 public:
-	TcpHandler(boost::asio::io_service &ioService);
+    TcpHandler(boost::asio::io_service &ioService);
     ~TcpHandler();
 
-	// Initialize with an already created socket
-	void Initialize(boost::shared_ptr<tcp::socket> socket);
-	// Connect to given endpoint and initialize by creating new socket
-	void Initialize(const tcp::endpoint &destEndpoint);
+    // Initialize with an already created socket
+    void Initialize(boost::shared_ptr<tcp::socket> socket);
+    // Connect to given endpoint and initialize by creating new socket
+    void Initialize(const tcp::endpoint &destEndpoint);
 
     // Send data of given size
 	void Send(const char* data, size_t size);
@@ -34,6 +34,7 @@ public:
     uint16_t GetRemotePort() const { return m_socket->remote_endpoint().port(); }
     boost::shared_ptr<tcp::socket> GetSocket() const { return m_socket; }
 
+    void Close();
 private:
 	boost::shared_ptr<tcp::socket> m_socket;
 	boost::asio::io_service &m_ioService;

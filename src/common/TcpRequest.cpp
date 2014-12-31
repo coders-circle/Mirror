@@ -95,6 +95,19 @@ void TcpRequest::P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::st
     Send(tcpHandler);
 }
 
+void TcpRequest::Disconnect(TcpHandler &tcpHandler)
+{
+    /*
+    Example:
+        {
+            Request-Type: 4
+        }
+    */
+    New();
+    m_document.AddMember("Request-Type", Value((int)DISCONNECT), m_document.GetAllocator());
+    Send(tcpHandler);
+}
+
 void TcpRequest::Invalid(TcpHandler& tcpHandler)
 {
     /*

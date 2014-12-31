@@ -21,17 +21,21 @@ public:
     boost::asio::io_service& GetIOService() { return m_io; }
 
     // Connect to a peer/server,
-    size_t Connect(const tcp::endpoint& peer, bool* successful = NULL);
+    size_t Connect(const tcp::endpoint& peer);
     // Connect to a peer/server asynchronously
-    void ConnectAsync(const tcp::endpoint& peer, bool* successful = NULL, size_t* connectionId = NULL);
+    void ConnectAsync(const tcp::endpoint& peer, bool* threadEnd = NULL, size_t* connectionId = NULL);
     // Connect to a peer through server
-    size_t Connect(uint32_t clientId, bool* successful = NULL);
+    size_t Connect(uint32_t clientId);
     // Connect to a peer through server asynchronously
-    void ConnectAsync(uint32_t clientId, bool* successful = NULL, size_t* connectionId = NULL);
+    void ConnectAsync(uint32_t clientId, bool* threadEnd = NULL, size_t* connectionId = NULL);
     // Start handling all requests that the client gets
     void HandleRequests();
     // Start handling all requests asynchronously
     void HandleRequestsAsync();
+    // Disconnect
+    void Disconnect(size_t connectionId);
+    // Check if connected
+    bool IsConnected(size_t connectionId);
 
     // Set the event handler to handle incoming chat messages
     void SetMessageEventHandler(std::function<void(boost::shared_ptr<MessageEventData>)> handler) { m_messageHandler = handler; }
@@ -59,6 +63,7 @@ private:
         : tcpHandler(io)
         {}
         TcpHandler tcpHandler;
+        bool connected;
         // maybe store userid and other stuffs here...
     };
 
@@ -72,8 +77,8 @@ private:
 
     // For P2P:
     bool m_p2pConnecting;
-    size_t HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint, bool* successful = NULL);
-    void HandleP2PRequestAsync(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint, bool* successful = NULL);
+    size_t HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint);
+    void HandleP2PRequestAsync(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint);
     boost::shared_ptr<tcp::acceptor> m_acceptor;
     void P2PListen(const tcp::endpoint &localEndpoint);
     void P2PConnect(tcp::endpoint &remoteEndpoint);
