@@ -41,6 +41,9 @@ void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* co
         catch (std::exception &ex)
         {
             std::cout << ex.what() << std::endl;
+            if (threadEnd)
+                *threadEnd = true;
+ 
         }
     });
 }
@@ -82,6 +85,9 @@ void Client::ConnectAsync(uint32_t clientId, bool* threadEnd, size_t* connection
         catch (std::exception &ex)
         {
             std::cout << ex.what() << std::endl;
+            if (threadEnd)
+                *threadEnd = true;
+
         }
     });
 }
