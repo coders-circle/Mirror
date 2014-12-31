@@ -1,13 +1,14 @@
 #include "client/Audio/AudioBuffer.h"
 #include "client/Audio/AudioStream.h"
+#include "client/Audio/AACEncoder.h"
 
 #include <iostream>
 #include <exception>
 #include <cassert>
 
 // Some constants:
-const double SAMPLE_RATE = 16000.0;
-const unsigned long FRAMES_PER_BUFFER	= 64;
+const double SAMPLE_RATE = 16000;
+const unsigned long FRAMES_PER_BUFFER = 64;
 const int NUM_CHANNELS = 1;
 
 int main()
@@ -16,6 +17,7 @@ int main()
 	{
 		/* Create a object that is used to record, save to file and play the audio. */
 		AudioBuffer	objAudioBuffer((int) (SAMPLE_RATE * 60));
+		AACEncoder encoder(24000, SAMPLE_RATE, 1);
 
 		/* Set up the System: */
 		portaudio::AutoSystem autoSys;
@@ -29,7 +31,6 @@ int main()
 		audioStream.CreateRecordStream();
 
 		/* create playback stream */
-		//std::cout << "Opening playback output stream on " << sys.deviceByIndex(outputDevice).name() << std::endl;
 		audioStream.SetPlaybackStreamParameters(NUM_CHANNELS, portaudio::INT16, SAMPLE_RATE, FRAMES_PER_BUFFER);
 		audioStream.CreatePlaybackStream();
 
@@ -47,7 +48,7 @@ int main()
 		std::cout << "recording successful... Press ENTER to play the audio" << std::endl;
 		//std::cin.get(cWait);
 
-		objAudioBuffer.WriteToFile("audio.raw");
+		objAudioBuffer.WriteToFile("rawaudio");
 
 		std::cout << "Playing back samples." << std::endl;
 		objAudioBuffer.ResetPlayback();
@@ -57,9 +58,12 @@ int main()
 			sys.sleep(100);
 		audioStream.StopPlaybackStream();
 
+		encoder.Encode(objAudioBuffer);
+
 		// Close the Stream (not strictly needed as terminating the System will also close all open Streams):
 		audioStream.CloseRecordStream();
 		audioStream.ClosePlaybackStream();
+		encoder.Close();
 
 		std::cout << "so far so good" << std::endl;
 
