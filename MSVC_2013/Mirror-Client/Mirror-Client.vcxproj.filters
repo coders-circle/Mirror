@@ -143,9 +143,6 @@
     <ClCompile Include="..\..\src\common\ChatMessage.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\RtpHandler.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\common\TcpRequest.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>

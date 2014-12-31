@@ -10,6 +10,7 @@
 #include "client/UI/pages/AboutPage.h"
 #include "client/UI/pages/SVConnectPage.h"
 #include "client/UI/pages/HomePage.h"
+#include "client/UI/pages/WaitPage.h"
 
 #include <gdk/gdkkeysyms.h>
 
@@ -30,12 +31,14 @@ public:
     static void ClientMessageEventHandler(boost::shared_ptr<MessageEventData> eventData);
     static gboolean KeyPressHandler(GtkWidget* widget, GdkEventKey *keyEvent, gpointer data);
     void Initialize(GtkWidget* parent, GtkWidget* fixed);
+    static gboolean ConnectionTest(gpointer data);
 
 private:
     LoginPage*      loginPage;
     AboutPage*      aboutPage;
     SVConnectPage*  svConnectPage;
     HomePage*       homePage;
+    WaitPage*       waitPage;
 
     static Application* app;
 
@@ -43,5 +46,7 @@ private:
     Client      client;
 
     bool connectedtoSV;
+    bool connectionThreadEnded;
+    uint32_t connectionID;
 };
 
