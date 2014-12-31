@@ -103,9 +103,9 @@ catch (std::exception err)
 #pragma comment(lib, "cairo.lib")
 #pragma comment(lib, "glib-2.0.lib")
 #pragma comment(lib, "gdk-win32-3.0.lib")
-#pragma comment(lib, "opencv_highgui245.lib")
-#pragma comment(lib, "opencv_core245.lib")
-#pragma comment(lib, "opencv_imgproc245.lib")
+//#pragma comment(lib, "opencv_highgui245.lib")
+//#pragma comment(lib, "opencv_core245.lib")
+//#pragma comment(lib, "opencv_imgproc245.lib")
 
 #endif
 

@@ -140,8 +140,8 @@ void Application::OnButtonEvent(int buttonID)
         }
         catch (std::exception err)
         {
-            std::cout << "oops! something bad happened\n" << err.what();
-            std::cout << std::endl;
+            //std::cout << "oops! something bad happened\n" << err.what();
+            //std::cout << std::endl;
         }
         break;
     case PAGECONTROL::HP_SENDBUTTON:

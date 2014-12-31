@@ -54,7 +54,7 @@ public:
         buff += std::string("\n");
         buff += text;
         std::string temp = buff + std::string("\n");
-        gtk_label_set_markup(GTK_LABEL(m_handle), temp.c_str());
+        gtk_label_set_label(GTK_LABEL(m_handle), temp.c_str());
         this->ScrollToEnd();
     }
     void SetJustify(int justification)
