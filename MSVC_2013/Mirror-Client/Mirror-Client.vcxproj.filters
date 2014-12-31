@@ -129,6 +129,12 @@
     <ClInclude Include="..\..\include\client\Application.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\WaitPage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Spinner.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">

@@ -33,6 +33,7 @@
 
 
 int main(int argc, char *argv[])
+try
 {
     GtkWidget *mainWindow;
     gtk_init(&argc, &argv);
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
     g_signal_connect_swapped(G_OBJECT(mainWindow), "destroy", G_CALLBACK(gtk_main_quit), NULL);
     //g_signal_connect_swapped(G_OBJECT(mainWindow), "idle", G_CALLBACK(IdleFunction), NULL);
     //g_idle_add(IdleFunction, 0);
-
+    
     //////////////////////////////////////////////////////////////////////////////
     // CSS Test
     //////////////////////////////////////////////////////////////////////////////
@@ -88,6 +89,10 @@ int main(int argc, char *argv[])
     gtk_main();
     
     return 0;
+}
+catch (std::exception err)
+{
+    std::cout << ":/ \n" << err.what() << std::endl;
 }
 
 

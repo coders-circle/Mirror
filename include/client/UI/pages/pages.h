@@ -1,7 +1,13 @@
-#pragma once
 // common header for custom pages
+#pragma once
 
-enum PAGE { LOGINPAGE = 0, SIGNUPPAGE, ABOUTPAGE, SVCONNECTPAGE, HOMEPAGE };
+
+#include "client/UI/Page.h"
+
+
+
+
+enum PAGE { LOGINPAGE = 0, SIGNUPPAGE, ABOUTPAGE, SVCONNECTPAGE, HOMEPAGE, WAITPAGE };
 
 enum PAGECONTROL{
     LP_LOGINBUTTON = 0, LP_USERNAMETEXT, LP_PASSWORDTEXT,   // Login page controls

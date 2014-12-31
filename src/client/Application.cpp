@@ -11,6 +11,8 @@ Application::Application()
     }
     app = this;
     this->connectedtoSV = false;
+    this->connectionThreadEnded = false;
+    this->connectionID = 0;
 }
 
 void Application::Initialize(GtkWidget* parent, GtkWidget* fixed)
@@ -34,11 +36,13 @@ void Application::Initialize(GtkWidget* parent, GtkWidget* fixed)
     aboutPage = new AboutPage(parent, fixed);
     svConnectPage = new SVConnectPage(parent, fixed);
     homePage = new HomePage(parent, fixed);
+    waitPage = new WaitPage(parent, fixed);
 
     uiManager.AddPage(loginPage);
     uiManager.AddPage(aboutPage);
     uiManager.AddPage(svConnectPage);
     uiManager.AddPage(homePage);
+    uiManager.AddPage(waitPage);
 
     uiManager.AddToolItemFromStock(GTK_STOCK_GO_BACK, TOOLITEM::BACK);
 
@@ -46,6 +50,41 @@ void Application::Initialize(GtkWidget* parent, GtkWidget* fixed)
     uiManager.ShowToolbar();
 
     uiManager.NavigateTo(PAGE::SVCONNECTPAGE);
+
+    
+}
+
+gboolean Application::ConnectionTest(gpointer data)
+{
+    
+    if (!app->connectionThreadEnded)
+    {
+        return TRUE;
+    }
+        
+    /*try
+    {
+        app->client.SetName(app->svConnectPage->GetName());
+        app->connectionID = app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
+    }
+    catch (Exception err)
+    {
+        app->uiManager.NavigateBack();
+    }*/
+
+    if (app->client.IsConnected(app->connectionID))
+    {
+        app->client.JoinChat(0);
+        app->client.SetMessageEventHandler((ClientMessageEventHandler));
+        app->client.HandleRequestsAsync();
+        app->uiManager.NavigateTo(PAGE::HOMEPAGE);
+    }
+    else
+    {
+        app->uiManager.NavigateBack();
+    }
+
+    return FALSE;
 }
 
 
@@ -86,13 +125,18 @@ void Application::OnButtonEvent(int buttonID)
         }
         try
         {
-            app->client.SetName(app->svConnectPage->GetName());
-            app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
-            app->client.JoinChat(0);
-            app->uiManager.NavigateTo(PAGE::HOMEPAGE);
-            app->client.SetMessageEventHandler((ClientMessageEventHandler));
-            app->client.HandleRequestsAsync();
-            this->connectedtoSV = true;
+            
+            app->client.ConnectAsync(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011),
+                &(app->connectionThreadEnded), &(app->connectionID));
+            app->uiManager.NavigateTo(PAGE::WAITPAGE);
+            g_timeout_add(100, ConnectionTest, 0);
+            //app->client.SetName(app->svConnectPage->GetName());
+            //app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
+            //app->client.JoinChat(0);
+            //app->uiManager.NavigateTo(PAGE::HOMEPAGE);
+            //app->client.SetMessageEventHandler((ClientMessageEventHandler));
+            //app->client.HandleRequestsAsync();
+            //this->connectedtoSV = true;
         }
         catch (std::exception err)
         {

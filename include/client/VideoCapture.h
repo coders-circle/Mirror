@@ -1,9 +1,10 @@
-#ifndef __VIDEOCAPTURINGDEVICE__
-#define __VIDEOCAPTURINGDEVICE__
+#pragma once
 
-#include <common/common.h>
+#include "common/common.h"
 #include <iostream>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
 
 // TODO: Implement this class
 class VideoCaptureDevice
@@ -12,7 +13,6 @@ class VideoCaptureDevice
 };
 
 
-/*
 
 class VideoCapture
 {
@@ -36,5 +36,3 @@ private:
     double m_fps;
 };
 
-*/
-#endif

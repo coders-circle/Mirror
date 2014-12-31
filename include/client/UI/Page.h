@@ -6,6 +6,7 @@
 #include "Button.h"
 #include "Label.h"
 #include "TextEdit.h"
+#include "Spinner.h"
 
 #include <iostream>
 #include <vector>
@@ -61,11 +62,22 @@ public:
     // typecast to TextEdit*
     Control* AddTextEdit(int id, int x, int y, int w, int h);
 
+    // Adds an animated Spinner int the specified coordinate
+    // returns a pointer to the created object
+    // typecast to Spinner*
+    Control* AddSpinner(int x, int y, int w = 20, int h = 20);
+
+    // returns width of parent window
+    int GetParentWidth();
+
+    // returns height of parent window
+    int GetParentHeight();
+
     // shows all controls within the page
-    void ShowControls();
+    virtual void ShowControls();
 
     // hide all controls within the page
-    void HideControls();
+    virtual void HideControls();
 
     // called when an event by controls within occurs 
     // to be implemented by derived class

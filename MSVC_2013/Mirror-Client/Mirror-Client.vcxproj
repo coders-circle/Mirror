@@ -86,6 +86,8 @@
     <ClInclude Include="..\..\include\client\UI\pages\pages.h" />
     <ClInclude Include="..\..\include\client\UI\pages\SignupPage.h" />
     <ClInclude Include="..\..\include\client\UI\pages\SVConnectPage.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\WaitPage.h" />
+    <ClInclude Include="..\..\include\client\UI\Spinner.h" />
     <ClInclude Include="..\..\include\client\UI\Statusbar.h" />
     <ClInclude Include="..\..\include\client\UI\TextEdit.h" />
     <ClInclude Include="..\..\include\client\UI\Toolbar.h" />
