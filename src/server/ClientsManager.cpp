@@ -22,6 +22,7 @@ void ClientsManager::HandleClient(boost::shared_ptr<tcp::socket> &socket)
     boost::lock_guard<boost::mutex> guard(m_mutex);
     ClientInfo client(m_ioService);
     client.connection.Initialize(socket);
+    client.connected = true;
     m_clients.push_back(client);
     std::cout << "Client #" << m_clients.size() - 1 << " Connected: " << m_clients[m_clients.size() - 1].connection.GetDestinationAddress() << std::endl;
 }
@@ -47,6 +48,7 @@ void ClientsManager::ProcessClients()
         // Process each client in turn
         for (unsigned int i = 0; i < m_clients.size(); ++i)
         {
+            if (!m_clients[i].connected) continue;
             try
             {
                 uint32_t id;
@@ -94,7 +96,13 @@ void ClientsManager::ProcessClients()
                             m_requests.Invalid(m_clients[i].connection);
                         }
                         break;
-
+                    
+                    case TcpRequest::DISCONNECT:
+                        m_clients[i].connection.Close();
+                        m_clients[i].connected = false;
+                        //m_clients.erase(m_clients.begin()+i);
+                        i--;
+                        break;
                     default:
                         std::cout << "Invalid Request " << m_requests.GetRequestType() << " from client #" << i << std::endl;
                     }
@@ -102,6 +110,8 @@ void ClientsManager::ProcessClients()
             }
             catch (std::exception &ex)
             {
+                m_clients[i].connection.Close();
+                m_clients[i].connected = false;
                 std::cout << ex.what() << std::endl;
             }
         }

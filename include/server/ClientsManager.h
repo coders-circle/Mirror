@@ -7,6 +7,7 @@ struct ClientInfo
 {
     ClientInfo(boost::asio::io_service& io) : connection(io) {}
     TcpHandler connection;
+    bool connected;
 };
 
 class ClientsManager
