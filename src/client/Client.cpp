@@ -14,16 +14,17 @@ Client::~Client()
 {}
 
 // Connecting to some remote peer (server/client)
-size_t Client::Connect(const tcp::endpoint& peer)
+size_t Client::Connect(const tcp::endpoint& peer, uint32_t secondsToWait)
 {
     // Lock the connections list not to process it while adding a connection
     boost::lock_guard<boost::mutex> guard(m_mutex);
 
     // Add new connection
     m_connections.push_back(Connection(m_io));
-    m_connections[m_connections.size()-1].connected = false;
     TcpHandler &handler = m_connections[m_connections.size() - 1].tcpHandler;
     m_connections[m_connections.size() - 1].connected = false;
+    
+    boost::thread timerThread(boost::bind(&Client::ConnectTimer, this, _1, _2), boost::ref(handler), secondsToWait);
     handler.Initialize(peer);
     m_connections[m_connections.size()-1].connected = true;
 
@@ -31,16 +32,24 @@ size_t Client::Connect(const tcp::endpoint& peer)
     return m_connections.size() - 1;
 }
 
+void Client::ConnectTimer(TcpHandler &handler, uint32_t seconds)
+{
+    boost::asio::deadline_timer t(m_io, boost::posix_time::seconds(seconds));
+    t.wait();
+    handler.Cancel();
+    handler.Close();
+}
+
 // Perform above function asynchronously
-void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* connectionId)
+void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* connectionId, uint32_t secondsToWait)
 {
 
-    boost::thread t([this, peer, threadEnd, connectionId](){
+    boost::thread t([this, peer, threadEnd, connectionId, secondsToWait](){
         try
         {
             if (threadEnd)
                 *threadEnd = false;
-            size_t id = Connect(peer);
+            size_t id = Connect(peer, secondsToWait);
             if (connectionId)
                 *connectionId = id;
             if (threadEnd)

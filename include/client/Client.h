@@ -22,9 +22,9 @@ public:
     boost::asio::io_service& GetIOService() { return m_io; }
 
     // Connect to a peer/server,
-    size_t Connect(const tcp::endpoint& peer);
+    size_t Connect(const tcp::endpoint& peer, uint32_t secondsToWait = 20);
     // Connect to a peer/server asynchronously
-    void ConnectAsync(const tcp::endpoint& peer, bool* threadEnd = NULL, size_t* connectionId = NULL);
+    void ConnectAsync(const tcp::endpoint& peer, bool* threadEnd = NULL, size_t* connectionId = NULL, uint32_t secondsToWait =20);
     // Connect to a peer through server
     size_t Connect(uint32_t clientId);
     // Connect to a peer through server asynchronously
@@ -82,6 +82,8 @@ private:
 
     TcpRequest m_request;
     std::string m_name;
+
+    void ConnectTimer(TcpHandler &handler, uint32_t seconds);
 
     // For P2P:
     bool m_p2pConnecting;
