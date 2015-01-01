@@ -6,6 +6,8 @@
 #include "client/Application.h"
 
 
+//#include "client/VideoCapture.h"
+
 //FrameRenderer fr;
 //VideoCapture vidCap;
 
@@ -33,7 +35,7 @@
 
 
 int main(int argc, char *argv[])
-try
+//try
 {
     GtkWidget *mainWindow;
     gtk_init(&argc, &argv);
@@ -90,10 +92,16 @@ try
     
     return 0;
 }
-catch (std::exception err)
-{
-    std::cout << ":/ \n" << err.what() << std::endl;
-}
+//catch (std::exception err)
+//{
+//    std::cout << ":/ \n" << err.what() << std::endl;
+//    return 1;
+//}
+//catch (...)
+//{
+//    std::cout << "zzz";
+//    return 1;
+//}
 
 
 

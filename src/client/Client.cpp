@@ -23,6 +23,7 @@ size_t Client::Connect(const tcp::endpoint& peer)
     m_connections.push_back(Connection(m_io));
     m_connections[m_connections.size()-1].connected = false;
     TcpHandler &handler = m_connections[m_connections.size() - 1].tcpHandler;
+    m_connections[m_connections.size() - 1].connected = false;
     handler.Initialize(peer);
     m_connections[m_connections.size()-1].connected = true;
 
@@ -33,6 +34,7 @@ size_t Client::Connect(const tcp::endpoint& peer)
 // Perform above function asynchronously
 void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* connectionId)
 {
+
     boost::thread t([this, peer, threadEnd, connectionId](){
         try
         {
@@ -49,7 +51,7 @@ void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* co
             std::cout << ex.what() << std::endl;
             if (threadEnd)
                 *threadEnd = true;
- 
+
         }
     });
 }
