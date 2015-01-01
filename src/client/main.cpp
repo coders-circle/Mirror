@@ -6,10 +6,10 @@
 #include "client/Application.h"
 
 
-#include "client/VideoCapture.h"
+//#include "client/VideoCapture.h"
 
 //FrameRenderer fr;
-VideoCapture vidCap;
+//VideoCapture vidCap;
 
 
 //gboolean IdleFunction(gpointer userData)
