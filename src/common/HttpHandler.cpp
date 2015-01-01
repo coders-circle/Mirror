@@ -98,7 +98,7 @@ void HttpHandler::GetResponse()
 {
 	try
 	{
-		boost::asio::read_until(*m_socket, m_serverResponse, "}"); 
+		boost::asio::read_until(*m_socket, m_serverResponse, "<<>>"); 
 	}
 	catch (Exception &e)
 	{

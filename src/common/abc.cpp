@@ -12,7 +12,8 @@ int main()
 	std::string port = "8000";
 	
 	httpHandler.Initialize(host, port);
-	httpHandler.SendGetRequest("/test/process-login/");
+	std::string jsondata = "{\"name\":\"bibek\",\"age\":22}";
+	httpHandler.SendPostRequest("/", jsondata);
 	httpHandler.GetResponse();
 	}
 	catch(Exception &ex)
