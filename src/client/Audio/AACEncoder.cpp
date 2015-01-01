@@ -53,7 +53,7 @@ bool AACEncoder::Initialize(void)
 
 bool AACEncoder::Encode(const AudioBuffer & objAudioBuffer)
 {
-    short* rawSamples = &(objAudioBuffer.GetSamples())[0];
+    uint8_t* rawSamples = (uint8_t*) &(objAudioBuffer.GetSamples())[0];
     size_t rawSize = sizeof(short) * objAudioBuffer.GetSamples().size();
 
     int outBufsize = FF_MIN_BUFFER_SIZE * 10;
