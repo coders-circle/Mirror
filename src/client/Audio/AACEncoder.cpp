@@ -53,30 +53,8 @@ bool AACEncoder::Initialize(void)
 
 bool AACEncoder::Encode(const AudioBuffer & objAudioBuffer)
 {
-	/*
-	std::vector<short> samples = objAudioBuffer.GetSamples();
-	size_t rawSize = sizeof(short) * samples.size();
-	std::cout << "raw size in bytes: " << rawSize << std::endl;
-	*/
-	
-
-	FILE *stream = fopen("rawaudio", "rb");
-    size_t audioSize;
-    uint8_t *rawAudio;
-
-    if (!stream)
-    {
-        std::cout << "Unable to open file" << std::endl;
-        return false;
-    }
-
-    fseek(stream, 0, SEEK_END);
-    audioSize = ftell(stream);
-    //std::cout<<size<<std::endl;
-    fseek(stream, 0, SEEK_SET);
-    rawAudio = (uint8_t *)malloc(audioSize);
-    fread(rawAudio, sizeof(uint8_t), audioSize, stream);
-    fclose(stream);
+    short* rawSamples = &(objAudioBuffer.GetSamples())[0];
+    size_t rawSize = sizeof(short) * objAudioBuffer.GetSamples().size();
 
     int outBufsize = FF_MIN_BUFFER_SIZE * 10;
 	//uint8_t *outbuf = new uint8_t[outBufsize];
@@ -88,12 +66,12 @@ bool AACEncoder::Encode(const AudioBuffer & objAudioBuffer)
 
 	std::fstream fout("encoded", std::ios::out|std::ios::binary);
 
-	while (audioSize >= frameBytes)
+	while (rawSize >= frameBytes)
 	{
-		int packetSize = avcodec_encode_audio(m_codecContext, outbuf, outBufsize, (short *)rawAudio);
-		rawAudio += frameBytes;
+		int packetSize = avcodec_encode_audio(m_codecContext, outbuf, outBufsize, (short *)rawSamples);
+		rawSamples += frameBytes;
         fout.write((char *) outbuf,packetSize);
-        audioSize -= frameBytes;
+        rawSize -= frameBytes;
 	}
 
 	fout.close();
