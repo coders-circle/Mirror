@@ -143,6 +143,10 @@ void Application::OnButtonEvent(int buttonID)
             //std::cout << "oops! something bad happened\n" << err.what();
             //std::cout << std::endl;
         }
+        catch (...)
+        {
+            std::cout << "zzz";
+        }
         break;
     case PAGECONTROL::HP_SENDBUTTON:
         app->client.SendMessage(0, app->homePage->GetMsg());

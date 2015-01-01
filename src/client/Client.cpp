@@ -17,6 +17,7 @@ size_t Client::Connect(const tcp::endpoint& peer)
     // Add new connection
     m_connections.push_back(Connection(m_io));
     TcpHandler &handler = m_connections[m_connections.size() - 1].tcpHandler;
+    m_connections[m_connections.size() - 1].connected = false;
     handler.Initialize(peer);
     m_connections[m_connections.size()-1].connected = true;
 
@@ -27,6 +28,7 @@ size_t Client::Connect(const tcp::endpoint& peer)
 // Perform above function asynchronously
 void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* connectionId)
 {
+
     boost::thread t([this, peer, threadEnd, connectionId](){
         try
         {
@@ -43,7 +45,7 @@ void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* co
             std::cout << ex.what() << std::endl;
             if (threadEnd)
                 *threadEnd = true;
- 
+
         }
     });
 }
@@ -147,6 +149,7 @@ void Client::P2PListen(const tcp::endpoint &localEndpoint)
         TODO: Need to verify if this is the required peer
         */
         Connection c(m_io);
+        c.connected = false;
         c.tcpHandler.Initialize(socket);
         c.connected = true;
         m_connections.push_back(c);
@@ -166,6 +169,7 @@ void Client::P2PConnect(tcp::endpoint &remoteEndpoint)
         {
             // Try connecting at the given remote endpoint
             Connection c(m_io);
+            c.connected = false;
             c.tcpHandler.Initialize(remoteEndpoint);
             c.connected = true;
             if (!m_p2pConnecting) return;
