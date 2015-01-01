@@ -1,5 +1,6 @@
 #pragma once
 #include <common/TcpHandler.h>
+#include <common/UdpHandler.h>
 #include <common/TcpRequest.h>
 
 /* Data passed to the message event handler */
@@ -66,8 +67,11 @@ private:
         {}
         TcpHandler tcpHandler;
         bool connected;
-        // maybe store userid and other stuffs here...
     };
+    // Single udp handler can be used for all connections
+    // We need two udp handlers (even and odd pair) for rtp and rtcp
+    UdpHandler m_udpHandler1;
+    UdpHandler m_udpHandler2;
 
     // List of the connections
     std::vector<Connection> m_connections;

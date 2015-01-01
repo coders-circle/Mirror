@@ -14,6 +14,7 @@ void TcpHandler::Close()
 {
     if (m_socket)
         m_socket->close();
+    m_socket.reset();
 }
 
 // this is initialized by the Listener which accepts 

@@ -3,7 +3,12 @@
 #include <common/ChatMessage.h>
 
 Client::Client()
-{}
+: m_udpHandler1(m_io), m_udpHandler2(m_io)
+{
+    UdpHandler::GetUdpPairs(m_udpHandler1, m_udpHandler2);
+    std::cout << "Udp Ports Used: \n" << m_udpHandler1.GetSocket()->local_endpoint().port() 
+                << ", " << m_udpHandler2.GetSocket()->local_endpoint().port() << std::endl;
+}
 
 Client::~Client()
 {}
