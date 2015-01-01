@@ -49,6 +49,8 @@ public:
     // Set username to use while sending messages
     void SetName(const std::string &name) { m_name = name; }
     const std::string& GetName() { return m_name; }
+    // Set connectionId of server
+    void SetServer(size_t connectionId) { m_serverId = connectionId; }
 
 private:
     boost::asio::io_service m_io;
@@ -71,6 +73,8 @@ private:
     std::vector<Connection> m_connections;
     // Mutex to lock the use of common variables (m_connections/m_request/...) during multithreading
     boost::mutex m_mutex;
+    // Connection-Id of server
+    size_t m_serverId;
 
     TcpRequest m_request;
     std::string m_name;

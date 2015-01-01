@@ -74,7 +74,8 @@ gboolean Application::ConnectionTest(gpointer data)
 
     if (app->client.IsConnected(app->connectionID))
     {
-        app->client.JoinChat(0);
+        app->client.SetServer(app->connectionID);
+        app->client.JoinChat(app->connectionID);
         app->client.SetMessageEventHandler((ClientMessageEventHandler));
         app->client.HandleRequestsAsync();
         app->uiManager.NavigateTo(PAGE::HOMEPAGE);
@@ -145,7 +146,7 @@ void Application::OnButtonEvent(int buttonID)
         }
         break;
     case PAGECONTROL::HP_SENDBUTTON:
-        app->client.SendMessage(0, app->homePage->GetMsg());
+        app->client.SendMessage(app->connectionID, app->homePage->GetMsg());
         app->homePage->msgHistory->AppendToNewLine(std::string("You: ") + app->homePage->GetMsg());
         app->homePage->ClearMsgText();
         break;

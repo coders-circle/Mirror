@@ -47,6 +47,6 @@ private:
 
     bool connectedtoSV;
     bool connectionThreadEnded;
-    uint32_t connectionID;
+    size_t connectionID;
 };
 

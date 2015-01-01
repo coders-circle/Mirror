@@ -16,6 +16,7 @@ size_t Client::Connect(const tcp::endpoint& peer)
 
     // Add new connection
     m_connections.push_back(Connection(m_io));
+    m_connections[m_connections.size()-1].connected = false;
     TcpHandler &handler = m_connections[m_connections.size() - 1].tcpHandler;
     handler.Initialize(peer);
     m_connections[m_connections.size()-1].connected = true;
@@ -55,7 +56,7 @@ size_t Client::Connect(uint32_t clientId)
     boost::lock_guard<boost::mutex> guard(m_mutex);
 
     // First send a P2P tcp connection request to server and receive back the returning request
-    TcpHandler& handler = m_connections[0].tcpHandler;
+    TcpHandler& handler = m_connections[m_serverId].tcpHandler;
     m_request.P2PTcp(handler, clientId, handler.GetSocket()->local_endpoint().address().to_string(), handler.GetSocket()->local_endpoint().port());
     m_request.ReceiveRequest(handler);
 
@@ -94,8 +95,7 @@ void Client::ConnectAsync(uint32_t clientId, bool* threadEnd, size_t* connection
 size_t Client::HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint)
 {
     m_p2pConnecting = true;
-    // The '0' connection is assumed to be a TCP connection with the server
-    TcpHandler& handler = m_connections[0].tcpHandler;
+    TcpHandler& handler = m_connections[m_serverId].tcpHandler;
     // Start listening at same local endpoint as which is connected to the server
     boost::thread t1(boost::bind(&Client::P2PListen, this, _1), handler.GetSocket()->local_endpoint());
     // Try connecting to both private and public endpoints of other peer
@@ -147,6 +147,7 @@ void Client::P2PListen(const tcp::endpoint &localEndpoint)
         TODO: Need to verify if this is the required peer
         */
         Connection c(m_io);
+        c.connected = false;
         c.tcpHandler.Initialize(socket);
         c.connected = true;
         m_connections.push_back(c);
@@ -166,6 +167,7 @@ void Client::P2PConnect(tcp::endpoint &remoteEndpoint)
         {
             // Try connecting at the given remote endpoint
             Connection c(m_io);
+            c.connected = false;
             c.tcpHandler.Initialize(remoteEndpoint);
             c.connected = true;
             if (!m_p2pConnecting) return;
@@ -245,8 +247,8 @@ void Client::HandleRequests()
                         HandleP2PRequestAsync(id,
                             tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPrivateIp()), m_request.GetPrivatePort()),
                             tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPublicIp()), m_request.GetPublicPort()));
-                        m_request.P2PTcp(m_connections[0].tcpHandler, id,
-                            m_connections[0].tcpHandler.GetSocket()->local_endpoint().address().to_string(), m_connections[0].tcpHandler.GetSocket()->local_endpoint().port()
+                        m_request.P2PTcp(m_connections[m_serverId].tcpHandler, id,
+                            m_connections[m_serverId].tcpHandler.GetSocket()->local_endpoint().address().to_string(), m_connections[m_serverId].tcpHandler.GetSocket()->local_endpoint().port()
                             );
                         break;
                     default:
