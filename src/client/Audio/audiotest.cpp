@@ -42,7 +42,8 @@ int main()
 
 		audioStream.StartRecordStream();
 		std::cin.get(cWait);
-		//sys.sleep(1000);
+		//sys.sleep(100);
+
 		audioStream.StopRecordStream();
 
 		std::cout << "recording successful... Press ENTER to play the audio" << std::endl;
