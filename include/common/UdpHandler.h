@@ -24,6 +24,15 @@ public:
     // Receive data from a remote endpoint; the remoteEndpoint is automatically populated
     size_t Receive(udp::endpoint &remoteEndpoint, char* data, size_t maxSize);
 
+    // Close the socket
+    void Close();
+
+    // Get two udp handlers at consecutive ports, such that first one is always at even and
+    // second one is always at odd. Needed for Rtp and Rtcp
+    static void GetUdpPairs(UdpHandler &handler1, UdpHandler &handler2);
+
+    boost::shared_ptr<udp::socket> GetSocket() { return m_socket; }
+
 private:
     boost::shared_ptr<udp::socket> m_socket;
     boost::asio::io_service &m_ioService;

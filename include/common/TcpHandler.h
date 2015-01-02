@@ -35,6 +35,7 @@ public:
     boost::shared_ptr<tcp::socket> GetSocket() const { return m_socket; }
 
     void Close();
+    void Cancel();
 private:
 	boost::shared_ptr<tcp::socket> m_socket;
 	boost::asio::io_service &m_ioService;
