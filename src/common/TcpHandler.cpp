@@ -14,7 +14,7 @@ void TcpHandler::Close()
 {
     if (m_socket)
         m_socket->close();
-    m_socket.reset();
+//    m_socket.reset();
 }
 
 void TcpHandler::Cancel()
