@@ -2,11 +2,12 @@
 
 #include "common/Exception.h"
 
-#include "Control.h"
-#include "Button.h"
-#include "Label.h"
-#include "TextEdit.h"
-#include "Spinner.h"
+#include "Client/UI/Control.h"
+#include "Client/UI/Button.h"
+#include "Client/UI/Label.h"
+#include "Client/UI/TextEdit.h"
+#include "Client/UI/Spinner.h"
+#include "Client/UI/FrameRenderer.h"
 
 #include <iostream>
 #include <vector>
@@ -66,6 +67,12 @@ public:
     // returns a pointer to the created object
     // typecast to Spinner*
     Control* AddSpinner(int x, int y, int w = 20, int h = 20);
+
+
+    // Adds an raw RGB frame renderer object
+    // returns a pointer to the created object
+    // typecast to FrameRenderer*
+    Control* AddFrameRenderer(int id, int x, int y, int w, int h);
 
     // returns width of parent window
     int GetParentWidth();

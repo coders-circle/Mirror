@@ -6,10 +6,11 @@ void Page::AllocateNewControl(int type, int id)
     m_controls.resize(m_controls.size() + 1);
     switch (type)
     {
-    case CONTROL::BUTTON:   m_controls[m_controls.size() - 1] = new Button();       break;
-    case CONTROL::LABEL:    m_controls[m_controls.size() - 1] = new Label();        break;
-    case CONTROL::TEXTEDIT: m_controls[m_controls.size() - 1] = new TextEdit();     break;
-    case CONTROL::SPINNER:  m_controls[m_controls.size() - 1] = new Spinner();      break;
+    case CONTROL::BUTTON:         m_controls[m_controls.size() - 1] = new Button();             break;
+    case CONTROL::LABEL:          m_controls[m_controls.size() - 1] = new Label();              break;
+    case CONTROL::TEXTEDIT:       m_controls[m_controls.size() - 1] = new TextEdit();           break;
+    case CONTROL::SPINNER:        m_controls[m_controls.size() - 1] = new Spinner();            break;
+    case CONTROL::FRAMERENDERER:  m_controls[m_controls.size() - 1] = new FrameRenderer();      break;
     }
     m_controls[m_controls.size() - 1]->SetID(id);
 }
@@ -75,6 +76,13 @@ Control* Page::AddTextEdit(int id, int x, int y, int w, int h)
 {
     this->AllocateNewControl(CONTROL::TEXTEDIT, id);
     ((TextEdit*)m_controls[m_controls.size() - 1])->Set(m_fixed, x, y, w, h);
+    return m_controls[m_controls.size() - 1];
+}
+
+Control* Page::AddFrameRenderer(int id, int x, int y, int w, int h)
+{
+    this->AllocateNewControl(CONTROL::FRAMERENDERER, id);
+    ((FrameRenderer*)m_controls[m_controls.size() - 1])->Set(m_fixed, x, y, w, h);
     return m_controls[m_controls.size() - 1];
 }
 

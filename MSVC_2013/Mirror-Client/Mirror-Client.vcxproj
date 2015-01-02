@@ -74,9 +74,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\client\Application.h" />
-    <ClInclude Include="..\..\include\client\FrameRenderer.h" />
     <ClInclude Include="..\..\include\client\UI\Button.h" />
     <ClInclude Include="..\..\include\client\UI\Control.h" />
+    <ClInclude Include="..\..\include\client\UI\FrameRenderer.h" />
     <ClInclude Include="..\..\include\client\UI\Label.h" />
     <ClInclude Include="..\..\include\client\UI\Menu.h" />
     <ClInclude Include="..\..\include\client\UI\Page.h" />
@@ -92,7 +92,6 @@
     <ClInclude Include="..\..\include\client\UI\TextEdit.h" />
     <ClInclude Include="..\..\include\client\UI\Toolbar.h" />
     <ClInclude Include="..\..\include\client\UI\UIManager.h" />
-    <ClInclude Include="..\..\include\client\VideoCapture.h" />
     <ClInclude Include="..\..\include\client\Client.h" />
     <ClInclude Include="..\..\include\common\ChatMessage.h" />
     <ClInclude Include="..\..\include\common\common.h" />
@@ -111,17 +110,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\Application.cpp" />
-    <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
     <ClCompile Include="..\..\src\client\UI\Button.cpp" />
     <ClCompile Include="..\..\src\client\UI\Control.cpp" />
+    <ClCompile Include="..\..\src\client\UI\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\UI\Label.cpp" />
     <ClCompile Include="..\..\src\client\UI\Menu.cpp" />
     <ClCompile Include="..\..\src\client\UI\Page.cpp" />
     <ClCompile Include="..\..\src\client\UI\Statusbar.cpp" />
     <ClCompile Include="..\..\src\client\UI\TextEdit.cpp" />
     <ClCompile Include="..\..\src\client\UI\UIManager.cpp" />
-    <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
     <ClCompile Include="..\..\src\client\Client.cpp" />
     <ClCompile Include="..\..\src\common\ChatMessage.cpp" />
     <ClCompile Include="..\..\src\common\TcpAcceptor.cpp" />

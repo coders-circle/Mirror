@@ -87,12 +87,6 @@
     <ClInclude Include="..\..\include\client\UI\pages\AboutPage.h">
       <Filter>include\UI\pages</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\FrameRenderer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\VideoCapture.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\UI\pages\pages.h">
       <Filter>include\UI\pages</Filter>
     </ClInclude>
@@ -135,6 +129,9 @@
     <ClInclude Include="..\..\include\client\UI\Spinner.h">
       <Filter>include\UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\FrameRenderer.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
@@ -173,9 +170,6 @@
     <ClCompile Include="..\..\src\client\Client.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\FrameRenderer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\client\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -188,8 +182,8 @@
     <ClCompile Include="..\..\src\client\UI\UIManager.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\VideoCapture.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\..\src\client\UI\FrameRenderer.cpp">
+      <Filter>src\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

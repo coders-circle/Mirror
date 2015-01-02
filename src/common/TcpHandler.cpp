@@ -14,6 +14,13 @@ void TcpHandler::Close()
 {
     if (m_socket)
         m_socket->close();
+    m_socket.reset();
+}
+
+void TcpHandler::Cancel()
+{
+    if (m_socket) 
+        m_socket->shutdown(tcp::socket::shutdown_both);
 }
 
 // this is initialized by the Listener which accepts 

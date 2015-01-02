@@ -3,8 +3,12 @@
 #include <common/ChatMessage.h>
 
 ClientsManager::ClientsManager(boost::asio::io_service& io)
-: m_acceptor(io), m_ioService(io)
-{}
+: m_acceptor(io), m_ioService(io), m_udpHandler1(io), m_udpHandler2(io)
+{
+    UdpHandler::GetUdpPairs(m_udpHandler1, m_udpHandler2);
+    std::cout << "Udp Ports Used: \n" << m_udpHandler1.GetSocket()->local_endpoint().port() 
+                << ", " << m_udpHandler2.GetSocket()->local_endpoint().port() << std::endl;
+}
 
 ClientsManager::~ClientsManager()
 {}
@@ -21,10 +25,10 @@ void ClientsManager::HandleClient(boost::shared_ptr<tcp::socket> &socket)
 {
     boost::lock_guard<boost::mutex> guard(m_mutex);
     ClientInfo client(m_ioService);
-    client.connection.Initialize(socket);
+    client.tcpHandler.Initialize(socket);
     client.connected = true;
     m_clients.push_back(client);
-    std::cout << "Client #" << m_clients.size() - 1 << " Connected: " << m_clients[m_clients.size() - 1].connection.GetDestinationAddress() << std::endl;
+    std::cout << "Client #" << m_clients.size() - 1 << " Connected: " << m_clients[m_clients.size() - 1].tcpHandler.GetDestinationAddress() << std::endl;
 }
 
 // Start processing each client
@@ -53,18 +57,18 @@ void ClientsManager::ProcessClients()
             {
                 uint32_t id;
                 // See if any request is incomming for this client
-                size_t bytes = m_clients[i].connection.Available();
+                size_t bytes = m_clients[i].tcpHandler.Available();
                 if (bytes > 0)
                 {
                     // if so receive the request and process accordingly
-                    m_requests.ReceiveRequest(m_clients[i].connection);
+                    m_requests.ReceiveRequest(m_clients[i].tcpHandler);
 
                     switch (m_requests.GetRequestType())
                     {
                     // Request to join chat, since this is the server, this is a request to join a group chat
                     case TcpRequest::JOIN_CHAT:
                         id = m_requests.GetGroupId();
-                        m_requests.JoinChat(m_clients[i].connection, id);
+                        m_requests.JoinChat(m_clients[i].tcpHandler, id);
                         // push the client id to the group
                         m_groups[id].push_back(i);
                         std::cout << "Connected client #" << i << " to group #" << id << std::endl;
@@ -82,23 +86,23 @@ void ClientsManager::ProcessClients()
                         if (id < m_clients.size() && id != i)
                         {
                             // Send request to second client
-                            m_requests.P2PTcp(m_clients[id].connection, i, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
-                                m_clients[i].connection.GetRemoteIp(), m_clients[i].connection.GetRemotePort());
+                            m_requests.P2PTcp(m_clients[id].tcpHandler, i, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
+                                m_clients[i].tcpHandler.GetRemoteIp(), m_clients[i].tcpHandler.GetRemotePort());
                             // Receive the return request
-                            m_requests.ReceiveRequest(m_clients[id].connection);
+                            m_requests.ReceiveRequest(m_clients[id].tcpHandler);
                             // Send back the return request to first client
-                            m_requests.P2PTcp(m_clients[i].connection, id, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
-                                m_clients[id].connection.GetRemoteIp(), m_clients[id].connection.GetRemotePort());
+                            m_requests.P2PTcp(m_clients[i].tcpHandler, id, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
+                                m_clients[id].tcpHandler.GetRemoteIp(), m_clients[id].tcpHandler.GetRemotePort());
                         }
                         else
                         {
                             // Send an invalid request
-                            m_requests.Invalid(m_clients[i].connection);
+                            m_requests.Invalid(m_clients[i].tcpHandler);
                         }
                         break;
                     
                     case TcpRequest::DISCONNECT:
-                        m_clients[i].connection.Close();
+                        m_clients[i].tcpHandler.Close();
                         m_clients[i].connected = false;
                         //m_clients.erase(m_clients.begin()+i);
                         i--;
@@ -110,7 +114,7 @@ void ClientsManager::ProcessClients()
             }
             catch (std::exception &ex)
             {
-                m_clients[i].connection.Close();
+                m_clients[i].tcpHandler.Close();
                 m_clients[i].connected = false;
                 std::cout << ex.what() << std::endl;
             }
@@ -122,7 +126,7 @@ void ClientsManager::ProcessClients()
 void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
 {
     ChatMessage chat;
-    chat.Receive(m_clients[client].connection, m_requests.GetMessageSize());
+    chat.Receive(m_clients[client].tcpHandler, m_requests.GetMessageSize());
     //m_mutex.lock();
 
     // Send the messsage to each client in the group
@@ -132,8 +136,8 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
         {
             if (m_groups[group][i] != client)
             {
-                m_requests.ChatMessage(m_clients[i].connection, chat.GetMessage().size() + 1, m_requests.GetUserId());
-                chat.Send(m_clients[m_groups[group][i]].connection);
+                m_requests.ChatMessage(m_clients[i].tcpHandler, chat.GetMessage().size() + 1, m_requests.GetUserId());
+                chat.Send(m_clients[m_groups[group][i]].tcpHandler);
             }
         }
         // client may be disconnected and exception may be thrown

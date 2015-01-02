@@ -7,11 +7,12 @@
 
 
 //#include "client/VideoCapture.h"
+//#include "client/FrameRenderer.h"
 
 //FrameRenderer fr;
 //VideoCapture vidCap;
-
-
+//
+//
 //gboolean IdleFunction(gpointer userData)
 //{
 //    //fr.SetRGBData(vidCap.GetBGRAFrame());
@@ -45,6 +46,9 @@ int main(int argc, char *argv[])
     gtk_window_set_resizable(GTK_WINDOW(mainWindow), FALSE);
     gtk_widget_set_size_request(mainWindow, 1000, 600);
     g_signal_connect_swapped(G_OBJECT(mainWindow), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+    
+
     //g_signal_connect_swapped(G_OBJECT(mainWindow), "idle", G_CALLBACK(IdleFunction), NULL);
     //g_idle_add(IdleFunction, 0);
     
@@ -80,8 +84,9 @@ int main(int argc, char *argv[])
     GtkWidget* fixed = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(mainWindow), fixed);
 
-    //vidCap.Initialize();
-    //fr.Initialize(mainWindow, fixed, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());
+    /*vidCap.Initialize();
+    fr.Initialize(mainWindow, fixed, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());*/
+    
     gtk_widget_show_all(mainWindow);
 
     Application app;
@@ -111,9 +116,10 @@ int main(int argc, char *argv[])
 #pragma comment(lib, "cairo.lib")
 #pragma comment(lib, "glib-2.0.lib")
 #pragma comment(lib, "gdk-win32-3.0.lib")
+
 //#pragma comment(lib, "opencv_highgui245.lib")
 //#pragma comment(lib, "opencv_core245.lib")
 //#pragma comment(lib, "opencv_imgproc245.lib")
-
+//#pragma comment(lib, "opencv_video245.lib")
 #endif
 

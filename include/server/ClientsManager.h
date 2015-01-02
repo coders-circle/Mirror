@@ -1,12 +1,14 @@
 #pragma once
 #include <common/TcpAcceptor.h>
 #include <common/TcpHandler.h>
+#include <common/UdpHandler.h>
 #include <common/TcpRequest.h>
 
 struct ClientInfo
 {
-    ClientInfo(boost::asio::io_service& io) : connection(io) {}
-    TcpHandler connection;
+    ClientInfo(boost::asio::io_service& io) 
+    : tcpHandler(io) {}
+    TcpHandler tcpHandler;
     bool connected;
 };
 
@@ -28,6 +30,10 @@ private:
     TcpAcceptor m_acceptor;
     TcpRequest m_requests;
     boost::mutex m_mutex;
+
+    // Udp Connections
+    UdpHandler m_udpHandler1;
+    UdpHandler m_udpHandler2;
 
     // Clients List
     std::vector<ClientInfo> m_clients;
