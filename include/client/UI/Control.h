@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include <string>
 
-enum CONTROL{ BUTTON, LABEL, TEXTEDIT, STATUSBAR, SPINNER};
+enum CONTROL{ BUTTON, LABEL, TEXTEDIT, STATUSBAR, SPINNER, FRAMERENDERER};
 
 // base class for UI control elements
 class Control
