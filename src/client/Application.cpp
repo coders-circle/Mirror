@@ -126,7 +126,7 @@ void Application::OnButtonEvent(int buttonID)
         }
         try
         {
-            
+            app->client.SetName(app->svConnectPage->GetName());
             app->client.ConnectAsync(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011),
                 &(app->connectionThreadEnded), &(app->connectionID));
             app->uiManager.NavigateTo(PAGE::WAITPAGE);
