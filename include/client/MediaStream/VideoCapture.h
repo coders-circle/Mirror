@@ -1,6 +1,14 @@
 #pragma once
 #include "VideoStream.h"
 
+class VideoCaptureException : public Exception
+{
+public:
+    VideoCaptureException(const std::string &errorString)
+    : Exception("Error capturing video: " + errorString)
+    {}
+};
+
 class VideoCapture : public VideoStream
 {
 public:

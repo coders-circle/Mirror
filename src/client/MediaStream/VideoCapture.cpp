@@ -31,9 +31,9 @@ void VideoCapture::Initialize()
     AVInputFormat * ifmt = av_find_input_format("video4linux2");
     if (avformat_open_input(&m_formatCtx, "/dev/video0", ifmt, NULL)!=0)
 #endif
-        throw Exception("Couldn't open input stream");
+        throw VideoCaptureException("Couldn't open input stream");
     if (avformat_find_stream_info(m_formatCtx, NULL) < 0)
-        throw Exception("No stream info");
+        throw VideoCaptureException("No stream info");
     av_dump_format(m_formatCtx, 0, "/dev/video0", 0);
     
     for (int i = 0; i < m_formatCtx->nb_streams; ++i)
@@ -43,14 +43,14 @@ void VideoCapture::Initialize()
         break;
     }
     if (!m_stream)
-        throw Exception("No video stream");
+        throw VideoCaptureException("No video stream");
 
     m_codecCtx = m_stream->codec;
     m_codec = avcodec_find_decoder(m_codecCtx->codec_id);
     if (!m_codec)
-        throw Exception("No supported codec");
+        throw VideoCaptureException("No supported codec");
     if (avcodec_open2(m_codecCtx, m_codec, NULL) < 0)
-        throw Exception ("Couldn't open codec");
+        throw VideoCaptureException ("Couldn't open codec");
 
     m_frame = av_frame_alloc();
     m_frameRGB = av_frame_alloc();
@@ -69,21 +69,28 @@ void VideoCapture::Initialize()
 
 void VideoCapture::Record()
 {
-    while (m_recording && av_read_frame(m_formatCtx, &m_packet)>=0)
+    try
     {
-        if (m_packet.stream_index != m_stream->index)
-            continue;
-        int isFrameAvailable=0;
-        int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
-        if (len<0)
-            throw Exception("Decoding error");
-
-        if (isFrameAvailable)
+        while (m_recording && av_read_frame(m_formatCtx, &m_packet)>=0)
         {
-            sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
-            VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
-            av_free_packet(&m_packet);
+            if (m_packet.stream_index != m_stream->index)
+                continue;
+            int isFrameAvailable=0;
+            int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
+            if (len<0)
+                throw Exception("Decoding error");
+    
+            if (isFrameAvailable)
+            {
+                sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
+                VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
+                av_free_packet(&m_packet);
+            }
         }
+    }
+    catch (std::exception &ex)
+    {
+        std::cout << ex.what() << std::endl;
     }
 }
 
