@@ -27,7 +27,7 @@ public:
 
     // not used in our case, for the containers like mp4
     // which can generate delayed frames
-    std::vector<AVPacket> m_delayedFrames;  
+    std::vector<AVPacket> m_delayedFrames;
 
     // contains decoded raw frames
     std::vector<AVFrame> m_rawFrames;
@@ -107,7 +107,7 @@ public:
             }
         }
         */
-    }
+            }
     unsigned int AllocateNewRawPacket()
     {
         m_rawFrames.resize(m_rawFrames.size() + 1);
@@ -160,7 +160,7 @@ public:
 
         if (packetFilled) 
         {
-            // this should not occur for our case
+            // this should always occur for our case
         }
     }
     void Test()
@@ -195,6 +195,19 @@ public:
         this->AddFrame(&m_encodedFrames[0]);
         this->AddFrame(&m_encodedFrames[1]);
         std::cout << m_rawFrames[1].width << ", " << m_rawFrames[1].height << std::endl;
+    }
+
+    // Test Encode to File
+    void Encode()
+    {
+        FILE* fp = fopen("test.avi", "wb");
+        for (int i = 0; i < m_encodedFrames.size(); i++)
+        {
+            fwrite(m_encodedFrames[i].data, 1, m_encodedFrames[i].size, fp);
+        }
+        uint8_t endcode[] = { 0, 0, 1, 0xb7 };
+        fwrite(endcode, 1, sizeof(endcode), fp);
+        fclose(fp);
     }
 protected:
     
