@@ -74,6 +74,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\client\Application.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\AudioCapture.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\AudioPlayback.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\AudioStream.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\MediaStream.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\VideoCapture.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\VideoPlayback.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\VideoStream.h" />
     <ClInclude Include="..\..\include\client\UI\Button.h" />
     <ClInclude Include="..\..\include\client\UI\Control.h" />
     <ClInclude Include="..\..\include\client\UI\FrameRenderer.h" />
@@ -111,6 +118,13 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\client\Application.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\AudioCapture.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\AudioPlayback.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\AudioStream.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\MediaStream.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\VideoCapture.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\VideoPlayback.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\VideoStream.cpp" />
     <ClCompile Include="..\..\src\client\UI\Button.cpp" />
     <ClCompile Include="..\..\src\client\UI\Control.cpp" />
     <ClCompile Include="..\..\src\client\UI\FrameRenderer.cpp" />
