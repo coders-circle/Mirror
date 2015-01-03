@@ -16,7 +16,7 @@ void HttpHandler:: SendGetRequest(std::string location)
 	// create a GET request
 	std::string requestStr = "GET " + location + " HTTP/1.0\r\n";
 	requestStr += "Host: " + m_hostName + "\r\n";
-	requestStr += "Accept: */*\r\n";
+	requestStr += "Accept: application/json\r\n";
 	requestStr += "Connection: Keep-Alive\r\n\r\n";
 
 	// convert requestStr to char*
@@ -73,8 +73,8 @@ void HttpHandler::SendPostRequest(std::string location, std::string jsonString)
 {
 	std::string requestStr = "POST " + location + " HTTP/1.0\r\n";
 	requestStr += "Host: " + m_hostName + "\r\n";
-	requestStr += "Content-Type: application/x-www-form-urlencoded\r\n";
-	requestStr += "Accept: */*\r\n";
+	requestStr += "Content-Type: application/json\r\n";
+	requestStr += "Accept: application/json\r\n";
 	requestStr += "Content-Length: " + std::to_string(jsonString.length()) + "\r\n";
 	requestStr += "Connection: Keep-Alive\r\n\r\n";
 	requestStr += jsonString;
@@ -98,7 +98,7 @@ void HttpHandler::GetResponse()
 {
 	try
 	{
-		boost::asio::read_until(*m_socket, m_serverResponse, "</html>"); 
+		boost::asio::read_until(*m_socket, m_serverResponse, "<<>>"); 
 	}
 	catch (Exception &e)
 	{
@@ -111,4 +111,6 @@ void HttpHandler::GetResponse()
 	{
 		std::cout << test << std::endl;
 	}
+	std::getline(responseStream, test);
+	std::cout << test << std::endl;
 }
