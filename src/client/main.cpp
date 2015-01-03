@@ -39,8 +39,8 @@
 int main(int argc, char *argv[])
 //try
 {
+    avcodec_register_all();
     VideoStream v;
-    v.Initialize(640, 480);
     v.Test();
 
 

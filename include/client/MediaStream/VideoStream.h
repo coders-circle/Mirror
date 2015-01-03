@@ -1,12 +1,14 @@
 #pragma once
 
-
-
 #include "client/MediaStream/MediaStream.h"
 
 #ifndef _WIN32
 #define av_frame_alloc avcodec_alloc_frame
 #endif
+
+#define INBUF_SIZE 4096
+#define AUDIO_INBUF_SIZE 20480
+#define AUDIO_REFILL_THRESH 4096
 
 
 
@@ -15,63 +17,101 @@ class VideoStream :public MediaStream
 {
 public:
     AVCodecID m_codecID;
-    AVCodec *m_codec;
-    AVCodecContext *m_codecContext;
+    AVCodec *m_encoder;
+    AVCodec *m_decoder;
+    AVCodecContext *m_encoderContext;
+    AVCodecContext *m_decoderContext;
+
+    // contains encoded frames
     std::vector<AVPacket> m_encodedFrames;
-    std::vector<AVPacket> m_delayedFrames;
+
+    // not used in our case, for the containers like mp4
+    // which can generate delayed frames
+    std::vector<AVPacket> m_delayedFrames;  
+
+    // contains decoded raw frames
+    std::vector<AVFrame> m_rawFrames;
+
     SwsContext * m_ctx;
-    void Initialize(int w, int h, int fps = 15, int bitrate = 100000)
+
+    void InitializeDecoder()
     {
-        avcodec_register_all();
-        m_codecID = AV_CODEC_ID_H264;
-        m_codec = avcodec_find_encoder(m_codecID);
-        if (!m_codec) throw CodecMissingException();
-        m_codecContext = avcodec_alloc_context3(m_codec);
-        if (!m_codecContext) throw Exception("can't allocate video codec context");
-        m_codecContext->bit_rate = bitrate;
-        m_codecContext->width = w;
-        m_codecContext->height = h;
-        AVRational avrat = { 1, fps };   // for 25 fps
-        m_codecContext->time_base = avrat;
-        /*emit one intra frame every ten frames
-        check frame pict_type before passing frame
-        to encoder, if frame->pict_type is AV_PICTURE_TYPE_I
-        then gop_size is ignored and the output of encoder
-        will always be I frame irrespective to gop_size*/
-        m_codecContext->gop_size = 10;
-        m_codecContext->max_b_frames = 1;
-        m_codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
+        m_decoder = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
+
+        if (!m_decoder) throw CodecMissingException();
+        m_decoderContext = avcodec_alloc_context3(m_decoder);
+        if (!m_decoderContext) throw Exception("Could not allocate video codec context");
+
+        if (m_decoder->capabilities&CODEC_CAP_TRUNCATED)
+            m_decoderContext->flags |= CODEC_FLAG_TRUNCATED; // we do not send complete frames 
+
+        if (avcodec_open2(m_decoderContext, m_decoder, NULL) < 0) 
+            throw Exception("Could not open codec");
+    }
+    void AddFrame(AVPacket* pkt)
+    {
+        unsigned int packetIndex = this->AllocateNewRawPacket();
+        int framePresent = 0;
+        if (avcodec_decode_video2(m_decoderContext, &m_rawFrames[packetIndex], &framePresent, pkt) < 0)
+        {
+            throw Exception("error decoding the packet");
+        }
+    }
+    unsigned char* GetRawRGBData(unsigned int rawFrameIndex)
+    {
+        
+    }
+    void InitializeEncoder(int w, int h, int fps = 15, int bitrate = 100000)
+    {
+        m_encoder = avcodec_find_encoder(m_codecID);
+        if (!m_encoder) throw CodecMissingException();
+        m_encoderContext = avcodec_alloc_context3(m_encoder);
+        if (!m_encoderContext) throw Exception("can't allocate video codec context");
+        m_encoderContext->bit_rate = bitrate;
+        m_encoderContext->width = w;
+        m_encoderContext->height = h;
+        AVRational avrat = { 1, fps }; 
+        m_encoderContext->time_base = avrat;
+        m_encoderContext->gop_size = 10;
+        m_encoderContext->max_b_frames = 1;
+        m_encoderContext->pix_fmt = AV_PIX_FMT_YUV420P;
         
         if (m_codecID == AV_CODEC_ID_H264)
-            av_opt_set(m_codecContext->priv_data, "preset", "slow", 0);
+            av_opt_set(m_encoderContext->priv_data, "preset", "slow", 0);
 
-        if (avcodec_open2(m_codecContext, m_codec, NULL) < 0)
+        if (avcodec_open2(m_encoderContext, m_encoder, NULL) < 0)
             throw Exception("failed to open the codec");
 
-        m_ctx = sws_getContext(m_codecContext->width, m_codecContext->height,
-            AV_PIX_FMT_RGB24, m_codecContext->width, m_codecContext->height,
+        m_ctx = sws_getContext(m_encoderContext->width, m_encoderContext->height,
+            AV_PIX_FMT_RGB24, m_encoderContext->width, m_encoderContext->height,
             AV_PIX_FMT_YUV420P, SWS_BICUBIC, 0, 0, 0);
     }
     VideoStream()
     {
-        
-
+        m_codecID = AV_CODEC_ID_H264;
     }
-    std::vector<AVPacket> GrabDelayedPackets()
+    void GrabDelayedPackets()
     {
         // there shouldn't be any delayed frames in our case
-
-        /*AVPacket pkt;
+        // following is the code just in case
+        /*
+        AVPacket pkt;
         int packetFilled = 1;
-        for (; packetFilled; ) {
-            int ret = avcodec_encode_video2(m_codecContext, &pkt, NULL, &packetFilled);
-            if (ret < 0) throw Exception("failed to encode delayed frames");
+        for (; packetFilled; ) 
+        {
+            if(avcodec_encode_video2(m_encoderContext, &pkt, NULL, &packetFilled) < 0)
+                throw Exception("failed to encode delayed frames");
 
             if (packetFilled) {
-                
-                av_free_packet(&pkt);
+                // store the packet
             }
-        }*/
+        }
+        */
+    }
+    unsigned int AllocateNewRawPacket()
+    {
+        m_rawFrames.resize(m_rawFrames.size() + 1);
+        return (m_rawFrames.size() - 1);
     }
     unsigned int AllocateNewPacket()
     {
@@ -83,16 +123,14 @@ public:
     void AddFrame(uint8_t* rgb24Data, int pts)
     {
         uint8_t * inData[1] = { rgb24Data };                // RGB24 have one plane
-        int inLinesize[1] = { 3 * m_codecContext->width };  // RGB stride
+        int inLinesize[1] = { 3 * m_encoderContext->width };  // RGB stride
 
         AVFrame *frame = av_frame_alloc();
-        frame->width = m_codecContext->width;
-        frame->height = m_codecContext->height;
-        frame->format = m_codecContext->pix_fmt;
-        // the image can be allocated by any means and av_image_alloc() is
-        // just the most convenient way if av_malloc() is to be used 
-        if (av_image_alloc(frame->data, frame->linesize, m_codecContext->width,
-            m_codecContext->height, m_codecContext->pix_fmt, 32) < 0)
+        frame->width = m_encoderContext->width;
+        frame->height = m_encoderContext->height;
+        frame->format = m_encoderContext->pix_fmt;
+        if (av_image_alloc(frame->data, frame->linesize, m_encoderContext->width,
+            m_encoderContext->height, m_encoderContext->pix_fmt, 32) < 0)
         {
             throw Exception("failed to allocate raw picture buffer");
         }
@@ -115,21 +153,21 @@ public:
         // as required
         // packetFilled checks if the packet is delayed or not
         int packetFilled = 0;
-        if (avcodec_encode_video2(m_codecContext, pkt, frame, &packetFilled) < 0)
+        if (avcodec_encode_video2(m_encoderContext, pkt, frame, &packetFilled) < 0)
         {
             throw Exception("failed to encode the frame");
         }
 
         if (packetFilled) 
         {
-            
+            // this should not occur for our case
         }
     }
-    //std::vector
     void Test()
     {
-        int w = m_codecContext->width;
-        int h = m_codecContext->height;
+        this->InitializeEncoder(1280, 1024);
+        int w = m_encoderContext->width;
+        int h = m_encoderContext->height;
         uint8_t *rgb24Data = new uint8_t[w*h * 3];
         for (int i = 0; i < 25 * 10; i++)
         {
@@ -141,18 +179,22 @@ public:
                     rgb24Data[3 * (y*w + x) + 1] = i % 255;
                     rgb24Data[3 * (y*w + x) + 2] = i % 255;
                 }
-                
             }
             this->AddFrame(rgb24Data, i);
         }
         FILE* fp = fopen("test.flv", "wb");
-        for (int i = 0; i < m_encodedFrames.size(); i++)
+        for (unsigned int i = 0; i < m_encodedFrames.size(); i++)
         {
             fwrite(m_encodedFrames[i].data, 1, m_encodedFrames[i].size, fp);
         }
         uint8_t endcode[] = { 0, 0, 1, 0xb7 };
         fwrite(endcode, 1, sizeof(endcode), fp);
         fclose(fp);
+
+        this->InitializeDecoder();
+        this->AddFrame(&m_encodedFrames[0]);
+        this->AddFrame(&m_encodedFrames[1]);
+        std::cout << m_rawFrames[1].width << ", " << m_rawFrames[1].height << std::endl;
     }
 protected:
     
