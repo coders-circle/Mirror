@@ -7,7 +7,7 @@ void VideoCapture::Initialize()
     AVFormatContext* avFormat = avformat_alloc_context();
 #ifdef _WIN32
     AVInputFormat * ifmt = av_find_input_format("dshow");
-    if (avformat_open_input(&avFormat, "video=Integrated Camera", ifmt, NULL)!=0)
+    if (avformat_open_input(&avFormat, "video=Integrated Webcam", ifmt, NULL)!=0)
 #else
     AVInputFormat * ifmt = av_find_input_format("video4linux2");
     if (avformat_open_input(&avFormat, "/dev/video0", ifmt, NULL)!=0)
@@ -35,10 +35,10 @@ void VideoCapture::Initialize()
     if (avcodec_open2(avCodec, codec, NULL) < 0)
         throw Exception ("Couldn't open codec");
     AVFrame * frame;
-    AVFrame * frameRGB = avcodec_alloc_frame();
+    AVFrame * frameRGB = av_frame_alloc();
     AVPacket pkt;
     av_init_packet(&pkt);
-    frame = avcodec_alloc_frame();
+    frame = av_frame_alloc();
     AVPixelFormat  pFormat = AV_PIX_FMT_RGB24;
     auto numBytes = avpicture_get_size(pFormat,avCodec->width,avCodec->height) ;
     auto buffer = (uint8_t *) av_malloc(numBytes*sizeof(uint8_t));
@@ -52,7 +52,7 @@ void VideoCapture::Initialize()
         *kg=false;
     });
                  
-    VideoStream::Initialize(avCodec->width, avCodec->height);
+    VideoStream::InitializeEncoder(avCodec->width, avCodec->height);
     while (keepgoing && av_read_frame(avFormat, &pkt)>=0)
     {
         if (pkt.stream_index != stream->index)
