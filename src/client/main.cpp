@@ -42,8 +42,7 @@ int main(int argc, char *argv[])
     av_register_all();
     avdevice_register_all();
     VideoCapture v;
-    v.Initialize();
-    //v.Test();
+    v.Test();
 
 
     GtkWidget *mainWindow;
