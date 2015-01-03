@@ -2,12 +2,12 @@
 
 #include "common/Exception.h"
 
-#include "Client/UI/Control.h"
-#include "Client/UI/Button.h"
-#include "Client/UI/Label.h"
-#include "Client/UI/TextEdit.h"
-#include "Client/UI/Spinner.h"
-#include "Client/UI/FrameRenderer.h"
+#include "client/UI/Control.h"
+#include "client/UI/Button.h"
+#include "client/UI/Label.h"
+#include "client/UI/TextEdit.h"
+#include "client/UI/Spinner.h"
+#include "client/UI/FrameRenderer.h"
 
 #include <iostream>
 #include <vector>
