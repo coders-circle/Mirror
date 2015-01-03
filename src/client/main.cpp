@@ -4,6 +4,7 @@
 
 #include <common/common.h>
 #include "client/Application.h"
+#include "client/MediaStream/VideoStream.h"
 
 
 //#include "client/VideoCapture.h"
@@ -38,6 +39,10 @@
 int main(int argc, char *argv[])
 //try
 {
+    VideoStream v;
+    v.Test();
+
+
     GtkWidget *mainWindow;
     gtk_init(&argc, &argv);
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
