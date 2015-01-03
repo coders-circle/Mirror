@@ -4,6 +4,10 @@
 
 #include "client/MediaStream/MediaStream.h"
 
+#ifndef _WIN32
+#define av_frame_alloc avcodec_alloc_frame
+#endif
+
 
 
 
@@ -37,7 +41,7 @@ public:
         m_codecContext->gop_size = 10;
         m_codecContext->max_b_frames = 1;
         m_codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
-
+        
         if (m_codecID == AV_CODEC_ID_H264)
             av_opt_set(m_codecContext->priv_data, "preset", "slow", 0);
 

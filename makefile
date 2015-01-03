@@ -1,7 +1,7 @@
 ## Directories to search include and source files
 INC_DIR := include
 COMMON_SRC_DIRS := common
-CLIENT_SRC_DIRS := client client/UI
+CLIENT_SRC_DIRS := client client/UI client/MediaStream
 SERVER_SRC_DIRS := server
 
 ## Directories to build files into
@@ -20,7 +20,7 @@ SERVER_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(SERVER_CPP_FILES:src/%.cpp=%.o))
 ## Compiler, compiler and linker flags and libaries to use
 CXX := g++
 CXXLIBS := `pkg-config --cflags gtk+-3.0 opencv`
-LDLIBS := `pkg-config --libs gtk+-3.0 opencv` -lboost_system -lboost_thread -lpthread
+LDLIBS := `pkg-config --libs gtk+-3.0 opencv` -lboost_system -lboost_thread -lpthread -lavutil -lavformat -lavdevice -lavcodec -lswscale
 CXXFLAGS := -I $(INC_DIR) -MMD --std=c++11 $(CXXLIBS) -Wno-deprecated-declarations
 LDFLAGS := --std=c++11 $(LDLIBS)
 
