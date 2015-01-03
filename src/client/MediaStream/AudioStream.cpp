@@ -41,7 +41,7 @@ void AudioStream::AddFrame(uint8_t* samples, int pts)
     if(avcodec_fill_audio_frame(frame, m_codecContext->channels, m_codecContext->sample_fmt, 
                                 (const uint8_t*)samples, bufferSize, 0) < 0)
     {
-        throw Exception("failed to allocate raw picture buffer");   
+        throw Exception("failed to allocate raw sample buffer");   
     }
 
     frame->pts = pts;   
