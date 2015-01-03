@@ -13,6 +13,8 @@ extern "C"
 #include <libavutil/mathematics.h>
 #include <libavutil/samplefmt.h>
 #include <libswscale/swscale.h>
+#include <libavdevice/avdevice.h>
+#include <libavformat/avformat.h>
 }
 
 #include <iostream>

@@ -22,7 +22,6 @@ public:
     SwsContext * m_ctx;
     void Initialize(int w, int h, int fps = 15, int bitrate = 100000)
     {
-        avcodec_register_all();
         m_codecID = AV_CODEC_ID_H264;
         m_codec = avcodec_find_encoder(m_codecID);
         if (!m_codec) throw CodecMissingException();
@@ -122,7 +121,7 @@ public:
 
         if (packetFilled) 
         {
-            
+            std::cout << "Filled" << std::endl;
         }
     }
     //std::vector
@@ -146,6 +145,19 @@ public:
             this->AddFrame(rgb24Data, i);
         }
         FILE* fp = fopen("test.flv", "wb");
+        for (int i = 0; i < m_encodedFrames.size(); i++)
+        {
+            fwrite(m_encodedFrames[i].data, 1, m_encodedFrames[i].size, fp);
+        }
+        uint8_t endcode[] = { 0, 0, 1, 0xb7 };
+        fwrite(endcode, 1, sizeof(endcode), fp);
+        fclose(fp);
+    }
+
+    // Test Encode to File
+    void Encode()
+    {
+        FILE* fp = fopen("test.avi", "wb");
         for (int i = 0; i < m_encodedFrames.size(); i++)
         {
             fwrite(m_encodedFrames[i].data, 1, m_encodedFrames[i].size, fp);

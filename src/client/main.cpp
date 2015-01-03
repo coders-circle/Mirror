@@ -4,7 +4,7 @@
 
 #include <common/common.h>
 #include "client/Application.h"
-#include "client/MediaStream/VideoStream.h"
+#include "client/MediaStream/VideoCapture.h"
 
 
 //#include "client/VideoCapture.h"
@@ -39,9 +39,11 @@
 int main(int argc, char *argv[])
 //try
 {
-    VideoStream v;
-    v.Initialize(640, 480);
-    v.Test();
+    av_register_all();
+    avdevice_register_all();
+    VideoCapture v;
+    v.Initialize();
+    //v.Test();
 
 
     GtkWidget *mainWindow;
