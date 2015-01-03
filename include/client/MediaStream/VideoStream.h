@@ -4,6 +4,10 @@
 
 #include "client/MediaStream/MediaStream.h"
 
+#ifndef _WIN32
+#define av_frame_alloc avcodec_alloc_frame
+#endif
+
 
 
 
@@ -15,7 +19,8 @@ public:
     AVCodecContext *m_codecContext;
     std::vector<AVPacket> m_encodedFrames;
     std::vector<AVPacket> m_delayedFrames;
-    VideoStream()
+    SwsContext * m_ctx;
+    void Initialize(int w, int h, int fps = 15, int bitrate = 100000)
     {
         avcodec_register_all();
         m_codecID = AV_CODEC_ID_H264;
@@ -23,10 +28,10 @@ public:
         if (!m_codec) throw CodecMissingException();
         m_codecContext = avcodec_alloc_context3(m_codec);
         if (!m_codecContext) throw Exception("can't allocate video codec context");
-        m_codecContext->bit_rate = 100000;
-        m_codecContext->width = 1280;
-        m_codecContext->height = 768;
-        AVRational avrat = { 1, 25 };   // for 25 fps
+        m_codecContext->bit_rate = bitrate;
+        m_codecContext->width = w;
+        m_codecContext->height = h;
+        AVRational avrat = { 1, fps };   // for 25 fps
         m_codecContext->time_base = avrat;
         /*emit one intra frame every ten frames
         check frame pict_type before passing frame
@@ -36,12 +41,20 @@ public:
         m_codecContext->gop_size = 10;
         m_codecContext->max_b_frames = 1;
         m_codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
-
+        
         if (m_codecID == AV_CODEC_ID_H264)
             av_opt_set(m_codecContext->priv_data, "preset", "slow", 0);
 
-        if (avcodec_open2(m_codecContext, m_codec, NULL) < 0) 
+        if (avcodec_open2(m_codecContext, m_codec, NULL) < 0)
             throw Exception("failed to open the codec");
+
+        m_ctx = sws_getContext(m_codecContext->width, m_codecContext->height,
+            AV_PIX_FMT_RGB24, m_codecContext->width, m_codecContext->height,
+            AV_PIX_FMT_YUV420P, SWS_BICUBIC, 0, 0, 0);
+    }
+    VideoStream()
+    {
+        
 
     }
     std::vector<AVPacket> GrabDelayedPackets()
@@ -64,6 +77,30 @@ public:
     {
         m_encodedFrames.resize(m_encodedFrames.size() + 1);
         return m_encodedFrames.size() - 1;
+    }
+
+    // pts = presentation time stamp
+    void AddFrame(uint8_t* rgb24Data, int pts)
+    {
+        uint8_t * inData[1] = { rgb24Data };                // RGB24 have one plane
+        int inLinesize[1] = { 3 * m_codecContext->width };  // RGB stride
+
+        AVFrame *frame = av_frame_alloc();
+        frame->width = m_codecContext->width;
+        frame->height = m_codecContext->height;
+        frame->format = m_codecContext->pix_fmt;
+        // the image can be allocated by any means and av_image_alloc() is
+        // just the most convenient way if av_malloc() is to be used 
+        if (av_image_alloc(frame->data, frame->linesize, m_codecContext->width,
+            m_codecContext->height, m_codecContext->pix_fmt, 32) < 0)
+        {
+            throw Exception("failed to allocate raw picture buffer");
+        }
+        sws_scale(m_ctx, inData, inLinesize, 0, frame->height, frame->data, frame->linesize);
+        frame->pts = pts;
+        this->AddFrame(frame);
+
+
     }
     void AddFrame(AVFrame *frame)
     {
@@ -91,44 +128,24 @@ public:
     //std::vector
     void Test()
     {
-
-        SwsContext * ctx = sws_getContext(m_codecContext->width, m_codecContext->height,
-            AV_PIX_FMT_RGB24, m_codecContext->width, m_codecContext->height,
-            AV_PIX_FMT_YUV420P, SWS_BICUBIC, 0, 0, 0);
-        uint8_t* rgb24Data = new uint8_t[3 * m_codecContext->width*m_codecContext->height];
-        uint8_t * inData[1] = { rgb24Data };                // RGB24 have one plane
-        int inLinesize[1] = { 3 * m_codecContext->width };  // RGB stride
-
-
-
-        AVFrame *frame = avcodec_alloc_frame();
-        frame->width = m_codecContext->width;
-        frame->height = m_codecContext->height;
-        frame->format = m_codecContext->pix_fmt;
-        // the image can be allocated by any means and av_image_alloc() is
-        // just the most convenient way if av_malloc() is to be used 
-        if (av_image_alloc(frame->data, frame->linesize, m_codecContext->width,
-            m_codecContext->height, m_codecContext->pix_fmt, 32) < 0)
-        {
-            throw Exception("failed to allocate raw picture buffer");
-        }
+        int w = m_codecContext->width;
+        int h = m_codecContext->height;
+        uint8_t *rgb24Data = new uint8_t[w*h * 3];
         for (int i = 0; i < 25 * 10; i++)
         {
-            for (int y = 0; y < frame->height; y++)
+            for (int y = 0; y < h; y++)
             {
-                for (int x = 0; x < frame->width; x++)
+                for (int x = 0; x < w; x++)
                 {
-                    rgb24Data[3 * (y*frame->width + x) + 0] = i % 255;
-                    rgb24Data[3 * (y*frame->width + x) + 1] = i % 255;
-                    rgb24Data[3 * (y*frame->width + x) + 2] = i % 255;
+                    rgb24Data[3 * (y*w + x) + 0] = i % 255;
+                    rgb24Data[3 * (y*w + x) + 1] = i % 255;
+                    rgb24Data[3 * (y*w + x) + 2] = i % 255;
                 }
                 
             }
-            sws_scale(ctx, inData, inLinesize, 0, frame->height, frame->data, frame->linesize);
-            frame->pts = i;
-            this->AddFrame(frame);
+            this->AddFrame(rgb24Data, i);
         }
-        FILE* fp = fopen("test.avi", "wb");
+        FILE* fp = fopen("test.flv", "wb");
         for (int i = 0; i < m_encodedFrames.size(); i++)
         {
             fwrite(m_encodedFrames[i].data, 1, m_encodedFrames[i].size, fp);

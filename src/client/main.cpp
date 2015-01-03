@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 //try
 {
     VideoStream v;
+    v.Initialize(640, 480);
     v.Test();
 
 
