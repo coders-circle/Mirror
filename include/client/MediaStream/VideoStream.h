@@ -94,7 +94,7 @@ public:
 
         SwsContext * ctx = sws_getContext(m_codecContext->width, m_codecContext->height,
             AV_PIX_FMT_RGB24, m_codecContext->width, m_codecContext->height,
-            AV_PIX_FMT_YUV420P, 0, 0, 0, 0);
+            AV_PIX_FMT_YUV420P, SWS_BICUBIC, 0, 0, 0);
         uint8_t* rgb24Data = new uint8_t[3 * m_codecContext->width*m_codecContext->height];
         uint8_t * inData[1] = { rgb24Data };                // RGB24 have one plane
         int inLinesize[1] = { 3 * m_codecContext->width };  // RGB stride
