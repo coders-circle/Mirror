@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include <string>
 
-enum CONTROL{ BUTTON, LABEL, TEXTEDIT, STATUSBAR};
+enum CONTROL{ BUTTON, LABEL, TEXTEDIT, STATUSBAR, SPINNER, FRAMERENDERER};
 
 // base class for UI control elements
 class Control
@@ -15,8 +15,8 @@ public:
     int GetID();
     void PutFixedAt(GtkWidget *fixed, int x, int y);
     void PutFixedRelativeTo(Control* obj, GtkWidget* fixed, int xOffset, int yOffset);
-    void Show();
-    void Hide();
+    virtual void Show();
+    virtual void Hide();
     GtkWidget* GetHandle();
 protected:
     GtkWidget* m_handle;

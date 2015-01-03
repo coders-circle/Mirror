@@ -1,5 +1,6 @@
 #pragma once
 #include <common/TcpHandler.h>
+#include <common/UdpHandler.h>
 #include <common/TcpRequest.h>
 
 /* Data passed to the message event handler */
@@ -21,15 +22,21 @@ public:
     boost::asio::io_service& GetIOService() { return m_io; }
 
     // Connect to a peer/server,
-    size_t Connect(const tcp::endpoint& peer, bool* successful = NULL);
+    size_t Connect(const tcp::endpoint& peer, uint32_t secondsToWait = 20);
     // Connect to a peer/server asynchronously
-    void ConnectAsync(const tcp::endpoint& peer, bool* successful = NULL);
+    void ConnectAsync(const tcp::endpoint& peer, bool* threadEnd = NULL, size_t* connectionId = NULL, uint32_t secondsToWait =20);
     // Connect to a peer through server
-    size_t Connect(uint32_t clientId, bool* successful = NULL);
+    size_t Connect(uint32_t clientId);
+    // Connect to a peer through server asynchronously
+    void ConnectAsync(uint32_t clientId, bool* threadEnd = NULL, size_t* connectionId = NULL);
     // Start handling all requests that the client gets
     void HandleRequests();
     // Start handling all requests asynchronously
-    void HandleRequestsAsync() { boost::thread t(boost::bind(&Client::HandleRequests, this)); }
+    void HandleRequestsAsync();
+    // Disconnect
+    void Disconnect(size_t connectionId);
+    // Check if connected
+    bool IsConnected(size_t connectionId);
 
     // Set the event handler to handle incoming chat messages
     void SetMessageEventHandler(std::function<void(boost::shared_ptr<MessageEventData>)> handler) { m_messageHandler = handler; }
@@ -43,6 +50,8 @@ public:
     // Set username to use while sending messages
     void SetName(const std::string &name) { m_name = name; }
     const std::string& GetName() { return m_name; }
+    // Set connectionId of server
+    void SetServer(size_t connectionId) { m_serverId = connectionId; }
 
 private:
     boost::asio::io_service m_io;
@@ -57,21 +66,29 @@ private:
         : tcpHandler(io)
         {}
         TcpHandler tcpHandler;
-        // maybe store userid and other stuffs here...
+        bool connected;
     };
+    // Single udp handler can be used for all connections
+    // We need two udp handlers (even and odd pair) for rtp and rtcp
+    UdpHandler m_udpHandler1;
+    UdpHandler m_udpHandler2;
 
     // List of the connections
     std::vector<Connection> m_connections;
     // Mutex to lock the use of common variables (m_connections/m_request/...) during multithreading
     boost::mutex m_mutex;
+    // Connection-Id of server
+    size_t m_serverId;
 
     TcpRequest m_request;
     std::string m_name;
 
+    void ConnectTimer(TcpHandler &handler, uint32_t seconds);
+
     // For P2P:
     bool m_p2pConnecting;
-    size_t HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint, bool* successful = NULL);
-    void HandleP2PRequestAsync(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint, bool* successful = NULL);
+    size_t HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint);
+    void HandleP2PRequestAsync(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint);
     boost::shared_ptr<tcp::acceptor> m_acceptor;
     void P2PListen(const tcp::endpoint &localEndpoint);
     void P2PConnect(tcp::endpoint &remoteEndpoint);

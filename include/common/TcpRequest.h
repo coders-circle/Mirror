@@ -16,6 +16,7 @@ public:
         INAVLID_TYPE = 0, 
         JOIN_CHAT, CHAT_MESSAGE, 
         P2P_TCP,
+        DISCONNECT,
     };
 
     TcpRequest();
@@ -28,6 +29,8 @@ public:
     // Request to establish a P2P TCP connection with a client
     // Contains private and public addess-port pairs and client-id
     void P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::string &privateIp, uint16_t privatePort, const std::string &publicIp = "", uint16_t publicPort = 0);
+    // Request to disconnect
+    void Disconnect(TcpHandler& tcpHandler);
     // Send an invalid request
     void Invalid(TcpHandler& tcpHandler);
 

@@ -2,10 +2,12 @@
 
 #include "common/Exception.h"
 
-#include "Control.h"
-#include "Button.h"
-#include "Label.h"
-#include "TextEdit.h"
+#include "client/UI/Control.h"
+#include "client/UI/Button.h"
+#include "client/UI/Label.h"
+#include "client/UI/TextEdit.h"
+#include "client/UI/Spinner.h"
+#include "client/UI/FrameRenderer.h"
 
 #include <iostream>
 #include <vector>
@@ -53,7 +55,7 @@ public:
     // the text may contain pango markup syntax,
     // returns a pointer to the created object
     // typecast to Label*
-    Control* AddLabel(int id, int x, int y);
+    Control* AddLabel(int id, int x, int y, int w, int h);
 
     // Adds a Edit Box in the specified coordinate,
     // id = unique identifier for the control
@@ -61,11 +63,28 @@ public:
     // typecast to TextEdit*
     Control* AddTextEdit(int id, int x, int y, int w, int h);
 
+    // Adds an animated Spinner int the specified coordinate
+    // returns a pointer to the created object
+    // typecast to Spinner*
+    Control* AddSpinner(int x, int y, int w = 20, int h = 20);
+
+
+    // Adds an raw RGB frame renderer object
+    // returns a pointer to the created object
+    // typecast to FrameRenderer*
+    Control* AddFrameRenderer(int id, int x, int y, int w, int h);
+
+    // returns width of parent window
+    int GetParentWidth();
+
+    // returns height of parent window
+    int GetParentHeight();
+
     // shows all controls within the page
-    void ShowControls();
+    virtual void ShowControls();
 
     // hide all controls within the page
-    void HideControls();
+    virtual void HideControls();
 
     // called when an event by controls within occurs 
     // to be implemented by derived class

@@ -1,16 +1,16 @@
 #include <common/common.h>
-#include <common/RtpHandler.h>
+#include <common/RtpPacket.h>
 
-RtpHandler::RtpHandler()
+RtpPacket::RtpPacket()
 {
 }
 
-RtpHandler::~RtpHandler()
+RtpPacket::~RtpPacket()
 {
     CleanUp();
 }
 
-void RtpHandler::Initialize(boost::shared_ptr<UdpHandler> udpHandler, const udp::endpoint &remoteEndpoint)
+void RtpPacket::Initialize(boost::shared_ptr<UdpHandler> udpHandler, const udp::endpoint &remoteEndpoint)
 {
     m_udpHandler = udpHandler;
     m_remoteEndpoint = remoteEndpoint;
@@ -18,16 +18,16 @@ void RtpHandler::Initialize(boost::shared_ptr<UdpHandler> udpHandler, const udp:
     m_timeStampIncrement = 3600;        // for 25fps video
 }
 
-void RtpHandler::CleanUp()
+void RtpPacket::CleanUp()
 {
     m_udpHandler.reset();
     m_remoteEndpoint = udp::endpoint();
 }
 
-void RtpHandler::Send(const char *data, size_t size)
+void RtpPacket::Send(const char *data, size_t size)
 {
     if (!m_udpHandler)
-        throw RtpTransmissionException("RTP Transmitter hasn't been properly initialized");
+        throw RtpTransmissionException("RTP packet hasn't been properly initialized");
 
     std::vector<char> packet;
     packet.resize(RTP_HEADER_SIZE);
@@ -44,8 +44,9 @@ void RtpHandler::Send(const char *data, size_t size)
     packet[10] = (char)0x7e;
     packet[11] = (char)0x67;
 
-    for (unsigned int i = 0; i < size; ++i)
-        packet[RTP_HEADER_SIZE + i] = data[i];
+    memcpy(&packet[RTP_HEADER_SIZE], data, size);
+    /*for (unsigned int i = 0; i < size; ++i)
+        packet[RTP_HEADER_SIZE + i] = data[i];*/
 
     m_sequenceNumber++;
     m_timeStamp += m_timeStampIncrement;
@@ -54,10 +55,10 @@ void RtpHandler::Send(const char *data, size_t size)
 }
 
 
-void RtpHandler::Receive(char* data, size_t maxSize)
+void RtpPacket::Receive(char* data, size_t maxSize)
 {
     if (!m_udpHandler)
-        throw RtpReceptionError("RTP Receiver hasn't been properly initialized");
+        throw RtpReceptionError("RTP packet hasn't been properly initialized");
 
     std::vector<char> packet;
     packet.resize(maxSize);
@@ -70,6 +71,7 @@ void RtpHandler::Receive(char* data, size_t maxSize)
     m_timeStamp = *((int*)&packet[4]);
     int SSRC = *((int*)&packet[8]);
 
-    for (unsigned int i = 0; i < len - RTP_HEADER_SIZE; ++i)
-        data[i] = packet[i + RTP_HEADER_SIZE];
+    memcpy(data, &packet[RTP_HEADER_SIZE], len - RTP_HEADER_SIZE);
+    /*for (unsigned int i = 0; i < len - RTP_HEADER_SIZE; ++i)
+        data[i] = packet[i + RTP_HEADER_SIZE];*/
 }

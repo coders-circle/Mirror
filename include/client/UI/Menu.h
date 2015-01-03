@@ -54,6 +54,10 @@ public:
     // return handle to the widget representing the menu itself
     GtkWidget* GetMenu();
 
+    // not used ( no need )
+    // using gtk_widget_show_all(menubar) works for menu
+    void Show();
+
     int GetID();
 private:
     GtkWidget* m_handle;
@@ -98,5 +102,3 @@ private:
     std::vector<Menu> m_menus;
     GCallback m_menuEventHandler;
 };
-
-enum MENU { CONNECTIONSMENU = 0, TOOLSMENU, HELPMENU };

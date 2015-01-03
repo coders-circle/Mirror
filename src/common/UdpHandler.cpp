@@ -36,3 +36,44 @@ size_t UdpHandler::Receive(udp::endpoint &remoteEndpoint, char* data, size_t max
         throw UdpHandlerException("Socket not created");
     return m_socket->receive_from(boost::asio::buffer(data, maxSize), remoteEndpoint);
 }
+
+void UdpHandler::Close()
+{
+    if (m_socket)
+        m_socket->close();
+    m_socket.reset();
+}
+
+void UdpHandler::GetUdpPairs(UdpHandler &handler1, UdpHandler &handler2)
+{
+    bool even, odd=false;
+    while (!odd)
+    {
+        even = false;
+        while (!even)
+        {
+            try
+            {
+                handler1.Initialize(udp::endpoint(udp::v4(), 0));
+                if (handler1.GetSocket()->local_endpoint().port()%2==0)
+                    even=true;
+                else
+                    handler1.Close();
+            }
+            catch(...) {}
+        }
+        try
+        {
+            uint16_t port1 = handler1.GetSocket()->local_endpoint().port();
+            handler2.Initialize(udp::endpoint(udp::v4(), port1+1));
+            if (handler2.GetSocket()->local_endpoint().port()==port1+1)
+                odd=true;
+            else
+            {
+                handler1.Close();
+                handler2.Close();
+            }
+        }
+        catch(...) { handler1.Close(); }
+    }
+}

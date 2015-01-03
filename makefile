@@ -1,33 +1,51 @@
+## Directories to search include and source files
 INC_DIR := include
+COMMON_SRC_DIRS := common
+CLIENT_SRC_DIRS := client client/UI client/MediaStream
+SERVER_SRC_DIRS := server
 
-COMMON_CPP_FILES := $(wildcard src/common/*.cpp) 
-CLIENT_CPP_FILES := $(wildcard src/client/*.cpp) $(wildcard src/client/UI/*.cpp) $(COMMON_CPP_FILES)
-CLIENT_OBJ_FILES := $(addprefix obj/,$(CLIENT_CPP_FILES:src/%.cpp=%.o))
+## Directories to build files into
+OBJ_DIR := obj
+BIN_DIR := bin
 
-SERVER_CPP_FILES := $(wildcard src/server/*.cpp) $(COMMON_CPP_FILES)
-SERVER_OBJ_FILES := $(addprefix obj/,$(SERVER_CPP_FILES:src/%.cpp=%.o))
+## List of all c++ files to compile
+COMMON_CPP_FILES := $(wildcard $(COMMON_SRC_DIRS:%=src/%/*.cpp))
+CLIENT_CPP_FILES := $(wildcard $(CLIENT_SRC_DIRS:%=src/%/*.cpp)) $(COMMON_CPP_FILES)
+SERVER_CPP_FILES := $(wildcard $(SERVER_SRC_DIRS:%=src/%/*.cpp)) $(COMMON_CPP_FILES)
 
-CC_FLAGS := -I $(INC_DIR) -MMD --std=c++11 `pkg-config --cflags gtk+-3.0 opencv`
-LD_FLAGS := --std=c++11 `pkg-config --libs gtk+-3.0 opencv` -lboost_system -lboost_thread -lpthread
+## List of all object files to generate
+CLIENT_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(CLIENT_CPP_FILES:src/%.cpp=%.o))
+SERVER_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(SERVER_CPP_FILES:src/%.cpp=%.o))
 
+## Compiler, compiler and linker flags and libaries to use
+CXX := g++
+CXXLIBS := `pkg-config --cflags gtk+-3.0 opencv`
+LDLIBS := `pkg-config --libs gtk+-3.0 opencv` -lboost_system -lboost_thread -lpthread -lavutil -lavformat -lavdevice -lavcodec -lswscale
+CXXFLAGS := -I $(INC_DIR) -MMD --std=c++11 $(CXXLIBS) -Wno-deprecated-declarations
+LDFLAGS := --std=c++11 $(LDLIBS)
+
+## Build client and server applications
 all: bin/client bin/server
 
-bin/client: $(CLIENT_OBJ_FILES)
-	g++ -o $@ $^ $(LD_FLAGS)
-bin/server: $(SERVER_OBJ_FILES)
-	g++ -o $@ $^ $(LD_FLAGS)
+$(BIN_DIR)/client: $(CLIENT_OBJ_FILES) | $(BIN_DIR)
+	$(CXX) -o $@ $^ $(LDFLAGS)
+$(BIN_DIR)/server: $(SERVER_OBJ_FILES) | $(BIN_DIR)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-obj/%.o: src/%.cpp
-	g++ -c -o $@ $< $(CC_FLAGS) 
+$(OBJ_DIR)/%.o: src/%.cpp | $(OBJ_DIR)
+	$(CXX) -c -o $@ $< $(CXXFLAGS) 
 
+$(BIN_DIR):
+	mkdir $(BIN_DIR)
+
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR) $(CLIENT_SRC_DIRS:%=$(OBJ_DIR)/%) $(COMMON_SRC_DIRS:%=$(OBJ_DIR)/%) $(SERVER_SRC_DIRS:%=$(OBJ_DIR)/%)
+	
+## Clean up everything and make necessary directories
 clean:
 	rm -rf obj
 	rm -rf bin
-	mkdir obj
-	mkdir bin
-	mkdir obj/client
-	mkdir obj/client/UI
-	mkdir obj/common
-	mkdir obj/server
 
+## Include auto-generated dependencies rules
+OBJFILES := $(CLIENT_OBJ_FILES) $(SERVER_OBJ_FILES)
 -include $(OBJFILES:.o=.d)

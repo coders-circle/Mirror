@@ -85,6 +85,16 @@ int Menu::GetID()
     return m_id;
 }
 
+void Menu::Show()
+{
+
+    gtk_widget_show(m_handle);
+    for (int i = 0, lim = m_items.size(); i < lim; i++)
+    {
+        gtk_widget_show(m_items[i].GetHandle());
+    }
+}
+
 ////////////////////////////////////////////////////////////
 // Definitions for member functions of MenuBar
 ////////////////////////////////////////////////////////////

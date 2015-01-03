@@ -10,6 +10,19 @@ TcpHandler::~TcpHandler()
 {
 }
 
+void TcpHandler::Close()
+{
+    if (m_socket)
+        m_socket->close();
+//    m_socket.reset();
+}
+
+void TcpHandler::Cancel()
+{
+    if (m_socket) 
+        m_socket->shutdown(tcp::socket::shutdown_both);
+}
+
 // this is initialized by the Listener which accepts 
 //  a connection from a peer and creates a socket
 void TcpHandler::Initialize(boost::shared_ptr<tcp::socket> socket)

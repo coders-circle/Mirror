@@ -6,9 +6,11 @@ void Page::AllocateNewControl(int type, int id)
     m_controls.resize(m_controls.size() + 1);
     switch (type)
     {
-    case CONTROL::BUTTON:   m_controls[m_controls.size() - 1] = new Button();       break;
-    case CONTROL::LABEL:    m_controls[m_controls.size() - 1] = new Label();        break;
-    case CONTROL::TEXTEDIT: m_controls[m_controls.size() - 1] = new TextEdit();     break;
+    case CONTROL::BUTTON:         m_controls[m_controls.size() - 1] = new Button();             break;
+    case CONTROL::LABEL:          m_controls[m_controls.size() - 1] = new Label();              break;
+    case CONTROL::TEXTEDIT:       m_controls[m_controls.size() - 1] = new TextEdit();           break;
+    case CONTROL::SPINNER:        m_controls[m_controls.size() - 1] = new Spinner();            break;
+    case CONTROL::FRAMERENDERER:  m_controls[m_controls.size() - 1] = new FrameRenderer();      break;
     }
     m_controls[m_controls.size() - 1]->SetID(id);
 }
@@ -48,6 +50,13 @@ Control* Page::AddButton(int id, std::string label, int x, int y, int w, int h)
     return m_controls[m_controls.size() - 1];
 }
 
+Control* Page::AddSpinner(int x, int y, int w, int h)
+{
+    this->AllocateNewControl(CONTROL::SPINNER, -1);
+    ((Spinner*)m_controls[m_controls.size() - 1])->Set(m_fixed, x, y, w, h);
+    return m_controls[m_controls.size() - 1];
+}
+
 Control* Page::AddLabel(std::string label, int x, int y, int w, int h, int justification)
 {
     this->AllocateNewControl(CONTROL::LABEL, -1);
@@ -56,10 +65,10 @@ Control* Page::AddLabel(std::string label, int x, int y, int w, int h, int justi
     return m_controls[m_controls.size() - 1];
 }
 
-Control* Page::AddLabel(int id, int x, int y)
+Control* Page::AddLabel(int id, int x, int y, int w, int h)
 {
     this->AllocateNewControl(CONTROL::LABEL, id);
-    ((Label*)m_controls[m_controls.size() - 1])->Set(id, m_fixed, x, y);
+    ((Label*)m_controls[m_controls.size() - 1])->Set(id, m_fixed, x, y, w, h);
     return m_controls[m_controls.size() - 1];
 }
 
@@ -69,6 +78,28 @@ Control* Page::AddTextEdit(int id, int x, int y, int w, int h)
     ((TextEdit*)m_controls[m_controls.size() - 1])->Set(m_fixed, x, y, w, h);
     return m_controls[m_controls.size() - 1];
 }
+
+Control* Page::AddFrameRenderer(int id, int x, int y, int w, int h)
+{
+    this->AllocateNewControl(CONTROL::FRAMERENDERER, id);
+    ((FrameRenderer*)m_controls[m_controls.size() - 1])->Set(m_fixed, x, y, w, h);
+    return m_controls[m_controls.size() - 1];
+}
+
+int Page::GetParentWidth()
+{
+    int w = 0, h = 0;
+    gtk_window_get_size(GTK_WINDOW(m_parentWindow), &w, &h);
+    return w;
+}
+
+int Page::GetParentHeight()
+{
+    int w = 0, h = 0;
+    gtk_window_get_size(GTK_WINDOW(m_parentWindow), &w, &h);
+    return h;
+}
+
 
 void Page::ShowControls()
 {

@@ -28,6 +28,12 @@
     <Filter Include="src\UI">
       <UniqueIdentifier>{639609fc-2ce0-49ee-a412-7904e176086f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\MediaStream">
+      <UniqueIdentifier>{56c0f246-71c2-42a9-8b7e-95021e07f833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\MediaStream">
+      <UniqueIdentifier>{d389c58c-6ca3-46a3-bb1e-14978631d44a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\common\common.h">
@@ -87,12 +93,6 @@
     <ClInclude Include="..\..\include\client\UI\pages\AboutPage.h">
       <Filter>include\UI\pages</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\client\FrameRenderer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\client\VideoCapture.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\client\UI\pages\pages.h">
       <Filter>include\UI\pages</Filter>
     </ClInclude>
@@ -129,15 +129,42 @@
     <ClInclude Include="..\..\include\client\Application.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\pages\WaitPage.h">
+      <Filter>include\UI\pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\Spinner.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\UI\FrameRenderer.h">
+      <Filter>include\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\MediaStream\AudioCapture.h">
+      <Filter>include\MediaStream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\MediaStream\AudioPlayback.h">
+      <Filter>include\MediaStream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\MediaStream\AudioStream.h">
+      <Filter>include\MediaStream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\MediaStream\MediaStream.h">
+      <Filter>include\MediaStream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\MediaStream\VideoCapture.h">
+      <Filter>include\MediaStream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\MediaStream\VideoPlayback.h">
+      <Filter>include\MediaStream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\client\MediaStream\VideoStream.h">
+      <Filter>include\MediaStream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\common\ChatMessage.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\RtpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\common\TcpRequest.cpp">
@@ -170,9 +197,6 @@
     <ClCompile Include="..\..\src\client\Client.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\FrameRenderer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\client\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -185,8 +209,29 @@
     <ClCompile Include="..\..\src\client\UI\UIManager.cpp">
       <Filter>src\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\VideoCapture.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\..\src\client\UI\FrameRenderer.cpp">
+      <Filter>src\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\MediaStream\AudioCapture.cpp">
+      <Filter>src\MediaStream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\MediaStream\AudioPlayback.cpp">
+      <Filter>src\MediaStream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\MediaStream\AudioStream.cpp">
+      <Filter>src\MediaStream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\MediaStream\MediaStream.cpp">
+      <Filter>src\MediaStream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\MediaStream\VideoCapture.cpp">
+      <Filter>src\MediaStream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\MediaStream\VideoPlayback.cpp">
+      <Filter>src\MediaStream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\MediaStream\VideoStream.cpp">
+      <Filter>src\MediaStream</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

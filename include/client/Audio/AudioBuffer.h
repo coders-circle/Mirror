@@ -43,6 +43,8 @@ public:
 
 	void WriteToFile(const std::string & strFilename);
 
+	std::vector<short> GetSamples(void) const { return m_vectorSamples; }
+	
 private:
 	std::vector<short> m_vectorSamples;
 	std::vector<short>::iterator m_iterPlayback;

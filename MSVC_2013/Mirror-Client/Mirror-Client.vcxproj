@@ -47,12 +47,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(OPENCV_ROOT)\include;$(GTKDIR)\include\gail-3.0;$(GTKDIR)\include\atk-1.0;$(GTKDIR)\include\gdk-pixbuf-2.0;$(SolutionDir)\..\include;$(BOOST_ROOT);$(GTKDIR)\include\gtk-3.0;$(GTKDIR)\include\glib-2.0;$(GTKDIR)\include\pango-1.0;$(GTKDIR)\lib\glib-2.0\include;$(GTKDIR)\include\cairo</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(LIBAV_ROOT)\include;$(OPENCV_ROOT)\include;$(GTKDIR)\include\gail-3.0;$(GTKDIR)\include\atk-1.0;$(GTKDIR)\include\gdk-pixbuf-2.0;$(SolutionDir)\..\include;$(BOOST_ROOT);$(GTKDIR)\include\gtk-3.0;$(GTKDIR)\include\glib-2.0;$(GTKDIR)\include\pango-1.0;$(GTKDIR)\lib\glib-2.0\include;$(GTKDIR)\include\cairo</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(GTKDIR)\lib;$(OPENCV_ROOT)\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(LIBAV_ROOT)\lib;$(BOOST_ROOT)\stage\lib;$(GTKDIR)\lib;$(OPENCV_ROOT)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,9 +74,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\client\Application.h" />
-    <ClInclude Include="..\..\include\client\FrameRenderer.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\AudioCapture.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\AudioPlayback.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\AudioStream.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\MediaStream.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\VideoCapture.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\VideoPlayback.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\VideoStream.h" />
     <ClInclude Include="..\..\include\client\UI\Button.h" />
     <ClInclude Include="..\..\include\client\UI\Control.h" />
+    <ClInclude Include="..\..\include\client\UI\FrameRenderer.h" />
     <ClInclude Include="..\..\include\client\UI\Label.h" />
     <ClInclude Include="..\..\include\client\UI\Menu.h" />
     <ClInclude Include="..\..\include\client\UI\Page.h" />
@@ -86,11 +93,12 @@
     <ClInclude Include="..\..\include\client\UI\pages\pages.h" />
     <ClInclude Include="..\..\include\client\UI\pages\SignupPage.h" />
     <ClInclude Include="..\..\include\client\UI\pages\SVConnectPage.h" />
+    <ClInclude Include="..\..\include\client\UI\pages\WaitPage.h" />
+    <ClInclude Include="..\..\include\client\UI\Spinner.h" />
     <ClInclude Include="..\..\include\client\UI\Statusbar.h" />
     <ClInclude Include="..\..\include\client\UI\TextEdit.h" />
     <ClInclude Include="..\..\include\client\UI\Toolbar.h" />
     <ClInclude Include="..\..\include\client\UI\UIManager.h" />
-    <ClInclude Include="..\..\include\client\VideoCapture.h" />
     <ClInclude Include="..\..\include\client\Client.h" />
     <ClInclude Include="..\..\include\common\ChatMessage.h" />
     <ClInclude Include="..\..\include\common\common.h" />
@@ -109,22 +117,27 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\client\Application.cpp" />
-    <ClCompile Include="..\..\src\client\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\main.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\AudioCapture.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\AudioPlayback.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\AudioStream.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\MediaStream.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\VideoCapture.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\VideoPlayback.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\VideoStream.cpp" />
     <ClCompile Include="..\..\src\client\UI\Button.cpp" />
     <ClCompile Include="..\..\src\client\UI\Control.cpp" />
+    <ClCompile Include="..\..\src\client\UI\FrameRenderer.cpp" />
     <ClCompile Include="..\..\src\client\UI\Label.cpp" />
     <ClCompile Include="..\..\src\client\UI\Menu.cpp" />
     <ClCompile Include="..\..\src\client\UI\Page.cpp" />
     <ClCompile Include="..\..\src\client\UI\Statusbar.cpp" />
     <ClCompile Include="..\..\src\client\UI\TextEdit.cpp" />
     <ClCompile Include="..\..\src\client\UI\UIManager.cpp" />
-    <ClCompile Include="..\..\src\client\VideoCapture.cpp" />
     <ClCompile Include="..\..\src\client\Client.cpp" />
     <ClCompile Include="..\..\src\common\ChatMessage.cpp" />
     <ClCompile Include="..\..\src\common\TcpAcceptor.cpp" />
     <ClCompile Include="..\..\src\common\TcpRequest.cpp" />
-    <ClCompile Include="..\..\src\common\RtpHandler.cpp" />
     <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
     <ClCompile Include="..\..\src\common\UdpHandler.cpp" />
   </ItemGroup>

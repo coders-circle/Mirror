@@ -1,10 +1,10 @@
-#include <common/common.h>
 #include "client/UI/Label.h"
 
 Label::Label()
 {
     m_handle = gtk_label_new(NULL);
     m_type = CONTROL::LABEL;
+    scw = 0;
 }
 
 void Label::Set(std::string label, GtkWidget* fixed, int x, int y, int w, int h)
@@ -20,5 +20,4 @@ void Label::Set(std::string label, GtkWidget* fixed, int x, int y, int w, int h)
 
     gtk_widget_set_size_request(m_handle, w, h);
     this->PutFixedAt(fixed, x, y);
-    
 }

@@ -3,13 +3,18 @@
 #include <common/ChatMessage.h>
 
 Client::Client()
-{}
+: m_udpHandler1(m_io), m_udpHandler2(m_io)
+{
+    UdpHandler::GetUdpPairs(m_udpHandler1, m_udpHandler2);
+    std::cout << "Udp Ports Used: \n" << m_udpHandler1.GetSocket()->local_endpoint().port() 
+                << ", " << m_udpHandler2.GetSocket()->local_endpoint().port() << std::endl;
+}
 
 Client::~Client()
 {}
 
 // Connecting to some remote peer (server/client)
-size_t Client::Connect(const tcp::endpoint& peer, bool* successful)
+size_t Client::Connect(const tcp::endpoint& peer, uint32_t secondsToWait)
 {
     // Lock the connections list not to process it while adding a connection
     boost::lock_guard<boost::mutex> guard(m_mutex);
@@ -17,51 +22,96 @@ size_t Client::Connect(const tcp::endpoint& peer, bool* successful)
     // Add new connection
     m_connections.push_back(Connection(m_io));
     TcpHandler &handler = m_connections[m_connections.size() - 1].tcpHandler;
+    m_connections[m_connections.size() - 1].connected = false;
+    
+    boost::thread timerThread(boost::bind(&Client::ConnectTimer, this, _1, _2), boost::ref(handler), secondsToWait);
     handler.Initialize(peer);
+    m_connections[m_connections.size()-1].connected = true;
 
     std::cout << "Connected to: " << handler.GetDestinationAddress() << std::endl;
-    // Set successful variable to true
-    if (successful)
-        *successful = true;
     return m_connections.size() - 1;
 }
 
-// Perform above function asynchronously
-void Client::ConnectAsync(const tcp::endpoint& peer, bool* successful)
+void Client::ConnectTimer(TcpHandler &handler, uint32_t seconds)
 {
-    boost::thread t(boost::bind((size_t(Client::*)(const tcp::endpoint&, bool*))&Client::Connect, this, _1, _2), peer, successful);
+    boost::asio::deadline_timer t(m_io, boost::posix_time::seconds(seconds));
+    t.wait();
+    handler.Cancel();
+    handler.Close();
+}
+
+// Perform above function asynchronously
+void Client::ConnectAsync(const tcp::endpoint& peer, bool* threadEnd, size_t* connectionId, uint32_t secondsToWait)
+{
+
+    boost::thread t([this, peer, threadEnd, connectionId, secondsToWait](){
+        try
+        {
+            if (threadEnd)
+                *threadEnd = false;
+            size_t id = Connect(peer, secondsToWait);
+            if (connectionId)
+                *connectionId = id;
+            if (threadEnd)
+                *threadEnd = true;
+        }
+        catch (std::exception &ex)
+        {
+            std::cout << ex.what() << std::endl;
+            if (threadEnd)
+                *threadEnd = true;
+
+        }
+    });
 }
 
 // Use server to connect to a client (for P2P)
-size_t Client::Connect(uint32_t clientId, bool* successful)
+size_t Client::Connect(uint32_t clientId)
 {
     // make sure no requests are being processed during this time
     boost::lock_guard<boost::mutex> guard(m_mutex);
 
     // First send a P2P tcp connection request to server and receive back the returning request
-    TcpHandler& handler = m_connections[0].tcpHandler;
+    TcpHandler& handler = m_connections[m_serverId].tcpHandler;
     m_request.P2PTcp(handler, clientId, handler.GetSocket()->local_endpoint().address().to_string(), handler.GetSocket()->local_endpoint().port());
     m_request.ReceiveRequest(handler);
 
     // If invalid request return now
     if (m_request.GetRequestType() != TcpRequest::P2P_TCP)
-    {
-        if (successful)
-            *successful = false;
         return 0;
-    }
 
     // Use the return request parameters to try connecting to other peer
     return HandleP2PRequest(m_request.GetClientId(),
         tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPrivateIp()), m_request.GetPrivatePort()),
-        tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPublicIp()), m_request.GetPublicPort()), successful);
+        tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPublicIp()), m_request.GetPublicPort()));
 }
 
-size_t Client::HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint, bool* successful)
+void Client::ConnectAsync(uint32_t clientId, bool* threadEnd, size_t* connectionId)
+{
+    boost::thread t([this, clientId, threadEnd, connectionId](){
+        try
+        {
+            if (threadEnd)
+                *threadEnd = false;
+            size_t id = Connect(clientId);
+            if (connectionId)
+                *connectionId = id;
+            if (threadEnd)
+                *threadEnd = true;
+        }
+        catch (std::exception &ex)
+        {
+            std::cout << ex.what() << std::endl;
+            if (threadEnd)
+                *threadEnd = true;
+
+        }
+    });
+}
+size_t Client::HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint)
 {
     m_p2pConnecting = true;
-    // The '0' connection is assumed to be a TCP connection with the server
-    TcpHandler& handler = m_connections[0].tcpHandler;
+    TcpHandler& handler = m_connections[m_serverId].tcpHandler;
     // Start listening at same local endpoint as which is connected to the server
     boost::thread t1(boost::bind(&Client::P2PListen, this, _1), handler.GetSocket()->local_endpoint());
     // Try connecting to both private and public endpoints of other peer
@@ -79,23 +129,17 @@ size_t Client::HandleP2PRequest(uint32_t clientId, const tcp::endpoint &privateE
             m_acceptor->close();
     }
     catch (...) {}
-    // Set successful variable to true
-    if (successful)
-    {
-        *successful = true;
-        std::cout << "Connected to client #" << clientId << " at connection: #" << m_connections.size() - 1;
-    }
     return m_connections.size() - 1;
 }
 
-void Client::HandleP2PRequestAsync(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint, bool* successful)
+void Client::HandleP2PRequestAsync(uint32_t clientId, const tcp::endpoint &privateEndpoint, const tcp::endpoint &publicEndpoint)
 {
-    boost::thread t([this, clientId, privateEndpoint, publicEndpoint, successful]() /* C++11 lambda function */
+    boost::thread t([this, clientId, privateEndpoint, publicEndpoint]() /* C++11 lambda function */
     {
         try
         {
             boost::lock_guard<boost::mutex> guard(m_mutex);
-            HandleP2PRequest(clientId, privateEndpoint, publicEndpoint, successful);
+            HandleP2PRequest(clientId, privateEndpoint, publicEndpoint);
         }
         catch (std::exception &ex)
         {
@@ -119,7 +163,9 @@ void Client::P2PListen(const tcp::endpoint &localEndpoint)
         TODO: Need to verify if this is the required peer
         */
         Connection c(m_io);
+        c.connected = false;
         c.tcpHandler.Initialize(socket);
+        c.connected = true;
         m_connections.push_back(c);
         m_p2pConnecting = false;
     }
@@ -128,7 +174,7 @@ void Client::P2PListen(const tcp::endpoint &localEndpoint)
         //std::cout << "Listener: " << ex.what() << std::endl;
     }
 }
-;
+
 void Client::P2PConnect(tcp::endpoint &remoteEndpoint)
 {
     while (m_p2pConnecting)
@@ -137,7 +183,9 @@ void Client::P2PConnect(tcp::endpoint &remoteEndpoint)
         {
             // Try connecting at the given remote endpoint
             Connection c(m_io);
+            c.connected = false;
             c.tcpHandler.Initialize(remoteEndpoint);
+            c.connected = true;
             if (!m_p2pConnecting) return;
 
             m_connections.push_back(c);
@@ -148,6 +196,11 @@ void Client::P2PConnect(tcp::endpoint &remoteEndpoint)
             //std::cout << "Connector: " << ex.what() << std::endl;
         }
     }
+}
+
+void Client::HandleRequestsAsync() 
+{ 
+    boost::thread t(boost::bind(&Client::HandleRequests, this));
 }
 
 // An infinite loop to handle incoming requests
@@ -163,8 +216,11 @@ void Client::HandleRequests()
         m_mutex.lock();
         for (unsigned int i = 0; i < m_connections.size(); ++i)
         {
+            if (!m_connections[i].connected) continue;
             try
             {
+                // Sleep some time to save CPU usage
+                boost::this_thread::sleep(boost::posix_time::milliseconds(200));
                 // See if any request is incomming for this connection
                 size_t bytes = m_connections[i].tcpHandler.Available();
                 ChatMessage chat;
@@ -207,8 +263,8 @@ void Client::HandleRequests()
                         HandleP2PRequestAsync(id,
                             tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPrivateIp()), m_request.GetPrivatePort()),
                             tcp::endpoint(boost::asio::ip::address::from_string(m_request.GetPublicIp()), m_request.GetPublicPort()));
-                        m_request.P2PTcp(m_connections[0].tcpHandler, id,
-                            m_connections[0].tcpHandler.GetSocket()->local_endpoint().address().to_string(), m_connections[0].tcpHandler.GetSocket()->local_endpoint().port()
+                        m_request.P2PTcp(m_connections[m_serverId].tcpHandler, id,
+                            m_connections[m_serverId].tcpHandler.GetSocket()->local_endpoint().address().to_string(), m_connections[m_serverId].tcpHandler.GetSocket()->local_endpoint().port()
                             );
                         break;
                     default:
@@ -218,11 +274,26 @@ void Client::HandleRequests()
             }
             catch (std::exception &ex)
             {
+                m_connections[i].tcpHandler.Close();
+                m_connections[i].connected = false;
                 std::cout << ex.what() << std::endl;
             }
         }
         m_mutex.unlock();
     }
+}
+
+void Client::Disconnect(size_t connectionId)
+{
+    m_request.Disconnect(m_connections[connectionId].tcpHandler);
+    m_connections[connectionId].tcpHandler.Close();
+    m_connections[connectionId].connected = false;
+    //m_connections.erase(m_connections.begin()+connectionId);
+}
+
+bool Client::IsConnected(size_t connectionId)
+{
+    return m_connections[connectionId].connected;
 }
 
 bool Client::JoinChat(uint32_t connectionId, uint32_t groupId)
