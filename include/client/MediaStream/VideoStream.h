@@ -101,7 +101,7 @@ public:
 
 
 
-        AVFrame *frame = av_frame_alloc();
+        AVFrame *frame = avcodec_alloc_frame();
         frame->width = m_codecContext->width;
         frame->height = m_codecContext->height;
         frame->format = m_codecContext->pix_fmt;
