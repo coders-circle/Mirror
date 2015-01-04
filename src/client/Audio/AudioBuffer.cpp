@@ -9,7 +9,7 @@ AudioBuffer::AudioBuffer(int sizeHint)
 	std::cout << "AudioBuffer Constructor" << std::endl;
 
 	if(sizeHint)
-		m_vectorSamples.reserve(sizeHint * 2);
+		m_vectorSamples.reserve(1024 * 1);
 
 	m_iterPlayback = m_vectorSamples.begin();
 }

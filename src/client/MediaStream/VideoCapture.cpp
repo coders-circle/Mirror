@@ -1,81 +1,121 @@
 #include <common/common.h>
 #include <client/MediaStream/VideoCapture.h>
 
+VideoCapture::VideoCapture()
+: m_formatCtx(NULL), m_codecCtx(NULL), m_codec(NULL), m_stream(NULL), m_imgConvertCtx(NULL),
+  m_frame(NULL), m_frameRGB(NULL)
+{}
+
+void VideoCapture::CleanUp()
+{
+    av_free_packet(&m_packet);
+    if (m_frame)
+        av_free(m_frame);
+    if (m_frameRGB) 
+        av_free(m_frameRGB);
+    if (m_codecCtx)
+        avcodec_close(m_codecCtx);
+    if (m_formatCtx)
+        avformat_close_input(&m_formatCtx);
+    if (m_imgConvertCtx)
+        sws_freeContext(m_imgConvertCtx);
+}
+
 void VideoCapture::Initialize()
 {
-   
-    AVFormatContext* avFormat = avformat_alloc_context();
+    m_formatCtx = avformat_alloc_context();
 #ifdef _WIN32
     AVInputFormat * ifmt = av_find_input_format("dshow");
-    if (avformat_open_input(&avFormat, "video=Integrated Webcam", ifmt, NULL)!=0)
+    if (avformat_open_input(&m_formatCtx, "video=Integrated Webcam", ifmt, NULL)!=0)
 #else
     AVInputFormat * ifmt = av_find_input_format("video4linux2");
-    if (avformat_open_input(&avFormat, "/dev/video0", ifmt, NULL)!=0)
+    if (avformat_open_input(&m_formatCtx, "/dev/video0", ifmt, NULL)!=0)
 #endif
-        throw Exception("Couldn't open input stream");
-        
-    if (avformat_find_stream_info(avFormat, NULL) < 0)
-        throw Exception("No stream info");
-        
-    av_dump_format(avFormat, 0, "/dev/video0", 0);
-    AVStream * stream = NULL;
-    for (int i = 0; i < avFormat->nb_streams; ++i)
-    if (avFormat->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+        throw VideoCaptureException("Couldn't open input stream");
+    if (avformat_find_stream_info(m_formatCtx, NULL) < 0)
+        throw VideoCaptureException("No stream info");
+    av_dump_format(m_formatCtx, 0, "/dev/video0", 0);
+    
+    for (int i = 0; i < m_formatCtx->nb_streams; ++i)
+    if (m_formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
     {
-        stream = avFormat->streams[i];
+        m_stream = m_formatCtx->streams[i];
         break;
     }
-     if (!stream)
-        throw Exception("No video stream");
-     auto avCodec = stream->codec;
-    auto codec = avcodec_find_decoder(avCodec->codec_id);
-    if (!codec)
-        throw Exception("No supported codec");
-     
-    if (avcodec_open2(avCodec, codec, NULL) < 0)
-        throw Exception ("Couldn't open codec");
-    AVFrame * frame;
-    AVFrame * frameRGB = av_frame_alloc();
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    frame = av_frame_alloc();
-    AVPixelFormat  pFormat = AV_PIX_FMT_RGB24;
-    auto numBytes = avpicture_get_size(pFormat,avCodec->width,avCodec->height) ;
-    auto buffer = (uint8_t *) av_malloc(numBytes*sizeof(uint8_t));
-    avpicture_fill((AVPicture *) frameRGB,buffer,pFormat,avCodec->width,avCodec->height);
+    if (!m_stream)
+        throw VideoCaptureException("No video stream");
 
-    bool keepgoing = true;
-    bool * kg = &keepgoing;
-    boost::thread t([kg](){
-        char c;
-        std::cout << "Enter"; std::cin >> c;
-        *kg=false;
-    });
-                 
-    VideoStream::InitializeEncoder(avCodec->width, avCodec->height);
-    while (keepgoing && av_read_frame(avFormat, &pkt)>=0)
+    m_codecCtx = m_stream->codec;
+    m_codec = avcodec_find_decoder(m_codecCtx->codec_id);
+    if (!m_codec)
+        throw VideoCaptureException("No supported codec");
+    if (avcodec_open2(m_codecCtx, m_codec, NULL) < 0)
+        throw VideoCaptureException ("Couldn't open codec");
+
+    m_frame = av_frame_alloc();
+    m_frameRGB = av_frame_alloc();
+    av_init_packet(&m_packet);
+    
+    AVPixelFormat pFormat = AV_PIX_FMT_RGB24;
+    auto numBytes = avpicture_get_size(pFormat, m_codecCtx->width, m_codecCtx->height) ;
+    auto buffer = (uint8_t*)av_malloc(numBytes*sizeof(uint8_t));
+    avpicture_fill((AVPicture*)m_frameRGB, buffer, pFormat, m_codecCtx->width, m_codecCtx->height);
+
+    VideoStream::InitializeEncoder(m_codecCtx->width, m_codecCtx->height);
+    
+    m_imgConvertCtx = sws_getCachedContext(NULL, m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,  
+                                             m_codecCtx->width, m_codecCtx->height, pFormat, SWS_BICUBIC, NULL, NULL,NULL);
+}
+
+void VideoCapture::Record()
+{
+    try
     {
-        if (pkt.stream_index != stream->index)
-            continue;
-        int isFrameAvailable=0;
-        int len = avcodec_decode_video2(avCodec, frame, &isFrameAvailable,&pkt);
-        if (len<0)
-            throw Exception("Decoding error");
-        if (isFrameAvailable)
+        while (m_recording && av_read_frame(m_formatCtx, &m_packet)>=0)
         {
-            struct SwsContext * img_convert_ctx;
-            img_convert_ctx = sws_getCachedContext(NULL,avCodec->width, avCodec->height, avCodec->pix_fmt,   avCodec->width, avCodec->height, pFormat, SWS_BICUBIC, NULL, NULL,NULL);
-            sws_scale(img_convert_ctx, ((AVPicture*)frame)->data, ((AVPicture*)frame)->linesize, 0, avCodec->height, ((AVPicture *)frameRGB)->data, ((AVPicture *)frameRGB)->linesize);
-            sws_freeContext(img_convert_ctx);
-            VideoStream::AddFrame(frameRGB->data[0], pkt.pts);
-            av_free_packet(&pkt);
+            if (m_packet.stream_index != m_stream->index)
+                continue;
+            int isFrameAvailable=0;
+            int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
+            if (len<0)
+                throw Exception("Decoding error");
+    
+            if (isFrameAvailable)
+            {
+                sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
+                VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
+                av_free_packet(&m_packet);
+            }
         }
     }
-    av_free_packet(&pkt);
-    av_free(frame);
-    av_free(frameRGB);
-    avcodec_close(avCodec);
-    avformat_close_input(&avFormat);
+    catch (std::exception &ex)
+    {
+        std::cout << ex.what() << std::endl;
+    }
+}
 
+void VideoCapture::StartRecording()
+{
+    Initialize();
+    m_recording = true;
+    m_recordThread = boost::thread(boost::bind(&VideoCapture::Record, this));
+}
+
+void VideoCapture::StopRecording()
+{
+    if (!m_recording) 
+        return;
+    m_recording = false;
+    m_recordThread.join();
+    CleanUp();
+}
+
+void VideoCapture::Test()
+{
+    StartRecording();
+    std::cout << "Enter something to interrupt" << std::endl;
+    char c;
+    std::cin >> c;
+    StopRecording();
     VideoStream::Encode();
 }

@@ -66,6 +66,8 @@ bool AACEncoder::Encode(const AudioBuffer & objAudioBuffer)
 
 	std::fstream fout("encoded", std::ios::out|std::ios::binary);
 
+	//std::cout << "frame size : " << m_codecContext->frame_size << std::endl;
+
 	while (rawSize >= frameBytes)
 	{
 		int packetSize = avcodec_encode_audio(m_codecContext, outbuf, outBufsize, (short *)rawSamples);
