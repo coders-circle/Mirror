@@ -23,12 +23,12 @@ public:
 
     void Test(void);
 
-private:
+protected:
     AVCodecID m_codecID;
     AVCodec *m_codec;
-    AVCodecContext *m_codecContext;
+    AVCodecContext *m_encoderContext;
     std::vector<AVPacket> m_encodedFrames;
 
-protected:
+private:
 
 };
