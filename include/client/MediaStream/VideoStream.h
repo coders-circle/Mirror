@@ -33,7 +33,7 @@ public:
     // Add a frame and encode into packet
     void AddFrame(AVFrame *frame);
 
-    int AddProgressivePacket(AVPacket* pkt)
+    int AddProgressivePacket(AVPacket* pkt);
 
     // @@@@@@@@@@@@@@@@@@
     // TEMPORARY fuction
