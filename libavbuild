@@ -1,0 +1,21 @@
+
+Linux ma compile garna:
+
+Link: version 11 from:
+https://libav.org/download.html
+
+Remove purano libav:
+apt-get remove libavcodec-dev libavutil-dev
+
+
+Get libav dependencies:
+apt-get build-dep libav-tools
+
+In libav directory from terminal, run configure:
+./configure --disable-yasm --disable-static --enable-shared --enable-libx264 --enable-gpl --enable-libvo-aacenc --enable-version3
+
+Build libav:
+make
+
+Install libav:
+make install

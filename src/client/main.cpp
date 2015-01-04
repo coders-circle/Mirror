@@ -9,7 +9,7 @@
 VideoStream v;
 AudioStream a;
 FrameRenderer fr;
-int currentVideoIndex = 27;
+int currentVideoIndex = 0;
 
 gboolean IdleFunction(gpointer userData)
 {
@@ -17,7 +17,7 @@ gboolean IdleFunction(gpointer userData)
     fr.SetRGBData(v.GetRawRGBData(currentVideoIndex));
     //Sleep(20);
     ++currentVideoIndex;
-    if (currentVideoIndex >= 10 * 25)
+    if (currentVideoIndex >= 200)
         return FALSE;
     return TRUE;
 }
