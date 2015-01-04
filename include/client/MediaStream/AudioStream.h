@@ -1,34 +1,29 @@
 #pragma once
 
-
-
 #include "client/MediaStream/MediaStream.h"
-
-#ifndef _WIN32
-#define av_frame_alloc avcodec_alloc_frame
-#endif
-
 
 
 
 class AudioStream : public MediaStream
 {
 public:
-    void Initialize(int samplerate = 16000, int bitrate=24000, int channel=2);
+    AudioStream();
 
-    unsigned int AllocateNewPacket(void);
+    // Initialize the audio stream for encoding process
+    void InitializeEncoder(int samplerate = 16000, int bitrate=24000, int channel=2);
 
+    // Add raw data and encode it into the packet
     void AddFrame(uint8_t* rawData, int pts);
+
+    // Add raw frame and encode it into the packet
     void AddFrame(AVFrame *frame);
 
+    // @@@@@@@@@@@@@@@@@
+    // TEMPORARY function
+    // test for the audio encoding
     void Test(void);
 
 protected:
-    AVCodecID m_codecID;
-    AVCodec *m_codec;
-    AVCodecContext *m_encoderContext;
-    std::vector<AVPacket> m_encodedFrames;
-
 private:
 
 };

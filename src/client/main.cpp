@@ -1,20 +1,14 @@
 /* Client - main.cpp */
 
 
-
 #include <common/common.h>
 #include "client/Application.h"
 #include "client/MediaStream/VideoCapture.h"
-
-
-//#include "client/VideoCapture.h"
+#include "client/MediaStream/AudioStream.h"
 
 VideoStream v;
-
+AudioStream a;
 FrameRenderer fr;
-//VideoCapture vidCap;
-//
-//
 int currentVideoIndex = 27;
 
 gboolean IdleFunction(gpointer userData)
@@ -46,8 +40,8 @@ int main(int argc, char *argv[])
 {
     av_register_all();
     avdevice_register_all();
-    
     v.Test();
+    a.Test();
     //v.Test();
 
 
