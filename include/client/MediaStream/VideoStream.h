@@ -30,36 +30,82 @@ public:
     std::vector<AVPacket> m_delayedFrames;
 
     // contains decoded raw frames
-    std::vector<AVFrame> m_rawFrames;
-
+    std::vector<AVFrame*> m_rawFrames;
     SwsContext * m_ctx;
+    uint8_t* m_rawRGBFrameData;
+
+    AVCodecParserContext* m_parser;
 
     void InitializeDecoder()
     {
-        m_decoder = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
+        m_decoder = avcodec_find_decoder(m_codecID);
 
         if (!m_decoder) throw CodecMissingException();
         m_decoderContext = avcodec_alloc_context3(m_decoder);
         if (!m_decoderContext) throw Exception("Could not allocate video codec context");
 
-        if (m_decoder->capabilities&CODEC_CAP_TRUNCATED)
-            m_decoderContext->flags |= CODEC_FLAG_TRUNCATED; // we do not send complete frames 
-
         if (avcodec_open2(m_decoderContext, m_decoder, NULL) < 0) 
             throw Exception("Could not open codec");
+
+        //m_parser = av_parser_init(AV_CODEC_ID_H264);
+        m_rawRGBFrameData = 0;
+
     }
     void AddFrame(AVPacket* pkt)
     {
         unsigned int packetIndex = this->AllocateNewRawPacket();
+        //std::cout << packetIndex << std::endl;
+        AVFrame* frame = av_frame_alloc();
+        //m_rawFrames[packetIndex] = av_frame_alloc();
+        //uint8_t* data = NULL;
+        //int size = 0;
+        //av_parser_parse2(m_parser, m_decoderContext, &data, &size, pkt->data, pkt->size, 0, 0, AV_NOPTS_VALUE);
+        
         int framePresent = 0;
-        if (avcodec_decode_video2(m_decoderContext, &m_rawFrames[packetIndex], &framePresent, pkt) < 0)
+
+        if (avcodec_decode_video2(m_decoderContext, frame, &framePresent, pkt) < 0)
         {
             throw Exception("error decoding the packet");
+        }
+        m_rawFrames[packetIndex] = av_frame_clone(frame);
+        if (!m_rawFrames[packetIndex])
+            m_rawFrames[packetIndex] = av_frame_alloc();
+        //av_frame_clo
+        av_frame_copy(m_rawFrames[packetIndex], frame);
+        if (framePresent)
+        {
+            //std::cout << "Frame present";
+            if (!m_rawRGBFrameData && frame->width != 0)
+            {
+                m_rawRGBFrameData = new uint8_t[frame->height*frame->width * 3];
+                std::cout << "Done!";
+            }
         }
     }
     unsigned char* GetRawRGBData(unsigned int rawFrameIndex)
     {
-        
+        if (rawFrameIndex >= m_rawFrames.size())
+        {
+            throw Exception("invalid frame index");
+        }
+        int w = m_rawFrames[rawFrameIndex]->width;
+        int h = m_rawFrames[rawFrameIndex]->height;
+        if (w != 0)
+        {
+            static SwsContext* scalerContext = sws_getContext(w, h, AV_PIX_FMT_YUV420P, w, h,
+                AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
+            AVFrame* yuvFrame = m_rawFrames[rawFrameIndex];   // RGB24 have one plane
+            //AVFrame *rgbFrame = av_frame_alloc();
+            int outLinesize[] = { 0 };  // RGB stride
+            uint8_t* outData[] = { m_rawRGBFrameData };
+            //rgbFrame->data[0] = m_rawRGBFrameData;
+            AVPicture *rgbFrame = new AVPicture;
+            avpicture_alloc(rgbFrame, AV_PIX_FMT_RGB24, w, h);
+            sws_scale(scalerContext, yuvFrame->data, yuvFrame->linesize, 0, h, rgbFrame->data, rgbFrame->linesize);
+            memcpy(m_rawRGBFrameData, rgbFrame->data[0], w*h * 3);
+            avpicture_free(rgbFrame);
+        }
+        return m_rawRGBFrameData;
     }
     void InitializeEncoder(int w, int h, int fps = 15, int bitrate = 100000)
     {
@@ -165,7 +211,7 @@ public:
     }
     void Test()
     {
-        this->InitializeEncoder(1280, 1024);
+        this->InitializeEncoder(640, 480);
         int w = m_encoderContext->width;
         int h = m_encoderContext->height;
         uint8_t *rgb24Data = new uint8_t[w*h * 3];
@@ -176,8 +222,8 @@ public:
                 for (int x = 0; x < w; x++)
                 {
                     rgb24Data[3 * (y*w + x) + 0] = i % 255;
-                    rgb24Data[3 * (y*w + x) + 1] = i % 255;
-                    rgb24Data[3 * (y*w + x) + 2] = i % 255;
+                    rgb24Data[3 * (y*w + x) + 1] = 0;
+                    rgb24Data[3 * (y*w + x) + 2] = 0;
                 }
             }
             this->AddFrame(rgb24Data, i);
@@ -192,22 +238,34 @@ public:
         fclose(fp);
 
         this->InitializeDecoder();
-        this->AddFrame(&m_encodedFrames[0]);
-        this->AddFrame(&m_encodedFrames[1]);
-        std::cout << m_rawFrames[1].width << ", " << m_rawFrames[1].height << std::endl;
+        for (unsigned int i = 0; i < m_encodedFrames.size(); i++)
+        {
+            this->AddFrame(&m_encodedFrames[i]);
+            //std::cout << m_rawFrames[i-26]->width << ", " << m_rawFrames[i-26]->height << std::endl;
+        }
+        
+        
+        //this->AddFrame(&m_encodedFrames[1]);
+        
     }
 
     // Test Encode to File
     void Encode()
     {
-        FILE* fp = fopen("test.avi", "wb");
+        this->InitializeDecoder();
+        for (unsigned int i = 0; i < m_encodedFrames.size(); i++)
+        {
+            this->AddFrame(&m_encodedFrames[i]);
+            //std::cout << m_rawFrames[i-26]->width << ", " << m_rawFrames[i-26]->height << std::endl;
+        }
+        /*FILE* fp = fopen("test.avi", "wb");
         for (int i = 0; i < m_encodedFrames.size(); i++)
         {
             fwrite(m_encodedFrames[i].data, 1, m_encodedFrames[i].size, fp);
         }
         uint8_t endcode[] = { 0, 0, 1, 0xb7 };
         fwrite(endcode, 1, sizeof(endcode), fp);
-        fclose(fp);
+        fclose(fp);*/
     }
 protected:
     
