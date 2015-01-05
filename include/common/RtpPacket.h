@@ -23,7 +23,7 @@ public:
     RtpPacket();
     ~RtpPacket();
 
-    void Initialize(boost::shared_ptr<UdpHandler> udpHandler, const udp::endpoint &remoteEndpoint);
+    void Initialize(UdpHandler* udpHandler, const udp::endpoint &remoteEndpoint);
     void CleanUp();
 
     int GetTimeStamp() const { return m_timeStamp; }
@@ -40,10 +40,10 @@ public:
 
     const udp::endpoint& GetRemoteEndpoint() const { return m_remoteEndpoint; }
 
-    void Send(const char *data, size_t size);
-    void Receive(char* data, size_t maxSize = 1500);
+    void Send(const uint8_t *data, size_t size);
+    size_t Receive(uint8_t* data, size_t maxSize = 1500);
 private:
-    boost::shared_ptr<UdpHandler> m_udpHandler;
+    UdpHandler* m_udpHandler;
     udp::endpoint m_remoteEndpoint;
 
     uint16_t m_sequenceNumber;

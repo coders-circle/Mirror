@@ -268,3 +268,36 @@ void VideoStream::AddFrame(AVFrame *frame)
         throw FailedToEncode();
     }
 }
+
+
+#include <common/RtpPacket.h>
+#include <client/Client.h>
+void VideoStream::SendRtp(Client &client, size_t connectionId)
+{
+    RtpPacket rtp;
+    rtp.Initialize(&client.GetUdpHandler1(), client.GetUdpEndpoint(connectionId));
+    rtp.SetPayloadType(12);
+    size_t pktsSz = m_encodedPackets.size();
+    for (size_t i = 0; i < pktsSz; ++i)
+    {
+        AVPacket* pkt = m_encodedPackets[i];
+        rtp.SetTimeStamp(pkt->pts);
+        rtp.Send(pkt->data, pkt->size);
+    }
+    
+    EraseEncodedPacketFromHead(pktsSz);
+}
+
+void VideoStream::ReceiveRtp(Client &client/*, size_t connectionId*/)
+{
+    RtpPacket rtp;
+    udp::endpoint ept;
+    rtp.Initialize(&client.GetUdpHandler1(), ept);
+    uint8_t data[1024];
+    size_t len = rtp.Receive(data, 1024);
+    AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()];
+    uint8_t* pdata = (uint8_t*)av_malloc(len);
+    memcpy(pdata, data, len);
+    av_packet_from_data(pkt, pdata, len);
+    pkt->pts = rtp.GetTimeStamp();
+}
