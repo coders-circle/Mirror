@@ -9,6 +9,10 @@ FrameRenderer::FrameRenderer()
     m_rgbImage = 0;
 }
 
+void FrameRenderer::Show()
+{
+    gtk_widget_show(m_drawingArea);
+}
 void FrameRenderer::SetRGBData(unsigned char* rgbData)
 {
     //memcpy(m_rgbData, rgbData, m_w*m_h*3);

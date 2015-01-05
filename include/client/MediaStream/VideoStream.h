@@ -33,7 +33,7 @@ public:
     // Add a frame and encode into packet
     void AddFrame(AVFrame *frame);
 
-    int AddProgressivePacket(AVPacket* pkt)
+    int AddProgressivePacket(AVPacket* pkt);
 
     // @@@@@@@@@@@@@@@@@@
     // TEMPORARY fuction
@@ -51,5 +51,7 @@ protected:
     // scaler context to convert YUV420P to 24-bit RGB color format
     SwsContext* m_YUV420PToRGB24ConverterContext;
 
-    //const unsigned int m_ipBufferSizeLimit;
+    // frame width and height
+    int m_fw, m_fh;
+    int m_fps;
 };

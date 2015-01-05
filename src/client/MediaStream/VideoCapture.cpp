@@ -36,7 +36,7 @@ void VideoCapture::Initialize()
         throw VideoCaptureException("No stream info");
     av_dump_format(m_formatCtx, 0, "/dev/video0", 0);
     
-    for (int i = 0; i < m_formatCtx->nb_streams; ++i)
+    for (unsigned int i = 0; i < m_formatCtx->nb_streams; ++i)
     if (m_formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
     {
         m_stream = m_formatCtx->streams[i];

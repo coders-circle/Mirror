@@ -16,11 +16,11 @@ void VideoStream::Encode()
 
 void VideoStream::Test()
 {
-    this->InitializeEncoder(640, 480);
+    this->InitializeEncoder(640, 480, 25);
     int w = m_encoderContext->width;
     int h = m_encoderContext->height;
     uint8_t *rgb24Data = new uint8_t[w*h * 3];
-    for (int i = 0; i < 25 * 10; i++)
+    for (int i = 0; i < 15 * 17; i++)
     {
         for (int y = 0; y < h; y++)
         {
@@ -46,6 +46,7 @@ void VideoStream::Test()
     for (unsigned int i = 0; i < m_encodedPackets.size(); i++)
     {
         this->AddPacket(m_encodedPackets[i]);
+        av_free_packet(m_encodedPackets[i]);
     }
 }
 
@@ -55,6 +56,9 @@ VideoStream::VideoStream()
     m_codecID = AV_CODEC_ID_H264;
     m_RGB24ToYUP420PConverterContext = 0;
     m_YUV420PToRGB24ConverterContext = 0;
+    m_fw = 0;
+    m_fh = 0;
+    m_fps = 0;
 }
 
 VideoStream::~VideoStream()
@@ -79,7 +83,8 @@ void VideoStream::InitializeDecoder()
 
     this->OpenCodec(m_decoderContext, m_decoder);
 }
-
+// do not use!
+// under construction
 int VideoStream::AddProgressivePacket(AVPacket* pkt)
 {
     AVFrame* frame = av_frame_alloc();
@@ -99,6 +104,7 @@ int VideoStream::AddProgressivePacket(AVPacket* pkt)
         {
             m_decodedFrames[frameIndex] = av_frame_alloc();
         }
+        
         av_frame_copy(m_decodedFrames[frameIndex], frame);
         if (m_rawData.size() == 0)
         {
@@ -111,6 +117,8 @@ int VideoStream::AddProgressivePacket(AVPacket* pkt)
                 //should not happen
                 sws_freeContext(m_YUV420PToRGB24ConverterContext);
             }
+            // @@@@@@@@@@@@@@@@@@@@@
+            // zzz encoder context!!!
             m_YUV420PToRGB24ConverterContext = sws_getContext(m_encoderContext->width,
                 m_encoderContext->height, AV_PIX_FMT_YUV420P, m_encoderContext->width,
                 m_encoderContext->height, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
@@ -153,9 +161,13 @@ void VideoStream::AddPacket(AVPacket* pkt)
                     //should not happen
                     sws_freeContext(m_YUV420PToRGB24ConverterContext);
                 }
-                m_YUV420PToRGB24ConverterContext = sws_getContext(m_encoderContext->width,
-                    m_encoderContext->height, AV_PIX_FMT_YUV420P, m_encoderContext->width,
-                    m_encoderContext->height, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
+                m_fw = frame->width;
+                m_fh = frame->height;
+                m_fps = m_decoderContext->framerate.num;
+                m_YUV420PToRGB24ConverterContext = sws_getContext(m_fw, m_fh, AV_PIX_FMT_YUV420P, 
+                    m_fw, m_fh, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
+                
+                std::cout << m_fps;
             }
         }
     }
@@ -204,6 +216,10 @@ void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
     m_RGB24ToYUP420PConverterContext = sws_getContext(m_encoderContext->width,
         m_encoderContext->height, AV_PIX_FMT_RGB24, m_encoderContext->width,
         m_encoderContext->height, AV_PIX_FMT_YUV420P, SWS_BICUBIC, 0, 0, 0);
+
+    m_fw = w;
+    m_fh = h;
+    m_fps = fps;
 }
 
 void VideoStream::AddFrame(uint8_t* rgb24Data, int pts)
@@ -228,6 +244,7 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, int pts)
 
     // Add frame for encoding
     this->AddFrame(frame);
+    av_frame_free(&frame);
 }
 
 
