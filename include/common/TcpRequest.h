@@ -17,6 +17,7 @@ public:
         JOIN_CHAT, CHAT_MESSAGE, 
         P2P_TCP,
         DISCONNECT,
+        UDP_PORT,
     };
 
     TcpRequest();
@@ -31,6 +32,8 @@ public:
     void P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::string &privateIp, uint16_t privatePort, const std::string &publicIp = "", uint16_t publicPort = 0);
     // Request to disconnect
     void Disconnect(TcpHandler& tcpHandler);
+    // Request to send/receive the udp-endpoint port
+    void UdpPort(TcpHandler& tcpHandler, uint16_t port = 0);
     // Send an invalid request
     void Invalid(TcpHandler& tcpHandler);
 
@@ -47,6 +50,8 @@ public:
     std::string GetPublicIp();
     uint16_t GetPublicPort();
     std::string GetUserId();
+    uint16_t GetUdpPort();
+
 private:
     // The Json Document that holds the request
     rapidjson::Document m_document;

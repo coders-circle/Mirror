@@ -5,7 +5,7 @@
 #define IP_VIDEO_STREAM_BUFFER_SIZE 4096
 
 
-
+class Client;
 class VideoStream :public MediaStream
 {
 public:
@@ -44,6 +44,12 @@ public:
     // TEMPORARY function
     // Test Encode to File
     void Encode();
+
+    // @@@@@@@@@@@@@@@@@
+    // TEMPORARY TEST FUNCTIONS
+    // Send/Receive over RTP
+    void SendRtp(Client& client, size_t connectionId);
+    void ReceiveRtp(Client &client/*, size_t connectionId*/);
 
 protected:
     // scaler context to convert 24-bit RGB to YUV420P color format

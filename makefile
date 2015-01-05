@@ -20,7 +20,7 @@ SERVER_OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(SERVER_CPP_FILES:src/%.cpp=%.o))
 ## Compiler, compiler and linker flags and libaries to use
 CXX := g++
 CXXLIBS := `pkg-config --cflags gtk+-3.0`
-LDLIBS := `pkg-config --libs gtk+-3.0` -lboost_system -lboost_thread -lpthread -lavformat -lavdevice -lavcodec -lswscale -lavutil
+LDLIBS := `pkg-config --libs gtk+-3.0` -lboost_system -lboost_thread -lpthread -lboost_timer -lavformat -lavdevice -lavcodec -lswscale -lavutil
 CXXFLAGS := -I $(INC_DIR) -MMD --std=c++11 $(CXXLIBS) -Wno-deprecated-declarations
 LDFLAGS := --std=c++11 $(LDLIBS)
 

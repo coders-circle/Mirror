@@ -108,6 +108,21 @@ void TcpRequest::Disconnect(TcpHandler &tcpHandler)
     Send(tcpHandler);
 }
 
+void TcpRequest::UdpPort(TcpHandler& tcpHandler, uint16_t port)
+{
+    /*
+    Example:
+        {
+            Request-Type: 5
+            Udp-Port: 1234
+        }
+    */
+    New();
+    m_document.AddMember("Request-Type", Value((int)UDP_PORT), m_document.GetAllocator());
+    m_document.AddMember("Udp-Port", Value((unsigned int)port), m_document.GetAllocator());
+    Send(tcpHandler);
+}
+
 void TcpRequest::Invalid(TcpHandler& tcpHandler)
 {
     /*
@@ -188,4 +203,9 @@ uint16_t TcpRequest::GetPublicPort()
 std::string TcpRequest::GetUserId()
 {
     return GetValue("User-Id").GetString();
+}
+
+uint16_t TcpRequest::GetUdpPort()
+{
+    return GetValue("Udp-Port").GetUint();
 }

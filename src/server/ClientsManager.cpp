@@ -5,7 +5,9 @@
 ClientsManager::ClientsManager(boost::asio::io_service& io)
 : m_acceptor(io), m_ioService(io), m_udpHandler1(io), m_udpHandler2(io)
 {
-    UdpHandler::GetUdpPairs(m_udpHandler1, m_udpHandler2);
+    //UdpHandler::GetUdpPairs(m_udpHandler1, m_udpHandler2);
+    m_udpHandler1.Initialize(udp::endpoint(udp::v4(), 1106));
+    m_udpHandler2.Initialize(udp::endpoint(udp::v4(), 1107));
     std::cout << "Udp Ports Used: \n" << m_udpHandler1.GetSocket()->local_endpoint().port() 
                 << ", " << m_udpHandler2.GetSocket()->local_endpoint().port() << std::endl;
 }
@@ -107,6 +109,18 @@ void ClientsManager::ProcessClients()
                         //m_clients.erase(m_clients.begin()+i);
                         i--;
                         break;
+                    
+                    case TcpRequest::UDP_PORT:
+                    {   
+                        m_requests.UdpPort(m_clients[i].tcpHandler, m_udpHandler1.GetSocket()->local_endpoint().port());
+                        char c;
+                        m_udpHandler1.Receive(m_clients[i].udpEndpoint, &c, 1);
+                        m_udpEndpointsMap[std::make_pair(m_clients[i].udpEndpoint.address().to_string(), m_clients[i].udpEndpoint.port())]
+                            =   i;
+                        std::cout << "Client connected at " << m_clients[i].udpEndpoint.port() << std::endl;
+                    }
+                        break;
+
                     default:
                         std::cout << "Invalid Request " << m_requests.GetRequestType() << " from client #" << i << std::endl;
                     }
@@ -119,6 +133,24 @@ void ClientsManager::ProcessClients()
                 std::cout << ex.what() << std::endl;
             }
         }
+        
+        // Also check for udp data
+        if (m_udpHandler1.GetSocket()->available() > 0)
+        {
+            udp::endpoint ep;
+            char data[1024];
+            m_udpHandler1.Receive(ep, data, 1024);
+            size_t cid = m_udpEndpointsMap[std::make_pair(ep.address().to_string(), ep.port())];
+            auto it = m_groups.begin();
+            for (; it != m_groups.end(); ++it)
+                if (std::find(it->second.begin(), it->second.end(), cid) != it->second.end())
+                    break;
+            if (it != m_groups.end())
+            for (unsigned int j = 0; j < it->second.size(); ++j)
+                m_udpHandler1.Send(m_clients[it->second[j]].udpEndpoint, data, 1024);
+
+        }
+
         m_mutex.unlock();
     }
 }

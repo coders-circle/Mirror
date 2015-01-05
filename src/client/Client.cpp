@@ -21,12 +21,24 @@ size_t Client::Connect(const tcp::endpoint& peer, uint32_t secondsToWait)
 
     // Add new connection
     m_connections.push_back(Connection(m_io));
-    TcpHandler &handler = m_connections[m_connections.size() - 1].tcpHandler;
-    m_connections[m_connections.size() - 1].connected = false;
+    size_t cid = m_connections.size() - 1;
+    TcpHandler &handler = m_connections[cid].tcpHandler;
+    m_connections[cid].connected = false;
     
     boost::thread timerThread(boost::bind(&Client::ConnectTimer, this, _1, _2), boost::ref(handler), secondsToWait);
     handler.Initialize(peer);
-    m_connections[m_connections.size()-1].connected = true;
+    m_connections[cid].connected = true;
+
+    // Connect UDP
+    m_request.UdpPort(handler);
+    m_request.ReceiveRequest(handler);
+    if (m_request.GetRequestType() != TcpRequest::UDP_PORT)
+        throw Exception("Couldn't connect udp");
+    uint16_t up = m_request.GetUdpPort();
+    m_connections[cid].udpEndpoint = udp::endpoint(peer.address(), up);
+    // Send a byte to ensure connection on other side
+    char c = 0;
+    m_udpHandler1.Send(m_connections[cid].udpEndpoint, &c, 1); 
 
     std::cout << "Connected to: " << handler.GetDestinationAddress() << std::endl;
     return m_connections.size() - 1;

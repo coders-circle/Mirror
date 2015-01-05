@@ -9,6 +9,7 @@ struct ClientInfo
     ClientInfo(boost::asio::io_service& io) 
     : tcpHandler(io) {}
     TcpHandler tcpHandler;
+    udp::endpoint udpEndpoint;
     bool connected;
 };
 
@@ -37,6 +38,8 @@ private:
 
     // Clients List
     std::vector<ClientInfo> m_clients;
+    std::map<std::pair<std::string, uint16_t>, size_t> m_udpEndpointsMap;
+
     std::unordered_map<uint32_t, std::vector<unsigned int>> m_groups; // map groupId to a list of id's of clients
                                                                       //  each client id is index of m_clients vector
 
