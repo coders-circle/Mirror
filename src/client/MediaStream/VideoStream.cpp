@@ -163,7 +163,7 @@ void VideoStream::AddPacket(AVPacket* pkt)
                 }
                 m_fw = frame->width;
                 m_fh = frame->height;
-                m_fps = m_decoderContext->framerate.num;
+                m_fps = m_decoderContext->time_base.den/(m_decoderContext->time_base.num*m_decoderContext->ticks_per_frame);
                 m_YUV420PToRGB24ConverterContext = sws_getContext(m_fw, m_fh, AV_PIX_FMT_YUV420P, 
                     m_fw, m_fh, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
                 
