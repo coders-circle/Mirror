@@ -16,7 +16,7 @@ void VideoStream::Encode()
 
 void VideoStream::Test()
 {
-    this->InitializeEncoder(640, 480, 25);
+    this->InitializeEncoder(640, 480, 15);
     int w = m_encoderContext->width;
     int h = m_encoderContext->height;
     uint8_t *rgb24Data = new uint8_t[w*h * 3];
@@ -33,14 +33,14 @@ void VideoStream::Test()
         }
         this->AddFrame(rgb24Data, i);
     }
-    FILE* fp = fopen("test.flv", "wb");
+    /*FILE* fp = fopen("test.flv", "wb");
     for (unsigned int i = 0; i < m_encodedPackets.size(); i++)
     {
         fwrite(m_encodedPackets[i]->data, 1, m_encodedPackets[i]->size, fp);
     }
     uint8_t endcode[] = { 0, 0, 1, 0xb7 };
     fwrite(endcode, 1, sizeof(endcode), fp);
-    fclose(fp);
+    fclose(fp);*/
 
     this->InitializeDecoder();
     for (unsigned int i = 0; i < m_encodedPackets.size(); i++)
@@ -166,8 +166,6 @@ void VideoStream::AddPacket(AVPacket* pkt)
                 m_fps = m_decoderContext->time_base.den/(m_decoderContext->time_base.num*m_decoderContext->ticks_per_frame);
                 m_YUV420PToRGB24ConverterContext = sws_getContext(m_fw, m_fh, AV_PIX_FMT_YUV420P, 
                     m_fw, m_fh, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
-                
-                std::cout << m_fps;
             }
         }
     }

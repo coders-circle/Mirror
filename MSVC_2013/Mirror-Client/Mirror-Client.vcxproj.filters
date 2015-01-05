@@ -159,6 +159,9 @@
     <ClInclude Include="..\..\include\client\MediaStream\VideoStream.h">
       <Filter>include\MediaStream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\common\Timer.h">
+      <Filter>include\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
