@@ -1,9 +1,10 @@
 #pragma once
 
-#include <boost/timer/timer.hpp>
 
 #include "client/MediaStream/VideoStream.h"
 #include "client/UI/FrameRenderer.h"
+
+#include "common/Timer.h"
 
 
 class VideoPlayback : public VideoStream
@@ -19,8 +20,6 @@ public:
         m_fixed = fixed;
         m_x = x;
         m_y = y;
-        //m_frameRenderer = frameRenderer;
-        //m_frameRenderer.
         m_frameDelay = 0;
     }
 
@@ -62,13 +61,19 @@ public:
     void StartPlayback()
     {
         m_playbackStopped = false;
-        unsigned timeElapsed;
+        Timer t2;
+        Timer t;
+        unsigned timeElapsed = 0;
+        t2.Reset();
+        t.Reset();
+        int i = 0;
         while (!m_playbackStopped)
         {
             if (timeElapsed >= m_frameDelay)
             {
                 if (m_decodedFrames.size() > 0)
                 {
+                    t.Reset();
                     if (!m_frameRenderer)
                     {
                         m_frameRenderer = new FrameRenderer;
@@ -76,18 +81,31 @@ public:
                         m_frameRenderer->Show();
                         if (m_frameDelay == 0 && m_fps != 0)
                         {
-                            m_frameDelay = 1000 / m_fps;
+                            m_frameDelay = 1000000 / m_fps;
                         }
                     }
-                    m_frameRenderer->SetRGBData(this->GetRawRGBData(0));
+                    unsigned char* rgbData = this->GetRawRGBData(0);
+                    if (rgbData)
+                    {
+                        m_frameRenderer->SetRGBData(rgbData);
+                    }
                     this->EraseDecodedFrameFromHead();
+                    ++i;
+                    if (i == 228)
+                        std::cout << t2.Elapsed()/1000000.0f <<std::endl;
                     timeElapsed = 0;
+                    
                 }
                 else
                 {
                     boost::this_thread::sleep(boost::posix_time::milliseconds(100));
                 }
             }
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+            timeElapsed = t.Elapsed();
+            //t.Start();
+            //std::cout << timeElapsed << " " << m_frameDelay << std::endl;
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(60));
         }
     }
     void StartPlaybackAsync()
