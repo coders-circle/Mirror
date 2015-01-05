@@ -11,8 +11,20 @@ MediaStream::MediaStream()
 
 MediaStream::~MediaStream()
 {
-    if (m_encoderContext) avcodec_free_context(&m_encoderContext);
-    if (m_decoderContext) avcodec_free_context(&m_decoderContext);
+    if (m_encoderContext)
+    {
+       // avcodec_free_context(&m_encoderContext);
+        avcodec_close(m_encoderContext);
+        av_freep(&m_encoderContext->extradata);
+        av_freep(&m_encoderContext);
+    }
+    if (m_decoderContext)
+    {
+        //avcodec_free_context(&m_decoderContext);
+        avcodec_close(m_decoderContext);
+        av_freep(&m_decoderContext->extradata);
+        av_freep(&m_decoderContext);
+    }
 }
 
 unsigned int MediaStream::AllocateNewEndodedPacket()

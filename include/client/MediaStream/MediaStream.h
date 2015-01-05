@@ -22,7 +22,12 @@ extern "C"
 
 #ifndef _WIN32
 #define av_frame_alloc avcodec_alloc_frame
+#define av_frame_copy(dst, src) av_image_copy(dst->data, dst->linesize, src->data, src->linesize, src->format, src->width, src->height)
 #endif
+
+
+
+
 
 
 class CodecNotFound :public Exception

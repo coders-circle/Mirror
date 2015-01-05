@@ -78,54 +78,54 @@ void VideoStream::InitializeDecoder()
     this->SetupDecoder();
 
     // for progressive decoding
-    if (m_decoder->capabilities & CODEC_CAP_TRUNCATED)
-        m_decoderContext->flags |= CODEC_FLAG_TRUNCATED;
+    /*if (m_decoder->capabilities & CODEC_CAP_TRUNCATED)
+        m_decoderContext->flags |= CODEC_FLAG_TRUNCATED;*/
 
     this->OpenCodec(m_decoderContext, m_decoder);
 }
 // do not use!
 // under construction
-int VideoStream::AddProgressivePacket(AVPacket* pkt)
-{
-    AVFrame* frame = av_frame_alloc();
-    int framePresent = 0;
-    int readBytes = avcodec_decode_video2(m_decoderContext, frame, &framePresent, pkt);
-    if (readBytes < 0)
-    {
-        throw FailedToDecode();
-    }
-    if (framePresent && frame->width != 0)
-    {
-        unsigned int frameIndex = this->AllocateNewDecodedFrame();
-        m_decodedFrames[frameIndex] = av_frame_clone(frame);
-        // av_frame_clone will not allocate the packet if the frame is empty
-        // so we have to check for that and allocate manually for empty packets
-        if (!m_decodedFrames[frameIndex])
-        {
-            m_decodedFrames[frameIndex] = av_frame_alloc();
-        }
-        
-        av_frame_copy(m_decodedFrames[frameIndex], frame);
-        if (m_rawData.size() == 0)
-        {
-            // this is the first time we get the filled frame
-            // so allocate enough memory for raw data and
-            // initialize scaler context for color fromat conversion
-            this->AllocateRawData(frame->height*frame->width * 3);
-            if (m_YUV420PToRGB24ConverterContext)
-            {
-                //should not happen
-                sws_freeContext(m_YUV420PToRGB24ConverterContext);
-            }
-            // @@@@@@@@@@@@@@@@@@@@@
-            // zzz encoder context!!!
-            m_YUV420PToRGB24ConverterContext = sws_getContext(m_encoderContext->width,
-                m_encoderContext->height, AV_PIX_FMT_YUV420P, m_encoderContext->width,
-                m_encoderContext->height, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
-        }
-    }
-    return readBytes;
-}
+//int VideoStream::AddProgressivePacket(AVPacket* pkt)
+//{
+//    AVFrame* frame = av_frame_alloc();
+//    int framePresent = 0;
+//    int readBytes = avcodec_decode_video2(m_decoderContext, frame, &framePresent, pkt);
+//    if (readBytes < 0)
+//    {
+//        throw FailedToDecode();
+//    }
+//    if (framePresent && frame->width != 0)
+//    {
+//        unsigned int frameIndex = this->AllocateNewDecodedFrame();
+//        m_decodedFrames[frameIndex] = av_frame_clone(frame);
+//        // av_frame_clone will not allocate the packet if the frame is empty
+//        // so we have to check for that and allocate manually for empty packets
+//        if (!m_decodedFrames[frameIndex])
+//        {
+//            m_decodedFrames[frameIndex] = av_frame_alloc();
+//        }
+//        
+//        av_frame_copy(m_decodedFrames[frameIndex], frame);
+//        if (m_rawData.size() == 0)
+//        {
+//            // this is the first time we get the filled frame
+//            // so allocate enough memory for raw data and
+//            // initialize scaler context for color fromat conversion
+//            this->AllocateRawData(frame->height*frame->width * 3);
+//            if (m_YUV420PToRGB24ConverterContext)
+//            {
+//                //should not happen
+//                sws_freeContext(m_YUV420PToRGB24ConverterContext);
+//            }
+//            // @@@@@@@@@@@@@@@@@@@@@
+//            // zzz encoder context!!!
+//            m_YUV420PToRGB24ConverterContext = sws_getContext(m_encoderContext->width,
+//                m_encoderContext->height, AV_PIX_FMT_YUV420P, m_encoderContext->width,
+//                m_encoderContext->height, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
+//        }
+//    }
+//    return readBytes;
+//}
 
 void VideoStream::AddPacket(AVPacket* pkt)
 {
@@ -161,6 +161,7 @@ void VideoStream::AddPacket(AVPacket* pkt)
                     //should not happen
                     sws_freeContext(m_YUV420PToRGB24ConverterContext);
                 }
+                
                 m_fw = frame->width;
                 m_fh = frame->height;
                 m_fps = m_decoderContext->framerate.num;
