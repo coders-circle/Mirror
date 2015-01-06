@@ -221,7 +221,8 @@ void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
     m_fps = fps;
 }
 
-void VideoStream::AddFrame(uint8_t* rgb24Data, int pts)
+
+void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 {
     AVFrame *frame = av_frame_alloc();
 

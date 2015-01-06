@@ -105,6 +105,7 @@
     <ClInclude Include="..\..\include\common\Exception.h" />
     <ClInclude Include="..\..\include\common\RTPCommon.h" />
     <ClInclude Include="..\..\include\common\RtpHandler.h" />
+    <ClInclude Include="..\..\include\common\RtpPacket.h" />
     <ClInclude Include="..\..\include\common\RtpReceiver.h" />
     <ClInclude Include="..\..\include\common\RtpTransmitter.h" />
     <ClInclude Include="..\..\include\common\TcpAcceptor.h" />
@@ -137,6 +138,8 @@
     <ClCompile Include="..\..\src\client\UI\UIManager.cpp" />
     <ClCompile Include="..\..\src\client\Client.cpp" />
     <ClCompile Include="..\..\src\common\ChatMessage.cpp" />
+    <ClCompile Include="..\..\src\common\HttpHandler.cpp" />
+    <ClCompile Include="..\..\src\common\RtpPacket.cpp" />
     <ClCompile Include="..\..\src\common\TcpAcceptor.cpp" />
     <ClCompile Include="..\..\src\common\TcpRequest.cpp" />
     <ClCompile Include="..\..\src\common\TcpHandler.cpp" />
