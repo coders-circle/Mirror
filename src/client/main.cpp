@@ -36,13 +36,23 @@ gboolean IdleFunction(gpointer userData)
 
 
 
+    Client client;
 int main(int argc, char *argv[])
-//try
 {
+try
+{
+    client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 10011)));
+    client.JoinChat(client.GetServer());
     av_register_all();
     avdevice_register_all();
+    
+    VideoCapture cap;
+    cap.StartRecording();
+
     v = new VideoPlayback();
-    v->Test();
+    v->InitializeDecoder();
+    //v->Test();
+    
 
     //v.Start
     //a.Test();
@@ -98,6 +108,23 @@ int main(int argc, char *argv[])
     v->Set(fixed, 10, 10);
     v->StartPlaybackAsync();
 
+    VideoCapture* capp = &cap;
+    boost::thread sendthread([capp](){
+        while(1)
+        {
+            capp->SendRtp(client, client.GetServer());
+            v->ReceiveRtp(client);
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+        }
+    });
+    /*boost::thread receivethread([capp](){
+        while(1)
+        {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+        }
+    });*/
+
+
     
     //fr.Set(fixed, 10, 10, 640, 480);
     
@@ -109,19 +136,20 @@ int main(int argc, char *argv[])
     
     gtk_main();
     
+    cap.StopRecording();
     return 0;
 }
-//catch (std::exception err)
-//{
-//    std::cout << ":/ \n" << err.what() << std::endl;
-//    return 1;
-//}
-//catch (...)
-//{
-//    std::cout << "zzz";
-//    return 1;
-//}
-
+catch (std::exception err)
+{
+    std::cout << ":/ \n" << err.what() << std::endl;
+    return 1;
+}
+catch (...)
+{
+    std::cout << "zzz";
+    return 1;
+}
+}
 
 
 #ifdef _WIN32

@@ -248,6 +248,7 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, int pts)
 
 void VideoStream::AddFrame(AVFrame *frame)
 {
+    boost::lock_guard<boost::mutex> guard(m_frameLock);
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);
@@ -272,32 +273,43 @@ void VideoStream::AddFrame(AVFrame *frame)
 
 #include <common/RtpPacket.h>
 #include <client/Client.h>
+#define min(x,y) ((x)<(y)?(x):(y))
+
 void VideoStream::SendRtp(Client &client, size_t connectionId)
 {
+    boost::lock_guard<boost::mutex> guard(m_frameLock);
+    size_t pktsSz;
     RtpPacket rtp;
     rtp.Initialize(&client.GetUdpHandler1(), client.GetUdpEndpoint(connectionId));
     rtp.SetPayloadType(12);
-    size_t pktsSz = m_encodedPackets.size();
+    pktsSz = m_encodedPackets.size();
     for (size_t i = 0; i < pktsSz; ++i)
     {
         AVPacket* pkt = m_encodedPackets[i];
-        rtp.SetTimeStamp(pkt->pts);
-        rtp.Send(pkt->data, pkt->size);
+        //std::cout << pkt->size << std::endl;
+        rtp.Send(pkt->data, min(1024,pkt->size));
     }
-    
     EraseEncodedPacketFromHead(pktsSz);
 }
 
 void VideoStream::ReceiveRtp(Client &client/*, size_t connectionId*/)
 {
+    if (client.GetUdpHandler1().GetSocket()->available() == 0) return;
+    boost::lock_guard<boost::mutex> guard(m_frameLock);
     RtpPacket rtp;
     udp::endpoint ept;
     rtp.Initialize(&client.GetUdpHandler1(), ept);
     uint8_t data[1024];
     size_t len = rtp.Receive(data, 1024);
-    AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()];
+    if (len == 0) return;
+    AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()] = new AVPacket;
     uint8_t* pdata = (uint8_t*)av_malloc(len);
     memcpy(pdata, data, len);
-    av_packet_from_data(pkt, pdata, len);
-    pkt->pts = rtp.GetTimeStamp();
+   // av_packet_from_data(pkt, pdata, len);
+    av_init_packet(pkt);
+    pkt->data = pdata;
+    pkt->size = len;
+    
+    std::cout << "Received packet: " << len << std::endl;
+    AddPacket(pkt);
 }

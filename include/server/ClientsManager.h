@@ -9,7 +9,7 @@ struct ClientInfo
     ClientInfo(boost::asio::io_service& io) 
     : tcpHandler(io) {}
     TcpHandler tcpHandler;
-    udp::endpoint udpEndpoint;
+    udp::endpoint udpEndpoint1, udpEndpoint2;
     bool connected;
 };
 

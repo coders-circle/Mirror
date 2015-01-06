@@ -25,14 +25,14 @@ void UdpHandler::Initialize(const udp::endpoint &localEndpoint)
 
 void UdpHandler::Send(const udp::endpoint &remoteEndpoint, const char* data, size_t size)
 {
-    if (m_socket)
+    if (!m_socket)
         throw UdpHandlerException("Socket not created");
     m_socket->send_to(boost::asio::buffer(data, size), remoteEndpoint);
 }
 
 size_t UdpHandler::Receive(udp::endpoint &remoteEndpoint, char* data, size_t maxSize)
 {
-    if (m_socket)
+    if (!m_socket)
         throw UdpHandlerException("Socket not created");
     return m_socket->receive_from(boost::asio::buffer(data, maxSize), remoteEndpoint);
 }

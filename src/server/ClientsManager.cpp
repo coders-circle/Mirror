@@ -114,10 +114,11 @@ void ClientsManager::ProcessClients()
                     {   
                         m_requests.UdpPort(m_clients[i].tcpHandler, m_udpHandler1.GetSocket()->local_endpoint().port());
                         char c;
-                        m_udpHandler1.Receive(m_clients[i].udpEndpoint, &c, 1);
-                        m_udpEndpointsMap[std::make_pair(m_clients[i].udpEndpoint.address().to_string(), m_clients[i].udpEndpoint.port())]
+                        m_udpHandler1.Receive(m_clients[i].udpEndpoint1, &c, 1);
+                        m_clients[i].udpEndpoint2 = udp::endpoint(m_clients[i].udpEndpoint1.address(), m_clients[i].udpEndpoint1.port()+1);
+                        m_udpEndpointsMap[std::make_pair(m_clients[i].udpEndpoint1.address().to_string(), m_clients[i].udpEndpoint1.port())]
                             =   i;
-                        std::cout << "Client connected at " << m_clients[i].udpEndpoint.port() << std::endl;
+                        std::cout << "Client connected at " << m_clients[i].udpEndpoint1.port() << std::endl;
                     }
                         break;
 
@@ -135,20 +136,27 @@ void ClientsManager::ProcessClients()
         }
         
         // Also check for udp data
+        //std::cout << "Checking on " << m_udpHandler1.GetSocket()->local_endpoint().address().to_string()<<":"<<
+        //                        m_udpHandler1.GetSocket()->local_endpoint().port() << std::endl;
         if (m_udpHandler1.GetSocket()->available() > 0)
         {
             udp::endpoint ep;
-            char data[1024];
-            m_udpHandler1.Receive(ep, data, 1024);
-            size_t cid = m_udpEndpointsMap[std::make_pair(ep.address().to_string(), ep.port())];
-            auto it = m_groups.begin();
-            for (; it != m_groups.end(); ++it)
-                if (std::find(it->second.begin(), it->second.end(), cid) != it->second.end())
-                    break;
-            if (it != m_groups.end())
-            for (unsigned int j = 0; j < it->second.size(); ++j)
-                m_udpHandler1.Send(m_clients[it->second[j]].udpEndpoint, data, 1024);
-
+            char data[1024+12];
+            size_t len = m_udpHandler1.Receive(ep, data, 1024+12);
+            if (len != 0)
+            {
+                size_t cid = m_udpEndpointsMap[std::make_pair(ep.address().to_string(), ep.port())];
+                auto it = m_groups.begin();
+                for (; it != m_groups.end(); ++it)
+                    if (std::find(it->second.begin(), it->second.end(), cid) != it->second.end())
+                        break;
+                if (it != m_groups.end())
+                for (unsigned int j = 0; j < it->second.size(); ++j)
+                {
+                    //std::cout << len << std::endl;
+                    m_udpHandler1.Send(m_clients[it->second[j]].udpEndpoint1, data, len);
+                }
+            }
         }
 
         m_mutex.unlock();
