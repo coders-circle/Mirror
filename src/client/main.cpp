@@ -114,7 +114,7 @@ try
         {
             capp->SendRtp(client, client.GetServer());
             v->ReceiveRtp(client);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
         }
     });
     /*boost::thread receivethread([capp](){

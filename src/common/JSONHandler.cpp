@@ -1,4 +1,6 @@
+#include <common/common.h>
 #include <common/JSONHandler.h>
+using namespace rapidjson;
 
 // constructor.
 JSONHandler::JSONHandler()

@@ -38,6 +38,9 @@ public:
     uint8_t GetPayloadType() const { return m_payloadType; }
     void SetPayloadType(uint8_t payloadType) { m_payloadType = payloadType; }
 
+    bool IsMarkerSet() const { return m_marker; }
+    void SetMarker(bool marker = true) { m_marker = marker; }
+
     const udp::endpoint& GetRemoteEndpoint() const { return m_remoteEndpoint; }
 
     void Send(const uint8_t *data, size_t size);
@@ -49,4 +52,5 @@ private:
     uint16_t m_sequenceNumber;
     int m_timeStamp, m_timeStampIncrement;
     uint8_t m_payloadType;
+    bool m_marker;
 };

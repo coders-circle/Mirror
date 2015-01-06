@@ -1,5 +1,5 @@
 #pragma once
-#include "rapidjson/docoument.h"
+#include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 

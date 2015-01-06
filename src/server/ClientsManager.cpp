@@ -141,8 +141,8 @@ void ClientsManager::ProcessClients()
         if (m_udpHandler1.GetSocket()->available() > 0)
         {
             udp::endpoint ep;
-            char data[1024+12];
-            size_t len = m_udpHandler1.Receive(ep, data, 1024+12);
+            char data[4096+12];
+            size_t len = m_udpHandler1.Receive(ep, data, 4096+12);
             if (len != 0)
             {
                 size_t cid = m_udpEndpointsMap[std::make_pair(ep.address().to_string(), ep.port())];
