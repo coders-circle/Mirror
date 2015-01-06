@@ -36,7 +36,8 @@ public:
 
     void Close();
     void Cancel();
-protected:
-	boost::shared_ptr<tcp::socket> m_socket;
+	
+protected:    
+    boost::shared_ptr<tcp::socket> m_socket;
 	boost::asio::io_service &m_ioService;
 };

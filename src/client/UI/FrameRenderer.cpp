@@ -9,9 +9,23 @@ FrameRenderer::FrameRenderer()
     m_rgbImage = 0;
 }
 
+void FrameRenderer::Show()
+{
+    gtk_widget_show(m_drawingArea);
+}
 void FrameRenderer::SetRGBData(unsigned char* rgbData)
 {
-    memcpy(m_rgbData, rgbData, m_w*m_h*4);
+    //memcpy(m_rgbData, rgbData, m_w*m_h*3);
+    for (int i1 = 0, i2 = 0, lim = m_w*m_h * 4; i1 < lim; i1++)
+    {
+        if ((i1+1) % 4 == 0)
+        {
+            m_rgbData[i1] = 255;
+            continue;
+        }
+        ++i2;
+        m_rgbData[i1] = rgbData[i2];
+    }
     gtk_widget_queue_draw_area(m_drawingArea, 0, 0, m_w, m_h);
 }
 

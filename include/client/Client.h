@@ -52,6 +52,12 @@ public:
     const std::string& GetName() { return m_name; }
     // Set connectionId of server
     void SetServer(size_t connectionId) { m_serverId = connectionId; }
+    // Get connectionId of server
+    size_t GetServer() const { return m_serverId; }
+
+    // Get remote udp endpoint of a connection
+    const udp::endpoint& GetUdpEndpoint(size_t connectionId) const { return m_connections[connectionId].udpEndpoint; }
+    UdpHandler& GetUdpHandler1() { return m_udpHandler1; }
 
 private:
     boost::asio::io_service m_io;
@@ -66,6 +72,7 @@ private:
         : tcpHandler(io)
         {}
         TcpHandler tcpHandler;
+        udp::endpoint udpEndpoint;
         bool connected;
     };
     // Single udp handler can be used for all connections

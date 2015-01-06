@@ -113,6 +113,7 @@
     <ClInclude Include="..\..\include\common\TcpReceiver.h" />
     <ClInclude Include="..\..\include\common\TcpRequest.h" />
     <ClInclude Include="..\..\include\common\TcpTransmitter.h" />
+    <ClInclude Include="..\..\include\common\Timer.h" />
     <ClInclude Include="..\..\include\common\UdpHandler.h" />
   </ItemGroup>
   <ItemGroup>

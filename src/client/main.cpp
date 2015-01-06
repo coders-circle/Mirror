@@ -1,27 +1,27 @@
 /* Client - main.cpp */
 
 
-
 #include <common/common.h>
 #include "client/Application.h"
 #include "client/MediaStream/VideoCapture.h"
+#include "client/MediaStream/AudioStream.h"
+#include "client/MediaStream/VideoPlayback.h"
 
-
-//#include "client/VideoCapture.h"
-//#include "client/FrameRenderer.h"
-
+VideoPlayback *v;
+//AudioStream a;
 //FrameRenderer fr;
-//VideoCapture vidCap;
-//
-//
-//gboolean IdleFunction(gpointer userData)
-//{
-//    //fr.SetRGBData(vidCap.GetBGRAFrame());
-//    vidCap.CaptureFrame();
-//    fr.SetRGBData(vidCap.GetBGRAFrame());
-//
-//    return TRUE;
-//}
+int currentVideoIndex = 0;
+
+gboolean IdleFunction(gpointer userData)
+{
+    //v->StartPlayback();
+    //fr.SetRGBData(v.GetRawRGBData(currentVideoIndex));
+    ////Sleep(20);
+    //++currentVideoIndex;
+    //if (currentVideoIndex >= 200)
+    //    return FALSE;
+    return TRUE;
+}
 //
 //gboolean time_handler(GtkWidget *widget)
 //{
@@ -41,8 +41,11 @@ int main(int argc, char *argv[])
 {
     av_register_all();
     avdevice_register_all();
-    VideoCapture v;
-    v.Initialize();
+    v = new VideoPlayback();
+    v->Test();
+
+    //v.Start
+    //a.Test();
     //v.Test();
 
 
@@ -58,7 +61,7 @@ int main(int argc, char *argv[])
     
 
     //g_signal_connect_swapped(G_OBJECT(mainWindow), "idle", G_CALLBACK(IdleFunction), NULL);
-    //g_idle_add(IdleFunction, 0);
+    //g_idle_add(IdleFunction, mainWindow);
     
     //////////////////////////////////////////////////////////////////////////////
     // CSS Test
@@ -92,13 +95,16 @@ int main(int argc, char *argv[])
     GtkWidget* fixed = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(mainWindow), fixed);
 
-    /*vidCap.Initialize();
-    fr.Initialize(mainWindow, fixed, 10, 10, vidCap.GetFrameWidth(), vidCap.GetFrameHeight());*/
+    v->Set(fixed, 10, 10);
+    v->StartPlaybackAsync();
+
+    
+    //fr.Set(fixed, 10, 10, 640, 480);
     
     gtk_widget_show_all(mainWindow);
 
-    Application app;
-    app.Initialize(mainWindow, fixed);
+    /*Application app;
+    app.Initialize(mainWindow, fixed);*/
     
     
     gtk_main();
