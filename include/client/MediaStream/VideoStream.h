@@ -28,7 +28,7 @@ public:
     
     // Add 24-bit raw RGB frame and encode into packet
     // pts = presentation time stamp
-    void AddFrame(uint8_t* rgb24Data, int pts);
+    void AddFrame(uint8_t* rgb24Data, uint64_t pts);
 
     // Add a frame and encode into packet
     void AddFrame(AVFrame *frame);

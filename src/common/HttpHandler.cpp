@@ -1,5 +1,6 @@
 #include "common/common.h"
 #include "common/HttpHandler.h"
+#include "rapidjson/document.h"
 
 // the construtor, takes reference to io_service as argument
 HttpHandler::HttpHandler(boost::asio::io_service& ioService):TcpHandler(ioService)
@@ -98,7 +99,7 @@ void HttpHandler::GetResponse()
 {
 	try
 	{
-		boost::asio::read_until(*m_socket, m_serverResponse, "<<>>"); 
+		boost::asio::read_until(*m_socket, m_serverResponse, "<<>>"); // <<>> denotes the end of the json data from the server
 	}
 	catch (Exception &e)
 	{
@@ -112,5 +113,14 @@ void HttpHandler::GetResponse()
 		std::cout << test << std::endl;
 	}
 	std::getline(responseStream, test);
+	test = test.substr(0, test.length()-4);
 	std::cout << test << std::endl;
+	/*char * json = new char[test.length()+1];
+	rapidjson::Document d;
+	strcpy(json, test.c_str());
+	d.Parse<0>(json);
+	auto a = d.FindMember("array");
+	assert(d["array"].IsNumber());
+	std::cout  << d["array"][0].GetInt();
+	*/
 }
