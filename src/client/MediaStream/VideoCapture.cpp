@@ -61,10 +61,12 @@ void VideoCapture::Initialize()
     auto buffer = (uint8_t*)av_malloc(numBytes*sizeof(uint8_t));
     avpicture_fill((AVPicture*)m_frameRGB, buffer, pFormat, m_codecCtx->width, m_codecCtx->height);
 
-    VideoStream::InitializeEncoder(m_codecCtx->width, m_codecCtx->height);
+    VideoStream::InitializeEncoder(320, 240);
+    //VideoStream::InitializeEncoder(m_codecCtx->width, m_codecCtx->height);
     
     m_imgConvertCtx = sws_getCachedContext(NULL, m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,  
-                                             m_codecCtx->width, m_codecCtx->height, pFormat, SWS_BICUBIC, NULL, NULL,NULL);
+                                             320, 240, pFormat, SWS_BICUBIC, NULL, NULL,NULL);
+                                             //m_codecCtx->width, m_codecCtx->height, pFormat, SWS_BICUBIC, NULL, NULL,NULL);
 }
 
 void VideoCapture::Record()

@@ -137,4 +137,8 @@ protected:
     // queued for the decoding process
     // used exclusive for continious decoding process
     std::vector<uint8_t> m_encodedDataStream;
+
+
+    // mutex to lock encoded frames
+    boost::mutex m_frameLock;
 };

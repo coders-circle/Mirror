@@ -58,6 +58,7 @@ public:
     // Get remote udp endpoint of a connection
     const udp::endpoint& GetUdpEndpoint(size_t connectionId) const { return m_connections[connectionId].udpEndpoint; }
     UdpHandler& GetUdpHandler1() { return m_udpHandler1; }
+    UdpHandler& GetUdpHandler2() { return m_udpHandler2; }
 
 private:
     boost::asio::io_service m_io;

@@ -31,8 +31,8 @@ void RtpPacket::Send(const uint8_t *data, size_t size)
         throw RtpTransmissionException("RTP packet hasn't been properly initialized");
 
     std::vector<uint8_t> packet;
-    packet.resize(RTP_HEADER_SIZE);
-    packet[0] = (uint8_t)0x80;                               // RTP version
+    packet.resize(RTP_HEADER_SIZE + size);
+    packet[0] = (uint8_t)(m_marker?0x81:0x80);                               // RTP version
     packet[1] = m_payloadType;                      // Payload type
     packet[2] = m_sequenceNumber >> 8;              // Sequence number of packet
     packet[3] = m_sequenceNumber & 0x0FF;           
@@ -62,11 +62,14 @@ size_t RtpPacket::Receive(uint8_t* data, size_t maxSize)
         throw RtpReceptionError("RTP packet hasn't been properly initialized");
 
     std::vector<uint8_t> packet;
-    packet.resize(maxSize);
+    packet.resize(RTP_HEADER_SIZE + maxSize);
     size_t len = m_udpHandler->Receive(m_remoteEndpoint, (char*)&packet[0], packet.size());
-    packet.resize(len);
+    if (len == RTP_HEADER_SIZE) return 0;
+    //packet.resize(len);
 
     uint8_t version = packet[0];
+    if (version & 0x01 == 0x01) m_marker = true;
+    else m_marker = false;
     m_payloadType = packet[1];
     m_sequenceNumber = *((uint16_t*)&packet[2]);
     m_timeStamp = *((int*)&packet[4]);

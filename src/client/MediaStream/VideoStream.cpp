@@ -250,6 +250,7 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 
 void VideoStream::AddFrame(AVFrame *frame)
 {
+    boost::lock_guard<boost::mutex> guard(m_frameLock);
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);
@@ -273,33 +274,53 @@ void VideoStream::AddFrame(AVFrame *frame)
 
 
 #include <common/RtpPacket.h>
+#include <client/MediaStream/RtpStreamer.h>
 #include <client/Client.h>
+#define min(x,y) ((x)<(y)?(x):(y))
+
 void VideoStream::SendRtp(Client &client, size_t connectionId)
 {
+    boost::lock_guard<boost::mutex> guard(m_frameLock);
+    size_t pktsSz;
     RtpPacket rtp;
+    RtpStreamer rtpstr;
     rtp.Initialize(&client.GetUdpHandler1(), client.GetUdpEndpoint(connectionId));
-    rtp.SetPayloadType(12);
-    size_t pktsSz = m_encodedPackets.size();
+    rtp.SetPayloadType(123);
+    pktsSz = m_encodedPackets.size();
     for (size_t i = 0; i < pktsSz; ++i)
     {
         AVPacket* pkt = m_encodedPackets[i];
-        rtp.SetTimeStamp(pkt->pts);
-        rtp.Send(pkt->data, pkt->size);
+        //std::cout << pkt->size << std::endl;
+        //rtp.Send(pkt->data, min(4096,pkt->size));
+        rtpstr.Send(rtp, pkt->data, pkt->size);
     }
-    
     EraseEncodedPacketFromHead(pktsSz);
 }
 
 void VideoStream::ReceiveRtp(Client &client/*, size_t connectionId*/)
 {
+    if (client.GetUdpHandler1().GetSocket()->available() == 0) return;
+    boost::lock_guard<boost::mutex> guard(m_frameLock);
     RtpPacket rtp;
     udp::endpoint ept;
     rtp.Initialize(&client.GetUdpHandler1(), ept);
-    uint8_t data[1024];
-    size_t len = rtp.Receive(data, 1024);
-    AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()];
+    /*uint8_t data[4096];
+    size_t len = rtp.Receive(data, 4096);
+    //std::cout << len << std::endl;
+    if (len == 0) return;
+    AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()] = new AVPacket;
     uint8_t* pdata = (uint8_t*)av_malloc(len);
     memcpy(pdata, data, len);
-    av_packet_from_data(pkt, pdata, len);
-    pkt->pts = rtp.GetTimeStamp();
+    */
+    uint8_t* pdata;
+    RtpStreamer rstr;
+    size_t len = rstr.Receive(rtp, &pdata, av_malloc);
+    AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()] = new AVPacket;
+   // av_packet_from_data(pkt, pdata, len);
+    av_init_packet(pkt);
+    pkt->data = pdata;
+    pkt->size = len;
+    
+    //std::cout << "Received packet: " << len << std::endl;
+    AddPacket(pkt);
 }
