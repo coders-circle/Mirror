@@ -21,7 +21,7 @@ void RtpStreamer::Send(RtpPacket& rtp, uint8_t* data, size_t len)
 size_t RtpStreamer::Receive(RtpPacket& rtp, uint8_t** data, void* (*allocator)(size_t))
 {
     std::vector<std::vector<uint8_t>> datas;
-    size_t tlen;
+    size_t tlen = 0;
     do
     {
         datas.push_back(std::vector<uint8_t>(1024));

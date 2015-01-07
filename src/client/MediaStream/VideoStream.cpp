@@ -250,7 +250,6 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 
 void VideoStream::AddFrame(AVFrame *frame)
 {
-    boost::lock_guard<boost::mutex> guard(m_frameLock);
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);

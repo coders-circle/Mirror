@@ -43,6 +43,7 @@ try
 {
     client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 10011)));
     client.JoinChat(client.GetServer());
+    client.JoinVideoChat(client.GetServer());
     av_register_all();
     avdevice_register_all();
     

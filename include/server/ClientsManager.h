@@ -39,6 +39,7 @@ private:
     // Clients List
     std::vector<ClientInfo> m_clients;
     std::map<std::pair<std::string, uint16_t>, size_t> m_udpEndpointsMap;
+    std::map<size_t, size_t> m_videoGroups; // map client to group that it is video-chatting with
 
     std::unordered_map<uint32_t, std::vector<unsigned int>> m_groups; // map groupId to a list of id's of clients
                                                                       //  each client id is index of m_clients vector
@@ -50,4 +51,11 @@ private:
 
     // Test Method to receive chat messages on GROUP_CHAT request
     void ReceiveChat(unsigned int client, unsigned int group);
+
+    static std::pair<std::string, uint16_t> GetEndpointKey(const udp::endpoint& ep)
+    {
+        return std::make_pair(ep.address().to_string(), ep.port());
+    }
+    // Disconnect a client
+    void Disconnect(size_t client);
 };

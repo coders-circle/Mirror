@@ -1,7 +1,7 @@
 #include <common/common.h>
 #include <common/HttpHandler.h>
 #include <common/JSONHandler.h>
-
+/*
 int main()
 {
 	boost::asio::io_service io_service;
@@ -38,4 +38,4 @@ int main()
 	
 	return 0;
 }
-
+*/

@@ -318,6 +318,16 @@ bool Client::JoinChat(uint32_t connectionId, uint32_t groupId)
     return true;
 }
 
+bool Client::JoinVideoChat(uint32_t connectionId, uint32_t groupId)
+{
+    m_request.JoinVideoChat(m_connections[connectionId].tcpHandler, groupId);
+    // We need a JOIN_VIDEO_CHAT request back from other peer/server to ensure chat is joined
+    m_request.ReceiveRequest(m_connections[connectionId].tcpHandler);
+    if (m_request.GetRequestType() != TcpRequest::JOIN_VIDEO_CHAT)
+        return false;
+    return true;
+}
+
 void Client::SendMessage(size_t receiverId, const std::string& message, uint32_t groupId)
 {
     if (receiverId >= m_connections.size())

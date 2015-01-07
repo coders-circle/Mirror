@@ -40,6 +40,19 @@ void ClientsManager::StartProcessing()
     ProcessClients();
 }
 
+
+void ClientsManager::Disconnect(size_t client)
+{
+    m_clients[client].tcpHandler.Close();
+    m_clients[client].connected = false;
+    auto it = m_videoGroups.find(client);
+    if (it != m_videoGroups.end())
+        m_videoGroups.erase(it);
+    auto it1 = m_udpEndpointsMap.find(GetEndpointKey(m_clients[client].udpEndpoint1));
+    if (it1 != m_udpEndpointsMap.end())
+        m_udpEndpointsMap.erase(it1);
+}
+
 // Process each client
 void ClientsManager::ProcessClients()
 {
@@ -107,7 +120,6 @@ void ClientsManager::ProcessClients()
                         m_clients[i].tcpHandler.Close();
                         m_clients[i].connected = false;
                         //m_clients.erase(m_clients.begin()+i);
-                        i--;
                         break;
                     
                     case TcpRequest::UDP_PORT:
@@ -116,10 +128,22 @@ void ClientsManager::ProcessClients()
                         char c;
                         m_udpHandler1.Receive(m_clients[i].udpEndpoint1, &c, 1);
                         m_clients[i].udpEndpoint2 = udp::endpoint(m_clients[i].udpEndpoint1.address(), m_clients[i].udpEndpoint1.port()+1);
-                        m_udpEndpointsMap[std::make_pair(m_clients[i].udpEndpoint1.address().to_string(), m_clients[i].udpEndpoint1.port())]
-                            =   i;
+                        m_udpEndpointsMap[GetEndpointKey(m_clients[i].udpEndpoint1)] = i;
                         std::cout << "Client connected at " << m_clients[i].udpEndpoint1.port() << std::endl;
                     }
+                        break;
+                    
+                    case TcpRequest::JOIN_VIDEO_CHAT:
+                        id = m_requests.GetGroupId();
+                        // Make sure client has joined the group already (through JOIN_CHAT request)
+                        if (std::find(m_groups[id].begin(), m_groups[id].end(), i) == m_groups[id].end())
+                            m_requests.Invalid(m_clients[i].tcpHandler);
+                        else
+                        {
+                            m_requests.JoinVideoChat(m_clients[i].tcpHandler, id);
+                            m_videoGroups[i] = id;
+                            std::cout << "Client #" << i << " is video chatting in group #" << id << std::endl;
+                        }
                         break;
 
                     default:
@@ -129,32 +153,26 @@ void ClientsManager::ProcessClients()
             }
             catch (std::exception &ex)
             {
-                m_clients[i].tcpHandler.Close();
-                m_clients[i].connected = false;
-                std::cout << ex.what() << std::endl;
+               Disconnect(i);
+               std::cout << ex.what() << std::endl;
             }
         }
         
         // Also check for udp data
-        //std::cout << "Checking on " << m_udpHandler1.GetSocket()->local_endpoint().address().to_string()<<":"<<
-        //                        m_udpHandler1.GetSocket()->local_endpoint().port() << std::endl;
         if (m_udpHandler1.GetSocket()->available() > 0)
         {
             udp::endpoint ep;
-            char data[4096+12];
-            size_t len = m_udpHandler1.Receive(ep, data, 4096+12);
+            char data[1500];
+            size_t len = m_udpHandler1.Receive(ep, data, 1500);
             if (len != 0)
             {
-                size_t cid = m_udpEndpointsMap[std::make_pair(ep.address().to_string(), ep.port())];
-                auto it = m_groups.begin();
-                for (; it != m_groups.end(); ++it)
-                    if (std::find(it->second.begin(), it->second.end(), cid) != it->second.end())
-                        break;
-                if (it != m_groups.end())
-                for (unsigned int j = 0; j < it->second.size(); ++j)
+                size_t cid = m_udpEndpointsMap[GetEndpointKey(ep)];
+                auto it = m_videoGroups.find(cid);
+                if (it != m_videoGroups.end())
+                for (unsigned int j = 0; j < m_groups[it->second].size(); ++j)
                 {
                     //std::cout << len << std::endl;
-                    m_udpHandler1.Send(m_clients[it->second[j]].udpEndpoint1, data, len);
+                    m_udpHandler1.Send(m_clients[m_groups[it->second][j]].udpEndpoint1, data, len);
                 }
             }
         }
@@ -190,3 +208,4 @@ void ClientsManager::ReceiveChat(unsigned int client, unsigned int group)
     }
     //m_mutex.unlock();
 }
+
