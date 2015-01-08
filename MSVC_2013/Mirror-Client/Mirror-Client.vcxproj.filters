@@ -165,6 +165,9 @@
     <ClInclude Include="..\..\include\common\RtpPacket.h">
       <Filter>include\common\Network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\client\MediaStream\RtpStreamer.h">
+      <Filter>include\MediaStream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
@@ -244,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\RtpPacket.cpp">
       <Filter>src\common\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\MediaStream\RtpStreamer.cpp">
+      <Filter>src\MediaStream</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

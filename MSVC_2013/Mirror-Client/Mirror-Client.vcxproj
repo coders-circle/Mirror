@@ -78,6 +78,7 @@
     <ClInclude Include="..\..\include\client\MediaStream\AudioPlayback.h" />
     <ClInclude Include="..\..\include\client\MediaStream\AudioStream.h" />
     <ClInclude Include="..\..\include\client\MediaStream\MediaStream.h" />
+    <ClInclude Include="..\..\include\client\MediaStream\RtpStreamer.h" />
     <ClInclude Include="..\..\include\client\MediaStream\VideoCapture.h" />
     <ClInclude Include="..\..\include\client\MediaStream\VideoPlayback.h" />
     <ClInclude Include="..\..\include\client\MediaStream\VideoStream.h" />
@@ -124,6 +125,7 @@
     <ClCompile Include="..\..\src\client\MediaStream\AudioPlayback.cpp" />
     <ClCompile Include="..\..\src\client\MediaStream\AudioStream.cpp" />
     <ClCompile Include="..\..\src\client\MediaStream\MediaStream.cpp" />
+    <ClCompile Include="..\..\src\client\MediaStream\RtpStreamer.cpp" />
     <ClCompile Include="..\..\src\client\MediaStream\VideoCapture.cpp" />
     <ClCompile Include="..\..\src\client\MediaStream\VideoPlayback.cpp" />
     <ClCompile Include="..\..\src\client\MediaStream\VideoStream.cpp" />

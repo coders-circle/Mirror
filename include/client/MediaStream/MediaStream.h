@@ -141,4 +141,6 @@ protected:
 
     // mutex to lock encoded frames
     boost::mutex m_frameLock;
+
+    boost::mutex m_decodedFrameLock;
 };

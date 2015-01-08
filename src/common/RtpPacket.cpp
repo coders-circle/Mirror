@@ -68,7 +68,7 @@ size_t RtpPacket::Receive(uint8_t* data, size_t maxSize)
     //packet.resize(len);
 
     uint8_t version = packet[0];
-    if (version & 0x01 == 0x01) m_marker = true;
+    if ((version & 0x01) == 0x01) m_marker = true;
     else m_marker = false;
     m_payloadType = packet[1];
     m_sequenceNumber = *((uint16_t*)&packet[2]);

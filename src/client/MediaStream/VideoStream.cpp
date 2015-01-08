@@ -141,6 +141,8 @@ void VideoStream::AddPacket(AVPacket* pkt)
     {
         if (frame->width != 0)
         {
+            while (m_decodedFrameLock.try_lock())
+                ;
             unsigned int frameIndex = this->AllocateNewDecodedFrame();
             m_decodedFrames[frameIndex] = av_frame_clone(frame);
             // av_frame_clone will not allocate the packet if the frame is empty
@@ -150,6 +152,7 @@ void VideoStream::AddPacket(AVPacket* pkt)
                 m_decodedFrames[frameIndex] = av_frame_alloc();
             }
             av_frame_copy(m_decodedFrames[frameIndex], frame);
+            m_decodedFrameLock.unlock();
             if (m_rawData.size() == 0)
             {
                 // this is the first time we get the filled frame

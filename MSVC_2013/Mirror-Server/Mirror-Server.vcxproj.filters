@@ -27,9 +27,6 @@
     <ClCompile Include="..\..\src\common\ChatMessage.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\common\RtpHandler.cpp">
-      <Filter>src\common\Network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\common\TcpHandler.cpp">
       <Filter>src\common\Network</Filter>
     </ClCompile>
@@ -44,6 +41,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\server\main.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\RtpPacket.cpp">
+      <Filter>src\common\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
