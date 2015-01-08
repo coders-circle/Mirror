@@ -28,7 +28,7 @@ class HttpHandler : public TcpHandler
 		// send the POST request
 		void SendPostRequest(std::string location, std::string jsonString);
 		// get the response
-		void GetResponse();
+		std::string GetResponse();
 
 	private:
 		//boost::asio::io_service& m_ioService;

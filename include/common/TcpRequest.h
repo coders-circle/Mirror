@@ -18,6 +18,7 @@ public:
         P2P_TCP,
         DISCONNECT,
         UDP_PORT,
+        JOIN_VIDEO_CHAT,
     };
 
     TcpRequest();
@@ -25,6 +26,8 @@ public:
 
     // Request to join a chat
     void JoinChat(TcpHandler &tcpHandler, uint32_t groupId = 0);
+    // Request to join a video chat
+    void JoinVideoChat(TcpHandler &tcpHandler, uint32_t groupId = 0);
     // Request to wait for incoming chat message
     void ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, const std::string &userId, uint32_t groupId = 0);
     // Request to establish a P2P TCP connection with a client

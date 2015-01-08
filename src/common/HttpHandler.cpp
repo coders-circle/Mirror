@@ -10,6 +10,10 @@ HttpHandler::HttpHandler(boost::asio::io_service& ioService):TcpHandler(ioServic
 // the destrutor
 HttpHandler::~HttpHandler()
 {
+	if (!m_socket)
+	{
+		(*m_socket).close();
+	}
 }
 
 void HttpHandler:: SendGetRequest(std::string location)
@@ -95,7 +99,7 @@ void HttpHandler::SendPostRequest(std::string location, std::string jsonString)
 
 
 // response after a GET or POST
-void HttpHandler::GetResponse()
+std::string HttpHandler::GetResponse()
 {
 	try
 	{
@@ -114,13 +118,6 @@ void HttpHandler::GetResponse()
 	}
 	std::getline(responseStream, test);
 	test = test.substr(0, test.length()-4);
-	std::cout << test << std::endl;
-	/*char * json = new char[test.length()+1];
-	rapidjson::Document d;
-	strcpy(json, test.c_str());
-	d.Parse<0>(json);
-	auto a = d.FindMember("array");
-	assert(d["array"].IsNumber());
-	std::cout  << d["array"][0].GetInt();
-	*/
+//	std::cout << test << std::endl;
+	return test;
 }

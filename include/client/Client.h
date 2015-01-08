@@ -40,13 +40,15 @@ public:
 
     // Set the event handler to handle incoming chat messages
     void SetMessageEventHandler(std::function<void(boost::shared_ptr<MessageEventData>)> handler) { m_messageHandler = handler; }
-    // Send chat message to a connection (receiverId = 0 for server)
+    // Send chat message to a connection
     void SendMessage(size_t receiverId, const std::string& message, uint32_t groupId = 0);
     // Event handler to handle a join chat request from a peer (for p2p only)
     void SetJoinChatEventHandler(std::function<bool(size_t)> handler) { m_joinChatHandler = handler; }
 
     // Send a join chat request; on successful returns true
     bool JoinChat(uint32_t connectionId, uint32_t groupId = 0);
+    // Send a join video chat request; on successful return true
+    bool JoinVideoChat(uint32_t connectionId, uint32_t groupId = 0);
     // Set username to use while sending messages
     void SetName(const std::string &name) { m_name = name; }
     const std::string& GetName() { return m_name; }

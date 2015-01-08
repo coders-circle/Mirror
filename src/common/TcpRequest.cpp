@@ -53,6 +53,22 @@ void TcpRequest::JoinChat(TcpHandler &tcpHandler, uint32_t groupId)
     Send(tcpHandler);
 }
 
+void TcpRequest::JoinVideoChat(TcpHandler &tcpHandler, uint32_t groupId)
+{
+    /*
+    Example:
+        {
+            Request-Type: 6
+            Group-Id: 20
+        }
+    */  
+    New();
+    m_document.AddMember("Request-Type", Value((int)JOIN_VIDEO_CHAT), m_document.GetAllocator());
+    m_document.AddMember("Group-Id", Value(groupId), m_document.GetAllocator());
+    Send(tcpHandler);
+    
+}
+
 void TcpRequest::ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, const std::string &userId, uint32_t groupId)
 {
     /*

@@ -36,6 +36,8 @@ public:
 
     void Close();
     void Cancel();
+
+    void ResetSocket() { m_socket.reset(); }
 	
 protected:    
     boost::shared_ptr<tcp::socket> m_socket;

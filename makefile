@@ -9,7 +9,7 @@ OBJ_DIR := obj
 BIN_DIR := bin
 
 ## List of all c++ files to compile
-COMMON_CPP_FILES := $(filter-out src/common/JSONHandler.cpp, $(wildcard $(COMMON_SRC_DIRS:%=src/%/*.cpp)))
+COMMON_CPP_FILES := $(wildcard $(COMMON_SRC_DIRS:%=src/%/*.cpp))
 CLIENT_CPP_FILES := $(wildcard $(CLIENT_SRC_DIRS:%=src/%/*.cpp)) $(COMMON_CPP_FILES)
 SERVER_CPP_FILES := $(wildcard $(SERVER_SRC_DIRS:%=src/%/*.cpp)) $(COMMON_CPP_FILES)
 
