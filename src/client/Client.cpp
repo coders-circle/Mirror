@@ -5,6 +5,7 @@
 Client::Client()
 : m_udpHandler1(m_io), m_udpHandler2(m_io)
 {
+    // Get a pair of consecutive even and odd udp ports
     UdpHandler::GetUdpPairs(m_udpHandler1, m_udpHandler2);
     std::cout << "Udp Ports Used: \n" << m_udpHandler1.GetSocket()->local_endpoint().port() 
                 << ", " << m_udpHandler2.GetSocket()->local_endpoint().port() << std::endl;
@@ -25,18 +26,24 @@ size_t Client::Connect(const tcp::endpoint& peer, uint32_t secondsToWait)
     TcpHandler &handler = m_connections[cid].tcpHandler;
     m_connections[cid].connected = false;
     
+    // Set timeout for connection
+    // After the timeout, the tcp socket is cancelled and closed;
+    // which will throw an exception and the function returns
     boost::thread timerThread(boost::bind(&Client::ConnectTimer, this, _1, _2), boost::ref(handler), secondsToWait);
+
+    // Establish the tcp connection
     handler.Initialize(peer);
     m_connections[cid].connected = true;
 
-    // Connect UDP
+    // Establish the udp connection; this requires sending the other peer/server 
+    // a request to send its udp-port
     m_request.UdpPort(handler);
     m_request.ReceiveRequest(handler);
     if (m_request.GetRequestType() != TcpRequest::UDP_PORT)
         throw Exception("Couldn't connect udp");
     uint16_t up = m_request.GetUdpPort();
     m_connections[cid].udpEndpoint = udp::endpoint(peer.address(), up);
-    // Send a byte to ensure connection on other side
+    // Send a byte to ensure the udp connection on other side
     char c = 0;
     m_udpHandler1.Send(m_connections[cid].udpEndpoint, &c, 1); 
 
@@ -300,7 +307,6 @@ void Client::Disconnect(size_t connectionId)
     m_request.Disconnect(m_connections[connectionId].tcpHandler);
     m_connections[connectionId].tcpHandler.Close();
     m_connections[connectionId].connected = false;
-    //m_connections.erase(m_connections.begin()+connectionId);
 }
 
 bool Client::IsConnected(size_t connectionId)

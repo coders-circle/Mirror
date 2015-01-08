@@ -45,11 +45,10 @@ public:
     // Test Encode to File
     void Encode();
 
-    // @@@@@@@@@@@@@@@@@
     // TEMPORARY TEST FUNCTIONS
     // Send/Receive over RTP
     void SendRtp(Client& client, size_t connectionId);
-    void ReceiveRtp(Client &client/*, size_t connectionId*/);
+    void ReceiveRtp(Client &client);
 
 protected:
     // scaler context to convert 24-bit RGB to YUV420P color format

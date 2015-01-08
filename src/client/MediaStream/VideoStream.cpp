@@ -250,6 +250,7 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 
 void VideoStream::AddFrame(AVFrame *frame)
 {
+    boost::lock_guard<boost::mutex> guard(m_frameLock);
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);
@@ -271,6 +272,7 @@ void VideoStream::AddFrame(AVFrame *frame)
     }
 }
 
+// Test methods to send/receive the video over RTP
 
 #include <common/RtpPacket.h>
 #include <client/MediaStream/RtpStreamer.h>
@@ -280,42 +282,46 @@ void VideoStream::AddFrame(AVFrame *frame)
 void VideoStream::SendRtp(Client &client, size_t connectionId)
 {
     boost::lock_guard<boost::mutex> guard(m_frameLock);
+    // We will use a RTP streamer to stream out the encoded packets
+    //  over as fragmented RTP packets
     size_t pktsSz;
     RtpPacket rtp;
     RtpStreamer rtpstr;
+
+    // Initialize the sending parameters for the RTP packets
     rtp.Initialize(&client.GetUdpHandler1(), client.GetUdpEndpoint(connectionId));
     rtp.SetPayloadType(123);
+
+    // Use RTP streamer to send each packet that has been encoded
     pktsSz = m_encodedPackets.size();
     for (size_t i = 0; i < pktsSz; ++i)
     {
         AVPacket* pkt = m_encodedPackets[i];
-        //std::cout << pkt->size << std::endl;
-        //rtp.Send(pkt->data, min(4096,pkt->size));
         rtpstr.Send(rtp, pkt->data, pkt->size);
     }
+    // Erase the sent packets
     EraseEncodedPacketFromHead(pktsSz);
 }
 
-void VideoStream::ReceiveRtp(Client &client/*, size_t connectionId*/)
+void VideoStream::ReceiveRtp(Client &client)
 {
-    if (client.GetUdpHandler1().GetSocket()->available() == 0) return;
+    if (client.GetUdpHandler1().GetSocket()->available() == 0) 
+        return;
     boost::lock_guard<boost::mutex> guard(m_frameLock);
+
+    // Again, a RTP streamer is used to stream in the fragmented packets
+    //  into one single encoded video packet
     RtpPacket rtp;
     udp::endpoint ept;
     rtp.Initialize(&client.GetUdpHandler1(), ept);
-    /*uint8_t data[4096];
-    size_t len = rtp.Receive(data, 4096);
-    //std::cout << len << std::endl;
-    if (len == 0) return;
-    AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()] = new AVPacket;
-    uint8_t* pdata = (uint8_t*)av_malloc(len);
-    memcpy(pdata, data, len);
-    */
+    // The streamer will also allocate the memory for the encoded packet
+    //  for which we pass an allocator (av_malloc)
     uint8_t* pdata;
     RtpStreamer rstr;
     size_t len = rstr.Receive(rtp, &pdata, av_malloc);
+
+    // Add the packet to our record; this can now be decoded and played
     AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()] = new AVPacket;
-   // av_packet_from_data(pkt, pdata, len);
     av_init_packet(pkt);
     pkt->data = pdata;
     pkt->size = len;
