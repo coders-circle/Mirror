@@ -23,6 +23,8 @@ public:
     // Add a packet and decode it to frame
     void AddPacket(AVPacket* pkt);
 
+    void AddPacket(uint8_t* packetData, int packetSize);
+
     // Get 24-bit raw RGB data from the given decoded frame
     unsigned char* GetRawRGBData(unsigned int decodedFrameIndex);
     
@@ -33,7 +35,7 @@ public:
     // Add a frame and encode into packet
     void AddFrame(AVFrame *frame);
 
-    int AddProgressivePacket(AVPacket* pkt);
+    //int AddProgressivePacket(AVPacket* pkt);
 
     // @@@@@@@@@@@@@@@@@@
     // TEMPORARY fuction

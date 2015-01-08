@@ -76,56 +76,17 @@ VideoStream::~VideoStream()
 void VideoStream::InitializeDecoder()
 {
     this->SetupDecoder();
-
-    // for progressive decoding
-    /*if (m_decoder->capabilities & CODEC_CAP_TRUNCATED)
-        m_decoderContext->flags |= CODEC_FLAG_TRUNCATED;*/
-
     this->OpenCodec(m_decoderContext, m_decoder);
 }
-// do not use!
-// under construction
-//int VideoStream::AddProgressivePacket(AVPacket* pkt)
-//{
-//    AVFrame* frame = av_frame_alloc();
-//    int framePresent = 0;
-//    int readBytes = avcodec_decode_video2(m_decoderContext, frame, &framePresent, pkt);
-//    if (readBytes < 0)
-//    {
-//        throw FailedToDecode();
-//    }
-//    if (framePresent && frame->width != 0)
-//    {
-//        unsigned int frameIndex = this->AllocateNewDecodedFrame();
-//        m_decodedFrames[frameIndex] = av_frame_clone(frame);
-//        // av_frame_clone will not allocate the packet if the frame is empty
-//        // so we have to check for that and allocate manually for empty packets
-//        if (!m_decodedFrames[frameIndex])
-//        {
-//            m_decodedFrames[frameIndex] = av_frame_alloc();
-//        }
-//        
-//        av_frame_copy(m_decodedFrames[frameIndex], frame);
-//        if (m_rawData.size() == 0)
-//        {
-//            // this is the first time we get the filled frame
-//            // so allocate enough memory for raw data and
-//            // initialize scaler context for color fromat conversion
-//            this->AllocateRawData(frame->height*frame->width * 3);
-//            if (m_YUV420PToRGB24ConverterContext)
-//            {
-//                //should not happen
-//                sws_freeContext(m_YUV420PToRGB24ConverterContext);
-//            }
-//            // @@@@@@@@@@@@@@@@@@@@@
-//            // zzz encoder context!!!
-//            m_YUV420PToRGB24ConverterContext = sws_getContext(m_encoderContext->width,
-//                m_encoderContext->height, AV_PIX_FMT_YUV420P, m_encoderContext->width,
-//                m_encoderContext->height, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
-//        }
-//    }
-//    return readBytes;
-//}
+
+void VideoStream::AddPacket(uint8_t *packetData, int packetSize)
+{
+    AVPacket* pkt = new AVPacket();
+    av_init_packet(pkt);
+    pkt->data = packetData;
+    pkt->size = packetSize;
+    this->AddPacket(pkt);
+}
 
 void VideoStream::AddPacket(AVPacket* pkt)
 {
@@ -141,12 +102,10 @@ void VideoStream::AddPacket(AVPacket* pkt)
     {
         if (frame->width != 0)
         {
-            while (m_decodedFrameLock.try_lock())
-                ;
+            while (!m_decodedFrameLock.try_lock())
+                std::cout << "Addpacket waiting" << std::endl;
             unsigned int frameIndex = this->AllocateNewDecodedFrame();
-            m_decodedFrames[frameIndex] = av_frame_clone(frame);
-            // av_frame_clone will not allocate the packet if the frame is empty
-            // so we have to check for that and allocate manually for empty packets
+            m_decodedFrames[frameIndex] = av_frame_clone(frame);            
             if (!m_decodedFrames[frameIndex])
             {
                 m_decodedFrames[frameIndex] = av_frame_alloc();
@@ -171,6 +130,17 @@ void VideoStream::AddPacket(AVPacket* pkt)
                 m_YUV420PToRGB24ConverterContext = sws_getContext(m_fw, m_fh, AV_PIX_FMT_YUV420P, 
                     m_fw, m_fh, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
             }
+        }
+    }
+    else
+    {
+        if (avcodec_decode_video2(m_decoderContext, NULL, &framePresent, pkt) < 0)
+        {
+            throw FailedToDecode();
+        }
+        if (framePresent)
+        {
+            std::cout << "OMG delayed packet" << std::endl;
         }
     }
 }
@@ -205,13 +175,15 @@ void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
     m_encoderContext->width = w;
     m_encoderContext->height = h;
     m_encoderContext->time_base = avrat;
-    m_encoderContext->gop_size = 10;
-    m_encoderContext->max_b_frames = 1;
+    m_encoderContext->gop_size = 30;
+    m_encoderContext->max_b_frames = 0;
     m_encoderContext->pix_fmt = AV_PIX_FMT_YUV420P;
 
     if (m_codecID == AV_CODEC_ID_H264)
     {
-        av_opt_set(m_encoderContext->priv_data, "preset", "slow", 0);
+       // av_opt_set(m_encoderContext->priv_data, "preset", "slow", 0);
+        av_opt_set(m_encoderContext->priv_data, "tune", "zerolatency", 0);
+        //av_dict_set
     }
     this->OpenCodec(m_encoderContext, m_encoder);
 
@@ -253,7 +225,9 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 
 void VideoStream::AddFrame(AVFrame *frame)
 {
-    boost::lock_guard<boost::mutex> guard(m_frameLock);
+    //boost::lock_guard<boost::mutex> guard(m_frameLock);
+    while (!m_encodedPacketLock.try_lock())
+        std::cout << "AddFrame waiting..." << std::endl;
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);
@@ -271,8 +245,10 @@ void VideoStream::AddFrame(AVFrame *frame)
     int packetFilled = 0;
     if (avcodec_encode_video2(m_encoderContext, pkt, frame, &packetFilled) < 0)
     {
+        m_encodedPacketLock.unlock();
         throw FailedToEncode();
     }
+    m_encodedPacketLock.unlock();
 }
 
 // Test methods to send/receive the video over RTP
@@ -284,7 +260,7 @@ void VideoStream::AddFrame(AVFrame *frame)
 
 void VideoStream::SendRtp(Client &client, size_t connectionId)
 {
-    boost::lock_guard<boost::mutex> guard(m_frameLock);
+    //boost::lock_guard<boost::mutex> guard(m_frameLock);
     // We will use a RTP streamer to stream out the encoded packets
     //  over as fragmented RTP packets
     size_t pktsSz;
@@ -296,21 +272,31 @@ void VideoStream::SendRtp(Client &client, size_t connectionId)
     rtp.SetPayloadType(123);
 
     // Use RTP streamer to send each packet that has been encoded
-    pktsSz = m_encodedPackets.size();
-    for (size_t i = 0; i < pktsSz; ++i)
-    {
-        AVPacket* pkt = m_encodedPackets[i];
-        rtpstr.Send(rtp, pkt->data, pkt->size);
+    while (!m_encodedPacketLock.try_lock())
+        std::cout << "SendRtp waiting..." << std::endl;
+
+    if (m_encodedPackets.size() > 0 ){
+        if (m_encodedPackets[0]->size != 0)
+            rtpstr.Send(rtp, m_encodedPackets[0]->data, m_encodedPackets[0]->size);
+        std::cout << "Available Packets: " << m_encodedPackets.size() << std::endl;
+        EraseEncodedPacketFromHead();
     }
-    // Erase the sent packets
-    EraseEncodedPacketFromHead(pktsSz);
+    //pktsSz = m_encodedPackets.size();
+    //for (size_t i = 0; i < pktsSz; ++i)
+    //{
+    //    AVPacket* pkt = m_encodedPackets[i];
+    //    rtpstr.Send(rtp, pkt->data, pkt->size);
+    //}
+    //// Erase the sent packets
+    //EraseEncodedPacketFromHead(pktsSz);
+    m_encodedPacketLock.unlock();
 }
 
 void VideoStream::ReceiveRtp(Client &client)
 {
     if (client.GetUdpHandler1().GetSocket()->available() == 0) 
         return;
-    boost::lock_guard<boost::mutex> guard(m_frameLock);
+    //boost::lock_guard<boost::mutex> guard(m_frameLock);
 
     // Again, a RTP streamer is used to stream in the fragmented packets
     //  into one single encoded video packet
@@ -322,13 +308,14 @@ void VideoStream::ReceiveRtp(Client &client)
     uint8_t* pdata;
     RtpStreamer rstr;
     size_t len = rstr.Receive(rtp, &pdata, av_malloc);
+    if (len == 0) return;
 
     // Add the packet to our record; this can now be decoded and played
-    AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()] = new AVPacket;
-    av_init_packet(pkt);
-    pkt->data = pdata;
-    pkt->size = len;
+    //AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()] = new AVPacket;
+    //av_init_packet(pkt);
+    //pkt->data = pdata;
+    //pkt->size = len;
     
-    //std::cout << "Received packet: " << len << std::endl;
-    AddPacket(pkt);
+    std::cout << "Received packet: " << len << std::endl;
+    this->AddPacket(pdata, len);
 }

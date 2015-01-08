@@ -143,4 +143,5 @@ protected:
     boost::mutex m_frameLock;
 
     boost::mutex m_decodedFrameLock;
+    boost::mutex m_encodedPacketLock;
 };

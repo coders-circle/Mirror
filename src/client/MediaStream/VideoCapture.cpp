@@ -63,7 +63,7 @@ void VideoCapture::Initialize()
 
     //VideoStream::InitializeEncoder(320, 240)
     //VideoStream::InitializeEncoder(m_codecCtx->width, m_codecCtx->height, 15, 50000);
-    VideoStream::InitializeEncoder(m_codecCtx->width/2, m_codecCtx->height/2, 15, 50000);
+    VideoStream::InitializeEncoder(m_codecCtx->width/2, m_codecCtx->height/2, 15, 500000);
     
     m_imgConvertCtx = sws_getCachedContext(NULL, m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,  
                                              //320, 240, pFormat, SWS_BICUBIC, NULL, NULL,NULL);
