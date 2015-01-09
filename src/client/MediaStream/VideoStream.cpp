@@ -1,25 +1,35 @@
 #include "common/common.h"
 #include "client/MediaStream/VideoStream.h"
 
-void VideoStream::Encode()
-{
-    FILE* fp = fopen("test.avi", "wb");
-    for (unsigned int i = 0; i < m_encodedPackets.size(); i++)
-    {
-        fwrite(m_encodedPackets[i]->data, 1, m_encodedPackets[i]->size, fp);
-    }
-    uint8_t endcode[] = { 0, 0, 1, 0xb7 };
-    fwrite(endcode, 1, sizeof(endcode), fp);
-    fclose(fp);
-}
-
 
 void VideoStream::Test()
 {
-    this->InitializeEncoder(640, 480, 15);
+    this->InitializeEncoder(800, 480, 15, 600000);
     int w = m_encoderContext->width;
     int h = m_encoderContext->height;
-    uint8_t *rgb24Data = new uint8_t[w*h * 3];
+    
+    boost::thread memLeakTestThread([this, w, h]()
+    {
+        uint8_t *rgb24Data = new uint8_t[w*h * 3];
+        unsigned long long pts = 0;
+        while (1)
+        {
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    rgb24Data[3 * (y*w + x) + 0] = 255.0*abs(sin(pts*3.14159f / 360.0f));
+                    rgb24Data[3 * (y*w + x) + 1] = 255.0*abs(sin(x*3.14159f / 800.0f));
+                    rgb24Data[3 * (y*w + x) + 2] = 255.0*abs(sin(y*3.14159f / 480.0f));
+                }
+            }
+            this->AddFrame(rgb24Data, pts++);
+            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+        }
+        
+    });
+    
+    /*uint8_t *rgb24Data = new uint8_t[w*h * 3];
     for (int i = 0; i < 15 * 17; i++)
     {
         for (int y = 0; y < h; y++)
@@ -32,7 +42,7 @@ void VideoStream::Test()
             }
         }
         this->AddFrame(rgb24Data, i);
-    }
+    }*/
     /*FILE* fp = fopen("test.flv", "wb");
     for (unsigned int i = 0; i < m_encodedPackets.size(); i++)
     {
@@ -42,12 +52,12 @@ void VideoStream::Test()
     fwrite(endcode, 1, sizeof(endcode), fp);
     fclose(fp);*/
 
-    this->InitializeDecoder();
+    /*this->InitializeDecoder();
     for (unsigned int i = 0; i < m_encodedPackets.size(); i++)
     {
         this->AddPacket(m_encodedPackets[i]);
         av_free_packet(m_encodedPackets[i]);
-    }
+    }*/
 }
 
 
@@ -86,24 +96,24 @@ void VideoStream::AddPacket(uint8_t *packetData, int packetSize)
     pkt->data = packetData;
     pkt->size = packetSize;
     this->AddPacket(pkt);
+    av_free_packet(pkt);
 }
 
 void VideoStream::AddPacket(AVPacket* pkt)
 {
     AVFrame* frame = av_frame_alloc();
     int framePresent = 0;
-
     if (avcodec_decode_video2(m_decoderContext, frame, &framePresent, pkt) < 0)
     {
         throw FailedToDecode();
     }
-
     if (framePresent)
     {
         if (frame->width != 0)
         {
             while (!m_decodedFrameLock.try_lock())
-                std::cout << "Addpacket waiting" << std::endl;
+                ;
+                //std::cout << "Addpacket waiting" << std::endl;
             unsigned int frameIndex = this->AllocateNewDecodedFrame();
             m_decodedFrames[frameIndex] = av_frame_clone(frame);            
             if (!m_decodedFrames[frameIndex])
@@ -132,17 +142,8 @@ void VideoStream::AddPacket(AVPacket* pkt)
             }
         }
     }
-    else
-    {
-        if (avcodec_decode_video2(m_decoderContext, NULL, &framePresent, pkt) < 0)
-        {
-            throw FailedToDecode();
-        }
-        if (framePresent)
-        {
-            std::cout << "OMG delayed packet" << std::endl;
-        }
-    }
+    //av_freep(frame->data);
+    av_frame_free(&frame);
 }
 
 
@@ -162,6 +163,7 @@ unsigned char* VideoStream::GetRawRGBData(unsigned int decodedFrameIndex)
         sws_scale(m_YUV420PToRGB24ConverterContext, yuvFrame->data, yuvFrame->linesize, 0, h, rgbFrame->data, rgbFrame->linesize);
         memcpy(m_rawData.data(), rgbFrame->data[0], w*h * 3);
         avpicture_free(rgbFrame);
+        delete rgbFrame;
     }
     return m_rawData.data();
 }
@@ -219,6 +221,7 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 
     // Add frame for encoding
     this->AddFrame(frame);
+    av_freep(&frame->data[0]);
     av_frame_free(&frame);
 }
 
@@ -227,7 +230,9 @@ void VideoStream::AddFrame(AVFrame *frame)
 {
     //boost::lock_guard<boost::mutex> guard(m_frameLock);
     while (!m_encodedPacketLock.try_lock())
-        std::cout << "AddFrame waiting..." << std::endl;
+        ;
+        //std::cout << "AddFrame waiting..." << std::endl;
+
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);
@@ -273,12 +278,14 @@ void VideoStream::SendRtp(Client &client, size_t connectionId)
 
     // Use RTP streamer to send each packet that has been encoded
     while (!m_encodedPacketLock.try_lock())
-        std::cout << "SendRtp waiting..." << std::endl;
+        ;
+        //std::cout << "SendRtp waiting..." << std::endl;
 
     if (m_encodedPackets.size() > 0 ){
         if (m_encodedPackets[0]->size != 0)
             rtpstr.Send(rtp, m_encodedPackets[0]->data, m_encodedPackets[0]->size);
-        std::cout << "Available Packets: " << m_encodedPackets.size() << std::endl;
+        //std::cout << "Available Packets: " << m_encodedPackets.size() << std::endl;
+        av_free_packet(m_encodedPackets[0]);
         EraseEncodedPacketFromHead();
     }
     //pktsSz = m_encodedPackets.size();
@@ -316,6 +323,7 @@ void VideoStream::ReceiveRtp(Client &client)
     //pkt->data = pdata;
     //pkt->size = len;
     
-    std::cout << "Received packet: " << len << std::endl;
+    //std::cout << "Received packet: " << len << std::endl;
     this->AddPacket(pdata, len);
+    delete[] pdata;
 }

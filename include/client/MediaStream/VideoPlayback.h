@@ -38,7 +38,9 @@ public:
             {
                 // wait for decoder to finish the frame
                 while (!m_decodedFrameLock.try_lock())
-                    std::cout << "start playback waiting..." << std::endl;
+                    ;
+                    
+                    //std::cout << "start playback waiting..." << std::endl;
                 if (m_decodedFrames.size() > 0)
                 {
                     t.Reset();
@@ -57,6 +59,7 @@ public:
                     {
                         m_frameRenderer->SetRGBData(rgbData);
                     }
+                    av_frame_free(&m_decodedFrames[0]);
                     this->EraseDecodedFrameFromHead();
                     
                     timeElapsed = 0;
@@ -65,10 +68,26 @@ public:
                 else
                 {
                     m_decodedFrameLock.unlock();
-                    boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+                    //
+                    
+                        
+                    if (m_encodedPacketLock.try_lock()){
+                        if (m_encodedPackets.size() > 0)
+                        {
+                            this->AddPacket(m_encodedPackets[0]);
+                            av_free_packet(m_encodedPackets[0]);
+                            this->EraseEncodedPacketFromHead();
+                        }
+                        m_encodedPacketLock.unlock();
+                    }
+                    else
+                    {
+                        boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+                    }
                 }
             }
             timeElapsed = t.Elapsed();
+            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
         }
     }
     void StartPlaybackAsync()

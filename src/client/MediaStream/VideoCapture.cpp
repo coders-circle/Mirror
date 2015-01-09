@@ -116,10 +116,10 @@ void VideoCapture::StopRecording()
 
 void VideoCapture::Test()
 {
-    StartRecording();
+    /*StartRecording();
     std::cout << "Enter something to interrupt" << std::endl;
     char c;
     std::cin >> c;
     StopRecording();
-    VideoStream::Encode();
+    VideoStream::Encode();*/
 }
