@@ -56,8 +56,9 @@ size_t RtpStreamer::Receive(RtpPacket& rtp, uint8_t** data, void* (*allocator)(s
 }
 
 // Get a received frame of data; rtp packets are merged till the packet that contains the marker bit
-size_t RtpStreamer::GetPacket(uint64_t source, uint8_t** data, void* (*allocator)(size_t))
+size_t RtpStreamer::GetPacket(uint32_t source, uint8_t** data, void* (*allocator)(size_t))
 {
+
     boost::lock_guard<boost::mutex> guard(m_mutex);
 
     if (m_rtpUnits.find(source) == m_rtpUnits.end())
@@ -69,14 +70,14 @@ size_t RtpStreamer::GetPacket(uint64_t source, uint8_t** data, void* (*allocator
 
     // Find the length of the frame and the last rtp packet that contains the marker bit
     // The total length is all length of all packets till the last rtp packet
-    size_t tlen = 0, i = 0;
-    for (; i < rtunits.size(); ++i)
+    size_t tlen = 0, i = m_startId;
+    for (; i < rtunits.size(); i = (i + 1) % rtunits.size())
     {
         RtpUnit& unit = rtunits[i];
         tlen += unit.data.size();
         if (unit.marker)
             break;
-        else if (i == rtunits.size() - 1)
+        else if ((m_startId > 0 && i == m_startId - 1) || (m_startId == 0 && i == rtunits.size()-1))
             return 0;
     }
 
@@ -89,9 +90,16 @@ size_t RtpStreamer::GetPacket(uint64_t source, uint8_t** data, void* (*allocator
         newdata += rtunits[j].data.size();
     }
     
-    // Replace the list with new list with the processed units removed
-    std::vector<RtpUnit>(rtunits.begin()+i+1, rtunits.end())
-        .swap(m_rtpUnits[source]);
+    // Remove the processed units
+    if (i < m_startId)
+    {
+        rtunits.erase(rtunits.begin() + m_startId, rtunits.end());
+        rtunits.erase(rtunits.begin(), rtunits.begin() + i + 1);
+        m_startId = i + 1;
+    }
+    else
+        rtunits.erase(rtunits.begin() + m_startId, rtunits.begin() + i + 1);
+
 
     return tlen;
 }
@@ -100,6 +108,7 @@ size_t RtpStreamer::GetPacket(uint64_t source, uint8_t** data, void* (*allocator
 void RtpStreamer::StartReceiving()
 {
     m_receiving = true;
+    m_startId = 0;
     RtpPacket rtp;
     rtp.Initialize(m_udpHandler, udp::endpoint());
     // Receive the packets till StopReceiving is called
@@ -113,8 +122,9 @@ void RtpStreamer::StartReceiving()
             RtpUnit unit;
             unit.data.resize(1024);
             size_t len = rtp.Receive(&unit.data[0], 1024);
-            if (len == 0) continue;
-
+            if (len == 0) 
+                continue;
+            
             // Add each rtp packet to the list and sort it
             unit.data.resize(len);
             unit.marker = rtp.IsMarkerSet();

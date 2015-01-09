@@ -26,8 +26,8 @@ public:
     void Initialize(UdpHandler* udpHandler, const udp::endpoint &remoteEndpoint);
     void CleanUp();
 
-    void SetSourceId(uint64_t id) { m_ssrc = id; }
-    uint64_t GetSourceId() const { return m_ssrc; }
+    void SetSourceId(uint32_t id) { m_ssrc = id; }
+    uint32_t GetSourceId() const { return m_ssrc; }
 
     int GetTimeStamp() const { return m_timeStamp; }
     void SetTimeStamp(int timeStamp) { m_timeStamp = timeStamp; }
@@ -52,11 +52,10 @@ private:
     UdpHandler* m_udpHandler;
     udp::endpoint m_remoteEndpoint;
 
+    uint32_t m_ssrc;
     uint16_t m_sequenceNumber;
     uint32_t m_timeStamp;
     int m_timeStampIncrement;
     uint8_t m_payloadType;
     bool m_marker;
-
-    uint64_t m_ssrc;
 };

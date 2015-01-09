@@ -74,9 +74,9 @@ size_t RtpPacket::Receive(uint8_t* data, size_t maxSize)
     if ((version & 0x01) == 0x01) m_marker = true;
     else m_marker = false;
     m_payloadType = packet[1];
-    m_sequenceNumber = (uint16_t)packet[2];
-    m_timeStamp = (uint32_t)packet[4];
-    m_ssrc = (uint64_t)packet[8];
+    m_sequenceNumber = *((uint16_t*)(&packet[2]));
+    m_timeStamp = *((uint32_t*)(&packet[4]));
+    m_ssrc = *((uint32_t*)(&packet[8]));
 
     memcpy(data, &packet[RTP_HEADER_SIZE], len - RTP_HEADER_SIZE);
     /*for (unsigned int i = 0; i < len - RTP_HEADER_SIZE; ++i)

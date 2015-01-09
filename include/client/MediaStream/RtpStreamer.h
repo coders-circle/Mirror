@@ -23,7 +23,7 @@ public:
     void StopReceiving();
 
     // Get a received packet of data; the fragmented rtp packets are merged into one and returned
-    size_t GetPacket(uint64_t source, uint8_t** data, void* (*allocator)(size_t));
+    size_t GetPacket(uint32_t source, uint8_t** data, void* (*allocator)(size_t));
     
     // The udp handler this streamer used to send/receive rtp packets
     UdpHandler* GetUdpHandler() { return m_udpHandler; }
@@ -46,8 +46,9 @@ private:
     
     // Map each source with a list of RtpUnit's that it sends
     typedef std::vector<RtpUnit> RtpUnitList;
-    std::map<uint64_t, RtpUnitList> m_rtpUnits;
-
+    std::map<uint32_t, RtpUnitList> m_rtpUnits;
+    
+    size_t m_startId;
 
     boost::mutex m_mutex;
     bool m_receiving;
