@@ -10,13 +10,19 @@ void VideoCapture::CleanUp()
 {
     av_free_packet(&m_packet);
     if (m_frame)
-        av_free(m_frame);
-    if (m_frameRGB) 
-        av_free(m_frameRGB);
-    if (m_codecCtx)
+    {
+        av_freep(&m_frame->data[0]);
+        av_frame_free(&m_frame);
+    }
+    if (m_frameRGB)
+    {
+        av_freep(&m_frameRGB->data[0]);
+        av_frame_free(&m_frameRGB);
+    }
+    /*if (m_codecCtx)
         avcodec_close(m_codecCtx);
     if (m_formatCtx)
-        avformat_close_input(&m_formatCtx);
+        avformat_close_input(&m_formatCtx);*/
     if (m_imgConvertCtx)
         sws_freeContext(m_imgConvertCtx);
 }
@@ -55,20 +61,29 @@ void VideoCapture::Initialize()
     m_frame = av_frame_alloc();
     m_frameRGB = av_frame_alloc();
     av_init_packet(&m_packet);
-    
-    AVPixelFormat pFormat = AV_PIX_FMT_RGB24;
-    auto numBytes = avpicture_get_size(pFormat, m_codecCtx->width, m_codecCtx->height) ;
-    auto buffer = (uint8_t*)av_malloc(numBytes*sizeof(uint8_t));
-    avpicture_fill((AVPicture*)m_frameRGB, buffer, pFormat, m_codecCtx->width, m_codecCtx->height);
 
-    //VideoStream::InitializeEncoder(320, 240)
-    //VideoStream::InitializeEncoder(m_codecCtx->width, m_codecCtx->height, 15, 50000);
-    VideoStream::InitializeEncoder(m_codecCtx->width/2, m_codecCtx->height/2, 15, 500000);
-    
+    //AVPixelFormat pFormat = AV_PIX_FMT_RGB24;
+    AVPixelFormat pFormat = AV_PIX_FMT_YUV420P;
+    /*auto numBytes = avpicture_get_size(pFormat, m_codecCtx->width, m_codecCtx->height) ;
+    auto buffer = (uint8_t*)av_malloc(numBytes*sizeof(uint8_t));
+    avpicture_fill((AVPicture*)m_frameRGB, buffer, pFormat, m_codecCtx->width, m_codecCtx->height);*/
+
+    int w = m_codecCtx->width;
+    int h = m_codecCtx->height;
+
+    if (w % 2 != 0) --w;
+    if (h % 2 != 0) --h;
+
+    if (av_image_alloc(m_frameRGB->data, m_frameRGB->linesize, w, h, pFormat, 32) < 0)
+    {
+        throw Exception("failed to allocate raw picture buffer");
+    }
+    VideoStream::InitializeEncoder(w, h, 15, 200000);
+    m_frameRGB->width = m_encoderContext->width;
+    m_frameRGB->height = m_encoderContext->height;
+    m_frameRGB->format = pFormat;
     m_imgConvertCtx = sws_getCachedContext(NULL, m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,  
-                                             //320, 240, pFormat, SWS_BICUBIC, NULL, NULL,NULL);
-                                             //m_codecCtx->width, m_codecCtx->height, pFormat, SWS_BICUBIC, NULL, NULL,NULL);
-                                             m_codecCtx->width/2, m_codecCtx->height/2, pFormat, SWS_BICUBIC, NULL, NULL, NULL);
+                                             w, h, pFormat, SWS_BICUBIC, NULL, NULL, NULL);
 }
 
 void VideoCapture::Record()
@@ -81,13 +96,17 @@ void VideoCapture::Record()
                 continue;
             int isFrameAvailable=0;
             int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
-            if (len<0)
-                throw Exception("Decoding error");
+            if (len < 0)
+                throw FailedToDecode();
     
             if (isFrameAvailable)
             {
-                sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
-                VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
+                sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 
+                    0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
+                //VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
+                /*m_frameRGB->width = m_encoderContext->width;
+                m_frameRGB->height = m_encoderContext->height;*/
+                VideoStream::AddFrame(m_frameRGB);
                 av_free_packet(&m_packet);
             }
         }

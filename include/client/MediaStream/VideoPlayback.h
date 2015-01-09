@@ -68,10 +68,8 @@ public:
                 else
                 {
                     m_decodedFrameLock.unlock();
-                    //
-                    
-                        
-                    if (m_encodedPacketLock.try_lock()){
+                    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+                    /*if (m_encodedPacketLock.try_lock()){
                         if (m_encodedPackets.size() > 0)
                         {
                             this->AddPacket(m_encodedPackets[0]);
@@ -79,15 +77,11 @@ public:
                             this->EraseEncodedPacketFromHead();
                         }
                         m_encodedPacketLock.unlock();
-                    }
-                    else
-                    {
-                        boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-                    }
+                    }*/
                 }
             }
             timeElapsed = t.Elapsed();
-            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
         }
     }
     void StartPlaybackAsync()

@@ -21,6 +21,7 @@ void VideoStream::Test()
                     rgb24Data[3 * (y*w + x) + 0] = 255.0*abs(sin(pts*3.14159f / 360.0f));
                     rgb24Data[3 * (y*w + x) + 1] = 255.0*abs(sin(x*3.14159f / 800.0f));
                     rgb24Data[3 * (y*w + x) + 2] = 255.0*abs(sin(y*3.14159f / 480.0f));
+                    
                 }
             }
             this->AddFrame(rgb24Data, pts++);
@@ -28,36 +29,6 @@ void VideoStream::Test()
         }
         
     });
-    
-    /*uint8_t *rgb24Data = new uint8_t[w*h * 3];
-    for (int i = 0; i < 15 * 17; i++)
-    {
-        for (int y = 0; y < h; y++)
-        {
-            for (int x = 0; x < w; x++)
-            {
-                rgb24Data[3 * (y*w + x) + 0] = i % 255;
-                rgb24Data[3 * (y*w + x) + 1] = 0;
-                rgb24Data[3 * (y*w + x) + 2] = 0;
-            }
-        }
-        this->AddFrame(rgb24Data, i);
-    }*/
-    /*FILE* fp = fopen("test.flv", "wb");
-    for (unsigned int i = 0; i < m_encodedPackets.size(); i++)
-    {
-        fwrite(m_encodedPackets[i]->data, 1, m_encodedPackets[i]->size, fp);
-    }
-    uint8_t endcode[] = { 0, 0, 1, 0xb7 };
-    fwrite(endcode, 1, sizeof(endcode), fp);
-    fclose(fp);*/
-
-    /*this->InitializeDecoder();
-    for (unsigned int i = 0; i < m_encodedPackets.size(); i++)
-    {
-        this->AddPacket(m_encodedPackets[i]);
-        av_free_packet(m_encodedPackets[i]);
-    }*/
 }
 
 
@@ -142,7 +113,6 @@ void VideoStream::AddPacket(AVPacket* pkt)
             }
         }
     }
-    //av_freep(frame->data);
     av_frame_free(&frame);
 }
 
@@ -183,9 +153,7 @@ void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
 
     if (m_codecID == AV_CODEC_ID_H264)
     {
-       // av_opt_set(m_encoderContext->priv_data, "preset", "slow", 0);
         av_opt_set(m_encoderContext->priv_data, "tune", "zerolatency", 0);
-        //av_dict_set
     }
     this->OpenCodec(m_encoderContext, m_encoder);
 
@@ -202,7 +170,6 @@ void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
 void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 {
     AVFrame *frame = av_frame_alloc();
-
     frame->width = m_encoderContext->width;
     frame->height = m_encoderContext->height;
     frame->format = m_encoderContext->pix_fmt;
@@ -218,7 +185,7 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
     uint8_t * inData[1] = { rgb24Data };                    // RGB24 have only one plane
     int inLinesize[1] = { 3 * m_encoderContext->width };    // RGB stride
     sws_scale(m_RGB24ToYUP420PConverterContext, inData, inLinesize, 0, frame->height, frame->data, frame->linesize);
-
+    
     // Add frame for encoding
     this->AddFrame(frame);
     av_freep(&frame->data[0]);
@@ -228,11 +195,8 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 
 void VideoStream::AddFrame(AVFrame *frame)
 {
-    //boost::lock_guard<boost::mutex> guard(m_frameLock);
     while (!m_encodedPacketLock.try_lock())
         ;
-        //std::cout << "AddFrame waiting..." << std::endl;
-
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);
@@ -265,9 +229,8 @@ void VideoStream::AddFrame(AVFrame *frame)
 
 void VideoStream::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint)
 {
-    //boost::lock_guard<boost::mutex> guard(m_frameLock);
     // We will use a RTP streamer to stream out the encoded packets
-    //  over as fragmented RTP packets
+    // over as fragmented RTP packets
     size_t pktsSz;
     RtpPacket rtp;
 
@@ -282,35 +245,26 @@ void VideoStream::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndp
     // Use RTP streamer to send each packet that has been encoded
     while (!m_encodedPacketLock.try_lock())
         ;
-        //std::cout << "SendRtp waiting..." << std::endl;
 
-    if (m_encodedPackets.size() > 0 ){
+    if (m_encodedPackets.size() > 0)
+    {
         if (m_encodedPackets[0]->size != 0)
+        {
             streamer.Send(rtp, m_encodedPackets[0]->data, m_encodedPackets[0]->size);
-        //std::cout << "Available Packets: " << m_encodedPackets.size() << std::endl;
-        std::cout << "Sending Packet: " << m_encodedPackets[0]->size << std::endl;
+            av_free_packet(m_encodedPackets[0]);
+        }
         EraseEncodedPacketFromHead();
     }
     sn = rtp.GetSequenceNumber();
-    //pktsSz = m_encodedPackets.size();
-    //for (size_t i = 0; i < pktsSz; ++i)
-    //{
-    //    AVPacket* pkt = m_encodedPackets[i];
-    //    rtpstr.Send(rtp, pkt->data, pkt->size);
-    //}
-    //// Erase the sent packets
-    //EraseEncodedPacketFromHead(pktsSz);
     m_encodedPacketLock.unlock();
 }
 
 void VideoStream::ReceiveRtp(RtpStreamer& streamer)
 {
-    uint8_t* pdata;
+    uint8_t* pdata = 0;
     size_t len = streamer.GetPacket(0, &pdata, av_malloc);
-    if (len == 0) 
-        return;
-    
-    std::cout << "Received packet: " << len << std::endl;
-    this->AddPacket(pdata, len);
-    delete[] pdata;
+    if (len > 0)
+    {
+        this->AddPacket(pdata, len);
+    }
 }
