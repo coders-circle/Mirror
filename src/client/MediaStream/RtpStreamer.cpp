@@ -4,6 +4,8 @@
 // Send the data as fragmented RTP packets
 void RtpStreamer::Send(RtpPacket& rtp, uint8_t* data, size_t len)
 {
+    boost::lock_guard<boost::mutex> guard(m_mutex);
+
     // Each RTP packet as max-length 1024
     size_t slen = 1024; // Max-Size of each rtp packet
     size_t plen = 0;    // Length of processed data (data that has been sent)
@@ -49,5 +51,94 @@ size_t RtpStreamer::Receive(RtpPacket& rtp, uint8_t** data, void* (*allocator)(s
         memcpy(newdata, &datas[i][0], datas[i].size());
         newdata += datas[i].size();
     }
+
     return tlen;
+}
+
+// Get a received frame of data; rtp packets are merged till the packet that contains the marker bit
+size_t RtpStreamer::GetPacket(uint32_t source, uint8_t** data, void* (*allocator)(size_t))
+{
+
+    boost::lock_guard<boost::mutex> guard(m_mutex);
+
+    if (m_rtpUnits.find(source) == m_rtpUnits.end())
+        return 0;
+    
+    RtpUnitList& rtunits = m_rtpUnits[source];
+    if (rtunits.size() == 0) 
+        return 0;
+
+    // Find the length of the frame and the last rtp packet that contains the marker bit
+    // The total length is all length of all packets till the last rtp packet
+    size_t tlen = 0, i = m_startId;
+    for (; i < rtunits.size(); i = (i + 1) % rtunits.size())
+    {
+        RtpUnit& unit = rtunits[i];
+        tlen += unit.data.size();
+        if (unit.marker)
+            break;
+        else if ((m_startId > 0 && i == m_startId - 1) || (m_startId == 0 && i == rtunits.size()-1))
+            return 0;
+    }
+
+    // Allocate memory for the total encoded frame and send back the pointer
+    uint8_t* newdata = *data = (uint8_t*)allocator(tlen);
+    // In the allocated memory, copy all data from each fragment
+    for (size_t j = 0; j <= i; ++j)
+    {
+        memcpy(newdata, &rtunits[j].data[0], rtunits[j].data.size());
+        newdata += rtunits[j].data.size();
+    }
+    
+    // Remove the processed units
+    if (i < m_startId)
+    {
+        rtunits.erase(rtunits.begin() + m_startId, rtunits.end());
+        rtunits.erase(rtunits.begin(), rtunits.begin() + i + 1);
+        m_startId = i + 1;
+    }
+    else
+        rtunits.erase(rtunits.begin() + m_startId, rtunits.begin() + i + 1);
+
+
+    return tlen;
+}
+
+// Start receiving Rtp packets
+void RtpStreamer::StartReceiving()
+{
+    m_receiving = true;
+    m_startId = 0;
+    RtpPacket rtp;
+    rtp.Initialize(m_udpHandler, udp::endpoint());
+    // Receive the packets till StopReceiving is called
+    while (m_receiving)
+    {
+        // sleep(...)
+        if (m_udpHandler->GetSocket()->available() > 0)
+        {
+            boost::lock_guard<boost::mutex> guard(m_mutex);
+            // Max size of each rtp packet is 1024
+            RtpUnit unit;
+            unit.data.resize(1024);
+            size_t len = rtp.Receive(&unit.data[0], 1024);
+            if (len == 0) 
+                continue;
+            
+            // Add each rtp packet to the list and sort it
+            unit.data.resize(len);
+            unit.marker = rtp.IsMarkerSet();
+            unit.sn = rtp.GetSequenceNumber();
+            m_rtpUnits[rtp.GetSourceId()].push_back(std::move(unit));
+            std::sort(m_rtpUnits[rtp.GetSourceId()].begin(), m_rtpUnits[rtp.GetSourceId()].end());
+        }
+    }
+}
+
+// Stop receiving Rtp packets; Also clear all list of RtpUnits for all sources
+void RtpStreamer::StopReceiving()
+{
+    boost::lock_guard<boost::mutex> guard(m_mutex);
+    m_receiving = false;
+    m_rtpUnits.clear();
 }
