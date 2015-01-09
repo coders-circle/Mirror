@@ -37,16 +37,23 @@ gboolean IdleFunction(gpointer userData)
 
 
     Client client;
+    RtpStreamer rtps;
 int main(int argc, char *argv[])
 {
 try
 {
+    av_register_all();
+    avdevice_register_all();
+
     client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 10011)));
     client.JoinChat(client.GetServer());
     client.JoinVideoChat(client.GetServer());
-    av_register_all();
-    avdevice_register_all();
-    
+
+    rtps.Initialize(&client.GetUdpHandler1());
+    boost::thread rtpsre ([](){
+        rtps.StartReceiving();
+    });
+   
     VideoCapture cap;
     cap.StartRecording();
 
@@ -113,8 +120,8 @@ try
     boost::thread sendthread([capp](){
         while(1)
         {
-            capp->SendRtp(client, client.GetServer());
-            v->ReceiveRtp(client);
+            capp->SendRtp(rtps, client.GetUdpEndpoint(client.GetServer()));
+            v->ReceiveRtp(rtps);
             boost::this_thread::sleep(boost::posix_time::milliseconds(66));
         }
     });

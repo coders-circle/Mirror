@@ -227,7 +227,7 @@ void VideoStream::AddFrame(AVFrame *frame)
 {
     //boost::lock_guard<boost::mutex> guard(m_frameLock);
     while (!m_encodedPacketLock.try_lock())
-        std::cout << "AddFrame waiting..." << std::endl;
+        ;//std::cout << "AddFrame waiting..." << std::endl;
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);
@@ -258,29 +258,35 @@ void VideoStream::AddFrame(AVFrame *frame)
 #include <client/Client.h>
 #define min(x,y) ((x)<(y)?(x):(y))
 
-void VideoStream::SendRtp(Client &client, size_t connectionId)
+void VideoStream::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint)
 {
     //boost::lock_guard<boost::mutex> guard(m_frameLock);
     // We will use a RTP streamer to stream out the encoded packets
     //  over as fragmented RTP packets
     size_t pktsSz;
     RtpPacket rtp;
-    RtpStreamer rtpstr;
+
+    static uint16_t sn = 0;
 
     // Initialize the sending parameters for the RTP packets
-    rtp.Initialize(&client.GetUdpHandler1(), client.GetUdpEndpoint(connectionId));
+    rtp.Initialize(streamer.GetUdpHandler(), remoteEndpoint);
     rtp.SetPayloadType(123);
+    rtp.SetSourceId(0);
+    rtp.SetSequenceNumber(sn);
 
     // Use RTP streamer to send each packet that has been encoded
     while (!m_encodedPacketLock.try_lock())
-        std::cout << "SendRtp waiting..." << std::endl;
+        ;
+        //std::cout << "SendRtp waiting..." << std::endl;
 
     if (m_encodedPackets.size() > 0 ){
         if (m_encodedPackets[0]->size != 0)
-            rtpstr.Send(rtp, m_encodedPackets[0]->data, m_encodedPackets[0]->size);
-        std::cout << "Available Packets: " << m_encodedPackets.size() << std::endl;
+            streamer.Send(rtp, m_encodedPackets[0]->data, m_encodedPackets[0]->size);
+        //std::cout << "Available Packets: " << m_encodedPackets.size() << std::endl;
+        std::cout << "Sending Packet: " << m_encodedPackets[0]->size << std::endl;
         EraseEncodedPacketFromHead();
     }
+    sn = rtp.GetSequenceNumber();
     //pktsSz = m_encodedPackets.size();
     //for (size_t i = 0; i < pktsSz; ++i)
     //{
@@ -292,30 +298,13 @@ void VideoStream::SendRtp(Client &client, size_t connectionId)
     m_encodedPacketLock.unlock();
 }
 
-void VideoStream::ReceiveRtp(Client &client)
+void VideoStream::ReceiveRtp(RtpStreamer& streamer)
 {
-    if (client.GetUdpHandler1().GetSocket()->available() == 0) 
-        return;
-    //boost::lock_guard<boost::mutex> guard(m_frameLock);
-
-    // Again, a RTP streamer is used to stream in the fragmented packets
-    //  into one single encoded video packet
-    RtpPacket rtp;
-    udp::endpoint ept;
-    rtp.Initialize(&client.GetUdpHandler1(), ept);
-    // The streamer will also allocate the memory for the encoded packet
-    //  for which we pass an allocator (av_malloc)
     uint8_t* pdata;
-    RtpStreamer rstr;
-    size_t len = rstr.Receive(rtp, &pdata, av_malloc);
-    if (len == 0) return;
+    size_t len = streamer.GetPacket(0, &pdata, av_malloc);
+    if (len == 0) 
+        return;
 
-    // Add the packet to our record; this can now be decoded and played
-    //AVPacket* pkt = m_encodedPackets[AllocateNewEndodedPacket()] = new AVPacket;
-    //av_init_packet(pkt);
-    //pkt->data = pdata;
-    //pkt->size = len;
-    
     std::cout << "Received packet: " << len << std::endl;
     this->AddPacket(pdata, len);
 }

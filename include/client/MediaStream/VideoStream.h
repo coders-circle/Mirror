@@ -1,6 +1,7 @@
 #pragma once
 
 #include "client/MediaStream/MediaStream.h"
+#include "client/MediaStream/RtpStreamer.h"
 
 #define IP_VIDEO_STREAM_BUFFER_SIZE 4096
 
@@ -49,8 +50,8 @@ public:
 
     // TEMPORARY TEST FUNCTIONS
     // Send/Receive over RTP
-    void SendRtp(Client& client, size_t connectionId);
-    void ReceiveRtp(Client &client);
+    void SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint);
+    void ReceiveRtp(RtpStreamer& streamer);
 
 protected:
     // scaler context to convert 24-bit RGB to YUV420P color format

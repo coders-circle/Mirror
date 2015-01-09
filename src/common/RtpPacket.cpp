@@ -34,16 +34,19 @@ void RtpPacket::Send(const uint8_t *data, size_t size)
     packet.resize(RTP_HEADER_SIZE + size);
     packet[0] = (uint8_t)(m_marker?0x81:0x80);                               // RTP version
     packet[1] = m_payloadType;                      // Payload type
-    packet[2] = m_sequenceNumber >> 8;              // Sequence number of packet
-    packet[3] = m_sequenceNumber & 0x0FF;           
-    packet[4] = (m_timeStamp & 0xFF000000) >> 24;   // Timestamp
-    packet[5] = (m_timeStamp & 0x00FF0000) >> 16;
-    packet[6] = (m_timeStamp & 0x0000FF00) >> 8;
-    packet[7] = (m_timeStamp & 0x000000FF);
-    packet[8] = (uint8_t)0x13;                               // 4 byte SSRC (sychronization source identifier)
-    packet[9] = (uint8_t)0xf9;                               // we just an arbitrary number here to keep it simple
-    packet[10] = (uint8_t)0x7e;
-    packet[11] = (uint8_t)0x67;
+    (uint16_t&)packet[2] = m_sequenceNumber;
+    (uint32_t&)packet[4] = m_timeStamp;
+    (uint32_t&)packet[8] = m_ssrc;
+    // packet[2] = m_sequenceNumber >> 8;              // Sequence number of packet
+    // packet[3] = m_sequenceNumber & 0x0FF;           
+    // packet[4] = (m_timeStamp & 0xFF000000) >> 24;   // Timestamp
+    // packet[5] = (m_timeStamp & 0x00FF0000) >> 16;
+    // packet[6] = (m_timeStamp & 0x0000FF00) >> 8;
+    // packet[7] = (m_timeStamp & 0x000000FF);
+    // packet[8] = (uint8_t)0x13;                               // 4 byte SSRC (sychronization source identifier)
+    // packet[9] = (uint8_t)0xf9;                               // we just an arbitrary number here to keep it simple
+    // packet[10] = (uint8_t)0x7e;
+    // packet[11] = (uint8_t)0x67;
 
     memcpy(&packet[RTP_HEADER_SIZE], data, size);
     /*for (unsigned int i = 0; i < size; ++i)
@@ -71,9 +74,9 @@ size_t RtpPacket::Receive(uint8_t* data, size_t maxSize)
     if ((version & 0x01) == 0x01) m_marker = true;
     else m_marker = false;
     m_payloadType = packet[1];
-    m_sequenceNumber = *((uint16_t*)&packet[2]);
-    m_timeStamp = *((int*)&packet[4]);
-    int SSRC = *((int*)&packet[8]);
+    m_sequenceNumber = (uint16_t)packet[2];
+    m_timeStamp = (uint32_t)packet[4];
+    m_ssrc = (uint64_t)packet[8];
 
     memcpy(data, &packet[RTP_HEADER_SIZE], len - RTP_HEADER_SIZE);
     /*for (unsigned int i = 0; i < len - RTP_HEADER_SIZE; ++i)
