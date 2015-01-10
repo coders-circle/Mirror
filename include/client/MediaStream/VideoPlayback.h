@@ -68,7 +68,7 @@ public:
                 else
                 {
                     m_decodedFrameLock.unlock();
-                    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+                    //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
                     /*if (m_encodedPacketLock.try_lock()){
                         if (m_encodedPackets.size() > 0)
                         {
@@ -81,7 +81,7 @@ public:
                 }
             }
             timeElapsed = t.Elapsed();
-            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(10));
         }
     }
     void StartPlaybackAsync()

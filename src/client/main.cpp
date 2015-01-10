@@ -6,6 +6,11 @@
 #include "client/MediaStream/AudioStream.h"
 #include "client/MediaStream/VideoPlayback.h"
 
+
+
+
+
+
 VideoPlayback *v;
 
 Client client;
@@ -62,7 +67,7 @@ try
         {
             capp->SendRtp(rtps, client.GetUdpEndpoint(client.GetServer()));
             v->ReceiveRtp(rtps);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     });
     gtk_widget_show_all(mainWindow);
