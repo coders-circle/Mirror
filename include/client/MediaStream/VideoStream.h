@@ -102,7 +102,10 @@ public:
         while (!m_decodedFrameLock.try_lock())
             std::cout << "GetRawRGBData waiting..."<<std::endl;
         if (!m_decodedFrame || m_decodedFrame->width == 0)
+        {
+            m_decodedFrameLock.unlock();
             return 0;
+        }
         int w = m_decodedFrame->width;
         int h = m_decodedFrame->height;
         if (w != 0)
