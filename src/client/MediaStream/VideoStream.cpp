@@ -25,7 +25,7 @@ void VideoStream::Test()
                 }
             }
             this->AddFrame(rgb24Data, pts++);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
         }
         
     });
@@ -196,7 +196,7 @@ void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
 void VideoStream::AddFrame(AVFrame *frame)
 {
     while (!m_encodedPacketLock.try_lock())
-        ;
+        std::cout << "AddFrame waiting ... :/" << std::endl;
     unsigned int packetIndex = this->AllocateNewEndodedPacket();
     m_encodedPackets[packetIndex] = new AVPacket;
     av_init_packet(m_encodedPackets[packetIndex]);
@@ -220,51 +220,5 @@ void VideoStream::AddFrame(AVFrame *frame)
     m_encodedPacketLock.unlock();
 }
 
-// Test methods to send/receive the video over RTP
 
-#include <common/RtpPacket.h>
-#include <client/MediaStream/RtpStreamer.h>
-#include <client/Client.h>
-#define min(x,y) ((x)<(y)?(x):(y))
 
-void VideoStream::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint)
-{
-    // We will use a RTP streamer to stream out the encoded packets
-    // over as fragmented RTP packets
-    //size_t pktsSz;
-    RtpPacket rtp;
-
-    static uint16_t sn = 0;
-
-    // Initialize the sending parameters for the RTP packets
-    rtp.Initialize(streamer.GetUdpHandler(), remoteEndpoint);
-    rtp.SetPayloadType(123);
-    rtp.SetSourceId(0);
-    rtp.SetSequenceNumber(sn);
-
-    // Use RTP streamer to send each packet that has been encoded
-    while (!m_encodedPacketLock.try_lock())
-        ;
-    if (m_encodedPackets.size() > 0)
-    {
-        if (m_encodedPackets[0]->size != 0)
-        {
-            streamer.Send(rtp, m_encodedPackets[0]->data, m_encodedPackets[0]->size);
-            av_free_packet(m_encodedPackets[0]);
-        }
-        EraseEncodedPacketFromHead();
-    }
-    m_encodedPacketLock.unlock();
-
-    sn = rtp.GetSequenceNumber();
-}
-
-void VideoStream::ReceiveRtp(RtpStreamer& streamer)
-{
-    uint8_t* pdata = 0;
-    size_t len = streamer.GetPacket(0, &pdata, av_malloc);
-    if (len > 0)
-    {
-        this->AddPacket(pdata, len);
-    }
-}

@@ -63,15 +63,14 @@ public:
                     }
                     av_frame_free(&m_decodedFrames[0]);
                     this->EraseDecodedFrameFromHead();
-                    
                     timeElapsed = 0;
                     m_decodedFrameLock.unlock();
                 }
                 else
                 {
                     m_decodedFrameLock.unlock();
-                    //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-                    if (m_encodedPacketLock.try_lock()){
+                    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+                    /*if (m_encodedPacketLock.try_lock()){
                         if (m_encodedPackets.size() > 0)
                         {
                             this->AddPacket(m_encodedPackets[0]);
@@ -79,7 +78,7 @@ public:
                             this->EraseEncodedPacketFromHead();
                         }
                         m_encodedPacketLock.unlock();
-                    }
+                    }*/
                 }
             }
             timeElapsed = t.Elapsed();
@@ -97,6 +96,16 @@ public:
     void FrameSyncronizer()
     {
 
+    }
+
+    void ReceiveRtp(RtpStreamer& streamer)
+    {
+        uint8_t* pdata = 0;
+        size_t len = streamer.GetPacket(0, &pdata, av_malloc);
+        if (len > 0)
+        {
+            this->AddPacket(pdata, len);
+        }
     }
 private:
     FrameRenderer *m_frameRenderer;

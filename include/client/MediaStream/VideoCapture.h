@@ -22,6 +22,9 @@ public:
     // Test function to start recording and stop on input
     void Test();
 
+    void SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint);
+
+
 private:
     AVFormatContext* m_formatCtx;
     AVCodecContext* m_codecCtx;

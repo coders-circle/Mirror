@@ -6,6 +6,40 @@ VideoCapture::VideoCapture()
   m_frame(NULL), m_frameRGB(NULL)
 {}
 
+
+void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint)
+{
+    // We will use a RTP streamer to stream out the encoded packets
+    // over as fragmented RTP packets
+    //size_t pktsSz;
+    RtpPacket rtp;
+
+    static uint16_t sn = 0;
+
+    // Initialize the sending parameters for the RTP packets
+    rtp.Initialize(streamer.GetUdpHandler(), remoteEndpoint);
+    rtp.SetPayloadType(123);
+    rtp.SetSourceId(0);
+    rtp.SetSequenceNumber(sn);
+
+    // Use RTP streamer to send each packet that has been encoded
+    while (!m_encodedPacketLock.try_lock())
+        ;
+    if (m_encodedPackets.size() > 0)
+    {
+        if (m_encodedPackets[0]->size != 0)
+        {
+            streamer.Send(rtp, m_encodedPackets[0]->data, m_encodedPackets[0]->size);
+            av_free_packet(m_encodedPackets[0]);
+        }
+        EraseEncodedPacketFromHead();
+    }
+    m_encodedPacketLock.unlock();
+
+    sn = rtp.GetSequenceNumber();
+}
+
+
 void VideoCapture::CleanUp()
 {
     av_free_packet(&m_packet);
@@ -90,25 +124,7 @@ void VideoCapture::Record()
 {
     try
     {
-        /*int w = m_encoderContext->width;
-        int h = m_encoderContext->height;
-        uint8_t *rgb24Data = new uint8_t[w*h * 3];
-        unsigned long long pts = 0;
-        while (1)
-        {
-            for (int y = 0; y < h; y++)
-            {
-                for (int x = 0; x < w; x++)
-                {
-                    rgb24Data[3 * (y*w + x) + 0] = 255.0*abs(sin(pts*3.14159f / 360.0f));
-                    rgb24Data[3 * (y*w + x) + 1] = 255.0*abs(sin(x*3.14159f / 800.0f));
-                    rgb24Data[3 * (y*w + x) + 2] = 255.0*abs(sin(y*3.14159f / 480.0f));
-
-                }
-            }
-            this->AddFrame(rgb24Data, pts++);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-        }*/
+        unsigned long long counter = 0;
         while (m_recording && av_read_frame(m_formatCtx, &m_packet)>=0)
         {
             if (m_packet.stream_index != m_stream->index)
@@ -125,11 +141,13 @@ void VideoCapture::Record()
                 //VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
                 /*m_frameRGB->width = m_encoderContext->width;
                 m_frameRGB->height = m_encoderContext->height;*/
-                VideoStream::AddFrame(m_frameRGB);
+                ++counter;
+                if (counter % 10 == 0) // queue packet once in a blue moon
+                    VideoStream::AddFrame(m_frameRGB);
                 av_free_packet(&m_packet);
             }
 
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
         }
     }
     catch (std::exception &ex)
@@ -141,7 +159,6 @@ void VideoCapture::Record()
 void VideoCapture::StartRecording()
 {
     Initialize();
-    //VideoStream::InitializeEncoder(640, 480, 15, 200000);
     m_recording = true;
     m_recordThread = boost::thread(boost::bind(&VideoCapture::Record, this));
 }
