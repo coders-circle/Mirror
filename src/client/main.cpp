@@ -13,16 +13,17 @@
 
 VideoPlayback *v;
 
-Client client;
-RtpStreamer rtps;
+//Client client;
+//RtpStreamer rtps;
 int main(int argc, char *argv[])
 try
 {
-    std::string ip;
-    std::cout << "Enter server ip: ";
-    std::cin >> ip;
     av_register_all();
     avdevice_register_all();
+    /*std::string ip;
+    std::cout << "Enter server ip: ";
+    std::cin >> ip;
+    
 
     client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011)));
     client.JoinChat(client.GetServer());
@@ -34,9 +35,10 @@ try
     });
    
     VideoCapture cap;
-    cap.StartRecording();
+    cap.StartRecording();*/
 
     v = new VideoPlayback();
+    v->Test();
     //v->InitializeDecoder();
     
     GtkWidget *mainWindow;
@@ -64,21 +66,22 @@ try
     v->Set(fixed, 10, 10);
     v->StartPlaybackAsync();
 
-    VideoCapture* capp = &cap;
+    /*VideoCapture* capp = &cap;
     boost::thread sendthread([capp](){
         while(1)
         {
+            
             capp->SendRtp(rtps, client.GetUdpEndpoint(client.GetServer()));
             v->ReceiveRtp(rtps);
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(200));
         }
-    });
+    });*/
     gtk_widget_show_all(mainWindow);
     /*Application app;
     app.Initialize(mainWindow, fixed);*/
     gtk_main();
-    rtps.StopReceiving();
-    cap.StopRecording();
+    /*rtps.StopReceiving();
+    cap.StopRecording();*/
     return 0;
 }
 catch (std::exception err)

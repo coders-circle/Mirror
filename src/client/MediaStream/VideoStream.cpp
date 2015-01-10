@@ -10,7 +10,7 @@ void VideoStream::Test()
     
     boost::thread memLeakTestThread([this, w, h]()
     {
-        uint8_t *rgb24Data = new uint8_t[w*h * 3];
+    uint8_t *rgb24Data = new uint8_t[w*h * 3];
         unsigned long long pts = 0;
         while (1)
         {
@@ -25,7 +25,7 @@ void VideoStream::Test()
                 }
             }
             this->AddFrame(rgb24Data, pts++);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
         }
         
     });
@@ -231,7 +231,7 @@ void VideoStream::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndp
 {
     // We will use a RTP streamer to stream out the encoded packets
     // over as fragmented RTP packets
-    size_t pktsSz;
+    //size_t pktsSz;
     RtpPacket rtp;
 
     static uint16_t sn = 0;
@@ -245,7 +245,6 @@ void VideoStream::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndp
     // Use RTP streamer to send each packet that has been encoded
     while (!m_encodedPacketLock.try_lock())
         ;
-
     if (m_encodedPackets.size() > 0)
     {
         if (m_encodedPackets[0]->size != 0)
@@ -255,8 +254,9 @@ void VideoStream::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndp
         }
         EraseEncodedPacketFromHead();
     }
-    sn = rtp.GetSequenceNumber();
     m_encodedPacketLock.unlock();
+
+    sn = rtp.GetSequenceNumber();
 }
 
 void VideoStream::ReceiveRtp(RtpStreamer& streamer)

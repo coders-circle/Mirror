@@ -90,7 +90,7 @@ void VideoCapture::Record()
 {
     try
     {
-        int w = m_encoderContext->width;
+        /*int w = m_encoderContext->width;
         int h = m_encoderContext->height;
         uint8_t *rgb24Data = new uint8_t[w*h * 3];
         unsigned long long pts = 0;
@@ -108,29 +108,29 @@ void VideoCapture::Record()
             }
             this->AddFrame(rgb24Data, pts++);
             boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-        }
-        //while (m_recording && av_read_frame(m_formatCtx, &m_packet)>=0)
-        //{
-        //    if (m_packet.stream_index != m_stream->index)
-        //        continue;
-        //    int isFrameAvailable=0;
-        //    int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
-        //    if (len < 0)
-        //        throw FailedToDecode();
+        }*/
+        while (m_recording && av_read_frame(m_formatCtx, &m_packet)>=0)
+        {
+            if (m_packet.stream_index != m_stream->index)
+                continue;
+            int isFrameAvailable=0;
+            int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
+            if (len < 0)
+                throw FailedToDecode();
     
-        //    if (isFrameAvailable)
-        //    {
-        //        sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 
-        //            0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
-        //        //VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
-        //        /*m_frameRGB->width = m_encoderContext->width;
-        //        m_frameRGB->height = m_encoderContext->height;*/
-        //        VideoStream::AddFrame(m_frameRGB);
-        //        av_free_packet(&m_packet);
-        //    }
+            if (isFrameAvailable)
+            {
+                sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 
+                    0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
+                //VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
+                /*m_frameRGB->width = m_encoderContext->width;
+                m_frameRGB->height = m_encoderContext->height;*/
+                VideoStream::AddFrame(m_frameRGB);
+                av_free_packet(&m_packet);
+            }
 
-        //    //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-        //}
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+        }
     }
     catch (std::exception &ex)
     {
@@ -140,8 +140,8 @@ void VideoCapture::Record()
 
 void VideoCapture::StartRecording()
 {
-    //Initialize();
-    VideoStream::InitializeEncoder(640, 480, 15, 200000);
+    Initialize();
+    //VideoStream::InitializeEncoder(640, 480, 15, 200000);
     m_recording = true;
     m_recordThread = boost::thread(boost::bind(&VideoCapture::Record, this));
 }

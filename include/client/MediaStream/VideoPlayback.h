@@ -38,7 +38,9 @@ public:
             {
                 // wait for decoder to finish the frame
                 while (!m_decodedFrameLock.try_lock())
-                    ;
+                {
+
+                }
                     
                     //std::cout << "start playback waiting..." << std::endl;
                 if (m_decodedFrames.size() > 0)
@@ -69,7 +71,7 @@ public:
                 {
                     m_decodedFrameLock.unlock();
                     //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-                    /*if (m_encodedPacketLock.try_lock()){
+                    if (m_encodedPacketLock.try_lock()){
                         if (m_encodedPackets.size() > 0)
                         {
                             this->AddPacket(m_encodedPackets[0]);
@@ -77,11 +79,11 @@ public:
                             this->EraseEncodedPacketFromHead();
                         }
                         m_encodedPacketLock.unlock();
-                    }*/
+                    }
                 }
             }
             timeElapsed = t.Elapsed();
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
         }
     }
     void StartPlaybackAsync()

@@ -53,6 +53,7 @@ public:
     void SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint);
     void ReceiveRtp(RtpStreamer& streamer);
 
+
 protected:
     // scaler context to convert 24-bit RGB to YUV420P color format
     SwsContext* m_RGB24ToYUP420PConverterContext;
