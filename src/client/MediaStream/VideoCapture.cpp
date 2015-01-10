@@ -78,7 +78,7 @@ void VideoCapture::Initialize()
     {
         throw Exception("failed to allocate raw picture buffer");
     }
-    VideoStream::InitializeEncoder(w, h, 25, 200000);
+    VideoStream::InitializeEncoder(w, h, 15, 200000);
     m_frameRGB->width = m_encoderContext->width;
     m_frameRGB->height = m_encoderContext->height;
     m_frameRGB->format = pFormat;
@@ -109,7 +109,8 @@ void VideoCapture::Record()
                 VideoStream::AddFrame(m_frameRGB);
                 av_free_packet(&m_packet);
             }
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
     catch (std::exception &ex)

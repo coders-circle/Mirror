@@ -114,6 +114,7 @@ void RtpStreamer::StartReceiving()
     // Receive the packets till StopReceiving is called
     while (m_receiving)
     {
+        boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         // sleep(...)
         if (m_udpHandler->GetSocket()->available() > 0)
         {
