@@ -25,13 +25,6 @@ extern "C"
 #define av_frame_copy(dst, src) av_image_copy(dst->data, dst->linesize, (const uint8_t**)src->data, src->linesize, (AVPixelFormat)src->format, src->width, src->height)
 #endif
 
-
-
-
-
-
-
-
 class CodecNotFound :public Exception
 {
 public:
@@ -144,4 +137,11 @@ protected:
 
     boost::mutex m_decodedFrameLock;
     boost::mutex m_encodedPacketLock;
+
+
+    // new Approach
+    AVPacket* m_encodedPacket;
+    AVFrame* m_decodedFrame;
+
+    
 };

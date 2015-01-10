@@ -4,7 +4,7 @@
 
 void VideoStream::Test()
 {
-    this->InitializeEncoder(800, 480, 15, 600000);
+    /*this->InitializeEncoder(800, 480, 15, 600000);
     int w = m_encoderContext->width;
     int h = m_encoderContext->height;
     
@@ -28,7 +28,7 @@ void VideoStream::Test()
             boost::this_thread::sleep(boost::posix_time::milliseconds(50));
         }
         
-    });
+    });*/
 }
 
 
@@ -40,6 +40,10 @@ VideoStream::VideoStream()
     m_fw = 0;
     m_fh = 0;
     m_fps = 0;
+
+    m_decodedFrame = av_frame_alloc();
+    m_encodedPacket = new AVPacket;
+    av_init_packet(m_encodedPacket);
 }
 
 VideoStream::~VideoStream()
@@ -108,6 +112,7 @@ void VideoStream::AddPacket(AVPacket* pkt)
                 m_fw = frame->width;
                 m_fh = frame->height;
                 m_fps = m_decoderContext->time_base.den/(m_decoderContext->time_base.num*m_decoderContext->ticks_per_frame);
+                std::cout << m_fps << std::endl;
                 m_YUV420PToRGB24ConverterContext = sws_getContext(m_fw, m_fh, AV_PIX_FMT_YUV420P, 
                     m_fw, m_fh, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
             }

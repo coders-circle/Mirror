@@ -4,28 +4,35 @@
 VideoCapture::VideoCapture()
 : m_formatCtx(NULL), m_codecCtx(NULL), m_codec(NULL), m_stream(NULL), m_imgConvertCtx(NULL),
   m_frame(NULL), m_frameRGB(NULL)
-{}
+{
+    m_packetAvailable = false;
+    m_readyToSend = false;
+}
 
 
 void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint)
 {
     // We will use a RTP streamer to stream out the encoded packets
     // over as fragmented RTP packets
-    //size_t pktsSz;
     RtpPacket rtp;
-
     static uint16_t sn = 0;
-
     // Initialize the sending parameters for the RTP packets
     rtp.Initialize(streamer.GetUdpHandler(), remoteEndpoint);
     rtp.SetPayloadType(123);
     rtp.SetSourceId(0);
     rtp.SetSequenceNumber(sn);
+    m_readyToSend = true;
+    while (!m_packetAvailable)
+        ;
+    m_packetAvailable = false;
+    if (m_encodedPacket->size > 0)
+        streamer.Send(rtp, m_encodedPacket->data, m_encodedPacket->size);
 
     // Use RTP streamer to send each packet that has been encoded
-    while (!m_encodedPacketLock.try_lock())
-        ;
-    if (m_encodedPackets.size() > 0)
+    /*while (!m_encodedPacketLock.try_lock())
+        std::cout << "RtpSend waiting..." << std::endl;*/
+    
+    /*if (m_encodedPackets.size() > 0)
     {
         if (m_encodedPackets[0]->size != 0)
         {
@@ -33,9 +40,8 @@ void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEnd
             av_free_packet(m_encodedPackets[0]);
         }
         EraseEncodedPacketFromHead();
-    }
-    m_encodedPacketLock.unlock();
-
+    }*/
+    //m_encodedPacketLock.unlock();
     sn = rtp.GetSequenceNumber();
 }
 
@@ -124,7 +130,7 @@ void VideoCapture::Record()
 {
     try
     {
-        unsigned long long counter = 0;
+        //unsigned long long counter = 0;
         while (m_recording && av_read_frame(m_formatCtx, &m_packet)>=0)
         {
             if (m_packet.stream_index != m_stream->index)
@@ -138,12 +144,13 @@ void VideoCapture::Record()
             {
                 sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 
                     0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
-                //VideoStream::AddFrame(m_frameRGB->data[0], m_packet.pts);
-                /*m_frameRGB->width = m_encoderContext->width;
-                m_frameRGB->height = m_encoderContext->height;*/
-                ++counter;
-                if (counter % 10 == 0) // queue packet once in a blue moon
-                    VideoStream::AddFrame(m_frameRGB);
+                if (m_readyToSend && this->EncodeToPacket(m_frameRGB))
+                {
+                    m_readyToSend = false;
+                    m_packetAvailable = true;
+                }
+                //++counter;
+                //
                 av_free_packet(&m_packet);
             }
 

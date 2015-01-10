@@ -40,4 +40,8 @@ private:
 
     bool m_recording;
     void Record();
+
+    bool m_readyToSend;
+    bool m_packetAvailable;
+
 };
