@@ -10,7 +10,7 @@ void VideoStream::Test()
     
     boost::thread memLeakTestThread([this, w, h]()
     {
-    uint8_t *rgb24Data = new uint8_t[w*h * 3];
+        uint8_t *rgb24Data = new uint8_t[w*h * 3];
         unsigned long long pts = 0;
         while (1)
         {
