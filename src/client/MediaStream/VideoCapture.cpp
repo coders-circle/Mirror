@@ -109,6 +109,8 @@ void VideoCapture::Record()
                 VideoStream::AddFrame(m_frameRGB);
                 av_free_packet(&m_packet);
             }
+
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
     catch (std::exception &ex)

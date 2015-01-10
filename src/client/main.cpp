@@ -13,10 +13,13 @@ RtpStreamer rtps;
 int main(int argc, char *argv[])
 try
 {
+    std::string ip;
+    std::cout << "Enter server ip: ";
+    std::cin >> ip;
     av_register_all();
     avdevice_register_all();
 
-    client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 10011)));
+    client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011)));
     client.JoinChat(client.GetServer());
     client.JoinVideoChat(client.GetServer());
 
