@@ -44,4 +44,6 @@ private:
     bool m_readyToSend;
     bool m_packetAvailable;
 
+    bool m_cameraAvailable;
+
 };

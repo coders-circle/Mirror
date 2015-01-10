@@ -7,11 +7,14 @@ VideoCapture::VideoCapture()
 {
     m_packetAvailable = false;
     m_readyToSend = false;
+    m_cameraAvailable = false;
 }
 
 
 void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint)
 {
+    if (!m_cameraAvailable)
+        return;
     // We will use a RTP streamer to stream out the encoded packets
     // over as fragmented RTP packets
     RtpPacket rtp;
@@ -124,37 +127,41 @@ void VideoCapture::Initialize()
     m_frameRGB->format = pFormat;
     m_imgConvertCtx = sws_getCachedContext(NULL, m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,  
                                              w, h, pFormat, SWS_BICUBIC, NULL, NULL, NULL);
+    m_cameraAvailable = true;
 }
 
 void VideoCapture::Record()
 {
     try
     {
-        //unsigned long long counter = 0;
-        while (m_recording && av_read_frame(m_formatCtx, &m_packet)>=0)
-        {
-            if (m_packet.stream_index != m_stream->index)
-                continue;
-            int isFrameAvailable=0;
-            int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
-            if (len < 0)
-                throw FailedToDecode();
-    
-            if (isFrameAvailable)
+        if (m_cameraAvailable){
+            while (m_recording && av_read_frame(m_formatCtx, &m_packet) >= 0)
             {
-                sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize, 
-                    0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
-                if (m_readyToSend && this->EncodeToPacket(m_frameRGB))
+                if (m_packet.stream_index != m_stream->index)
+                    continue;
+                int isFrameAvailable = 0;
+                int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
+                if (len < 0)
+                    throw FailedToDecode();
+                if (isFrameAvailable)
                 {
-                    m_readyToSend = false;
-                    m_packetAvailable = true;
+                    sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize,
+                        0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
+                    if (m_readyToSend && this->EncodeToPacket(m_frameRGB))
+                    {
+                        m_readyToSend = false;
+                        m_packetAvailable = true;
+                    }
+                    av_free_packet(&m_packet);
                 }
-                //++counter;
-                //
-                av_free_packet(&m_packet);
-            }
 
-            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+                boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+            }
+        }
+        else{
+            while (1){
+                boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+            }
         }
     }
     catch (std::exception &ex)
@@ -165,7 +172,12 @@ void VideoCapture::Record()
 
 void VideoCapture::StartRecording()
 {
-    Initialize();
+    try{
+        Initialize();
+    }
+    catch (...){
+        m_cameraAvailable = false;
+    }
     m_recording = true;
     m_recordThread = boost::thread(boost::bind(&VideoCapture::Record, this));
 }

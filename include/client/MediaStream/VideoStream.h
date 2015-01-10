@@ -13,7 +13,7 @@ public:
     AVFrame* DecodeToFrame(AVPacket* pkt)
     {
         while (!m_decodedFrameLock.try_lock())
-            ;
+            std::cout << "DecodeToFrame waiting..."<< std::endl;
         int framePresent = 0;
         if (avcodec_decode_video2(m_decoderContext, m_decodedFrame, &framePresent, pkt) < 0)
         {
@@ -55,7 +55,7 @@ public:
     AVPacket* EncodeToPacket(AVFrame* frame)
     {
         while (!m_encodedPacketLock.try_lock())
-            ;
+            std::cout << "EncodeToPacket waiting..."<<std::endl;
         if (m_encodedPacket->size) 
         { 
             av_free_packet(m_encodedPacket); 
@@ -99,7 +99,7 @@ public:
     unsigned char* GetRawRGBData()
     {
         while (!m_decodedFrameLock.try_lock())
-            ;
+            std::cout << "GetRawRGBData waiting..."<<std::endl;
         if (!m_decodedFrame || m_decodedFrame->width == 0)
             return 0;
         int w = m_decodedFrame->width;

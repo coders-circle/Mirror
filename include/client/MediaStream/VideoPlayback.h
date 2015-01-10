@@ -27,12 +27,6 @@ public:
     void StartPlayback()
     {
         m_playbackStopped = false;
-        /*Timer t2;
-        Timer t;
-        unsigned timeElapsed = 0;
-        t2.Reset();
-        t.Reset();
-        int i = 0;*/
         while (!m_playbackStopped)
         {
             if (m_newFrameAvailable)
@@ -43,9 +37,15 @@ public:
                     m_frameRenderer = new FrameRenderer;
                     m_frameRenderer->Set(m_fixed, m_x, m_y, m_fw, m_fh);
                     m_frameRenderer->Show();
+                    if (m_fps != 0) m_frameDelay = 1000 / m_fps;
+                    else m_frameDelay = 10;
                 }
                 unsigned char* rgbData = this->GetRawRGBData();
                 if (rgbData) m_frameRenderer->SetRGBData(rgbData);
+            }
+            else
+            {
+                boost::this_thread::sleep(boost::posix_time::milliseconds(m_frameDelay));
             }
         }
         //while (!m_playbackStopped)

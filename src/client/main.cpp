@@ -65,8 +65,8 @@ try
         while(1)
         {
             capp->SendRtp(rtps, client.GetUdpEndpoint(client.GetServer()));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
             v->ReceiveRtp(rtps);
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     });
     gtk_widget_show_all(mainWindow);
