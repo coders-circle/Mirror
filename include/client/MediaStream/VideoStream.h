@@ -18,7 +18,8 @@ public:
         if (avcodec_decode_video2(m_decoderContext, m_decodedFrame, &framePresent, pkt) < 0)
         {
             m_decodedFrameLock.unlock();
-            throw FailedToDecode();
+            return 0;
+            //throw FailedToDecode();
         }
         if (framePresent && m_decodedFrame->width != 0)
         {

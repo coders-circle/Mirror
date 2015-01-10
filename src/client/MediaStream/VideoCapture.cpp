@@ -26,25 +26,10 @@ void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEnd
     rtp.SetSequenceNumber(sn);
     m_readyToSend = true;
     while (!m_packetAvailable)
-        ;
+        boost::this_thread::sleep(boost::posix_time::milliseconds(30));
     m_packetAvailable = false;
     if (m_encodedPacket->size > 0)
         streamer.Send(rtp, m_encodedPacket->data, m_encodedPacket->size);
-
-    // Use RTP streamer to send each packet that has been encoded
-    /*while (!m_encodedPacketLock.try_lock())
-        std::cout << "RtpSend waiting..." << std::endl;*/
-    
-    /*if (m_encodedPackets.size() > 0)
-    {
-        if (m_encodedPackets[0]->size != 0)
-        {
-            streamer.Send(rtp, m_encodedPackets[0]->data, m_encodedPackets[0]->size);
-            av_free_packet(m_encodedPackets[0]);
-        }
-        EraseEncodedPacketFromHead();
-    }*/
-    //m_encodedPacketLock.unlock();
     sn = rtp.GetSequenceNumber();
 }
 
@@ -154,8 +139,7 @@ void VideoCapture::Record()
                     }
                     av_free_packet(&m_packet);
                 }
-
-                boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+                boost::this_thread::sleep(boost::posix_time::milliseconds(30));
             }
         }
         else{

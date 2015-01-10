@@ -46,6 +46,10 @@ public:
             else
             {
                 boost::this_thread::sleep(boost::posix_time::milliseconds(m_frameDelay));
+                if (!m_frameDelay)
+                {
+                    boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+                }
             }
         }
         //while (!m_playbackStopped)
