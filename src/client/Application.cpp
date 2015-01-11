@@ -3,6 +3,12 @@
 
 Application* Application::app = 0;
 
+Application::~Application()
+{
+    rtps.StopReceiving();
+    cap.StopRecording();
+}
+
 Application::Application()
 {
     if (app)
@@ -46,8 +52,8 @@ void Application::Initialize(GtkWidget* parent, GtkWidget* fixed)
 
     uiManager.AddToolItemFromStock(GTK_STOCK_GO_BACK, TOOLITEM::BACK);
 
-    uiManager.ShowMenu();
-    uiManager.ShowToolbar();
+    //uiManager.ShowMenu();
+    //uiManager.ShowToolbar();
 
     uiManager.NavigateTo(PAGE::SVCONNECTPAGE);
 
@@ -127,26 +133,50 @@ void Application::OnButtonEvent(int buttonID)
         try
         {
             app->client.SetName(app->svConnectPage->GetName());
-            app->client.ConnectAsync(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011),
-                &(app->connectionThreadEnded), &(app->connectionID));
-            app->uiManager.NavigateTo(PAGE::WAITPAGE);
-            g_timeout_add(100, ConnectionTest, 0);
+            /*app->client.ConnectAsync(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011),
+                &(app->connectionThreadEnded), &(app->connectionID));*/
+
+            client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011)));
+            client.JoinChat(client.GetServer());
+            client.JoinVideoChat(client.GetServer());
+
+            //app->uiManager.NavigateTo(PAGE::WAITPAGE);
+            //g_timeout_add(100, ConnectionTest, 0);
+
             //app->client.SetName(app->svConnectPage->GetName());
             //app->client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(app->svConnectPage->GetIP()), 10011));
             //app->client.JoinChat(0);
-            //app->uiManager.NavigateTo(PAGE::HOMEPAGE);
-            //app->client.SetMessageEventHandler((ClientMessageEventHandler));
-            //app->client.HandleRequestsAsync();
-            //this->connectedtoSV = true;
+            app->uiManager.NavigateTo(PAGE::HOMEPAGE);
+            app->client.SetMessageEventHandler((ClientMessageEventHandler));
+            app->client.HandleRequestsAsync();
+            this->connectedtoSV = true;
+
+            rtps.Initialize(&client.GetUdpHandler1());
+            RtpStreamer* rtpss = &rtps;
+            boost::thread rtpsre([rtpss](){
+                rtpss->StartReceiving();
+            });
+            cap.StartRecording();
+            VideoCapture* capp = &cap;
+            Client* cp = &client;
+            VideoPlayback* vp = &(app->homePage->videoPlayback);
+            boost::thread sendthread([capp, rtpss, cp, vp](){
+                while (1)
+                {
+                    capp->SendRtp(*rtpss, cp->GetUdpEndpoint(cp->GetServer()));
+                    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+                    vp->ReceiveRtp(*rtpss);
+                }
+            });
         }
         catch (std::exception err)
         {
-            //std::cout << "oops! something bad happened\n" << err.what();
-            //std::cout << std::endl;
+            std::cout << "oops! something bad happened\n" << err.what();
+            std::cout << std::endl;
         }
         catch (...)
         {
-            std::cout << "zzz";
+            std::cout << "Unexpected error occured" << std::endl;
         }
         break;
     case PAGECONTROL::HP_SENDBUTTON:

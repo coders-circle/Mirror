@@ -7,20 +7,20 @@
 #include "client/MediaStream/VideoPlayback.h"
 
 
-VideoPlayback *v;
-
-Client client;
-RtpStreamer rtps;
+//VideoPlayback *v;
+//
+//Client client;
+//RtpStreamer rtps;
 int main(int argc, char *argv[])
 try
 {
-    std::string ip;
+    /*std::string ip;
     std::cout << "Enter server ip: ";
-    std::cin >> ip;
+    std::cin >> ip;*/
     av_register_all();
     avdevice_register_all();
 
-    client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011)));
+    /*client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011)));
     client.JoinChat(client.GetServer());
     client.JoinVideoChat(client.GetServer());
 
@@ -33,6 +33,8 @@ try
     cap.StartRecording();
 
     v = new VideoPlayback();
+    */
+
     //v->InitializeDecoder();
     
     GtkWidget *mainWindow;
@@ -40,7 +42,7 @@ try
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_default_size(GTK_WINDOW(mainWindow), 1000, 600);
     gtk_window_set_resizable(GTK_WINDOW(mainWindow), FALSE);
-    gtk_widget_set_size_request(mainWindow, 1000, 600);
+    gtk_widget_set_size_request(mainWindow, 820, 620);
     g_signal_connect_swapped(G_OBJECT(mainWindow), "destroy", G_CALLBACK(gtk_main_quit), NULL);
     GtkCssProvider *provider;
     GdkDisplay *display;
@@ -57,10 +59,10 @@ try
     GtkWidget* fixed = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(mainWindow), fixed);
 
-    v->Set(fixed, 10, 10);
-    v->StartPlaybackAsync();
+    //v->Set(fixed, 10, 10, 500, 440);
+    //v->StartPlaybackAsync();
 
-    VideoCapture* capp = &cap;
+    /*VideoCapture* capp = &cap;
     boost::thread sendthread([capp](){
         while(1)
         {
@@ -68,13 +70,13 @@ try
             boost::this_thread::sleep(boost::posix_time::milliseconds(10));
             v->ReceiveRtp(rtps);
         }
-    });
+    });*/
     gtk_widget_show_all(mainWindow);
-    /*Application app;
-    app.Initialize(mainWindow, fixed);*/
+    Application app;
+    app.Initialize(mainWindow, fixed);
     gtk_main();
-    rtps.StopReceiving();
-    cap.StopRecording();
+    //rtps.StopReceiving();
+    //cap.StopRecording();
     return 0;
 }
 catch (std::exception err)
