@@ -105,6 +105,7 @@ void ClientsManager::ProcessClients()
                         m_groups[id].push_back(i);
                         std::cout << "Connected client #" << i << " to group #" << id << std::endl;
                         break;
+
                     // Request to receive an incoming chat message
                     case TcpRequest::CHAT_MESSAGE:
                         id = m_requests.GetGroupId();
