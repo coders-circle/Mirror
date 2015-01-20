@@ -101,13 +101,11 @@ void VideoCapture::Initialize()
     if (w % 2 != 0) --w;
     if (h % 2 != 0) --h;
 
-
-
     if (av_image_alloc(m_frameRGB->data, m_frameRGB->linesize, w, h, pFormat, 32) < 0)
     {
         throw Exception("failed to allocate raw picture buffer");
     }
-    VideoStream::InitializeEncoder(w, h, 15, 200000);
+    VideoStream::InitializeEncoder(w, h, 30, 400000);
     m_frameRGB->width = m_encoderContext->width;
     m_frameRGB->height = m_encoderContext->height;
     m_frameRGB->format = pFormat;

@@ -25,20 +25,13 @@ public:
     // Initialize the video stream for encoding process
     void InitializeEncoder(int w, int h, int fps = 15, int bitrate = 200000);
 
-
-    void SetSize(int w, int h);
-
 protected:
-    SwsContext* m_YUV420PToBGRAConverterContext;
-
     // scaler context to convert 24-bit RGB to YUV420P color format
     SwsContext* m_RGB24ToYUP420PConverterContext;
-
     // scaler context to convert YUV420P to 24-bit RGB color format
     SwsContext* m_YUV420PToRGB24ConverterContext;
 
     // frame width and height
     int m_fw, m_fh;
     int m_fps;
-    int m_w, m_h;
 };

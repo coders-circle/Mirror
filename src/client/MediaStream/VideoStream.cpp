@@ -8,7 +8,6 @@ VideoStream::VideoStream()
     m_codecID = AV_CODEC_ID_H264;
     m_RGB24ToYUP420PConverterContext = 0;
     m_YUV420PToRGB24ConverterContext = 0;
-    m_YUV420PToBGRAConverterContext = 0;
     m_fw = 0;
     m_fh = 0;
     m_fps = 0;
@@ -44,8 +43,8 @@ void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
     m_encoderContext->width = w;
     m_encoderContext->height = h;
     m_encoderContext->time_base = avrat;
-    m_encoderContext->gop_size = 10;
-    m_encoderContext->max_b_frames = 1;
+    m_encoderContext->gop_size = 30;
+    m_encoderContext->max_b_frames = 0;
     m_encoderContext->pix_fmt = AV_PIX_FMT_YUV420P;
     if (m_codecID == AV_CODEC_ID_H264)
     {
@@ -73,6 +72,7 @@ AVFrame* VideoStream::DecodeToFrame(AVPacket* pkt)
     }
     if (framePresent && m_decodedFrame->width != 0)
     {
+        m_decodedFrameLock.unlock();
         if (m_rawData.size() == 0)
         {
             m_fw = m_decodedFrame->width;
@@ -80,16 +80,9 @@ AVFrame* VideoStream::DecodeToFrame(AVPacket* pkt)
             this->AllocateRawData(m_fw*m_fh * 3);
             m_fps = m_decoderContext->time_base.den
                 / (m_decoderContext->time_base.num*m_decoderContext->ticks_per_frame);
-
-            if (m_w == 0) m_w = m_fw;
-            if (m_h == 0) m_h = m_fh;
-
-
             m_YUV420PToRGB24ConverterContext = sws_getContext(m_fw, m_fh,
                 AV_PIX_FMT_YUV420P, m_fw, m_fh, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
         }
-        m_decodedFrameLock.unlock();
-
     }
     else m_decodedFrameLock.unlock();
     return m_decodedFrame;
@@ -183,14 +176,4 @@ unsigned char* VideoStream::GetRawRGBData()
     }
     else m_decodedFrameLock.unlock();
     return m_rawData.data();
-}
-
-void VideoStream::SetSize(int w, int h)
-{
-    m_w = w;
-    m_h = h;
-    if (m_YUV420PToBGRAConverterContext)
-    {
-
-    }
 }
