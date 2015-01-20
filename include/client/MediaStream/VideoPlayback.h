@@ -16,18 +16,12 @@ public:
         m_frameRenderer = 0;
         m_newFrameAvailable = false;
     }
-    void Set(GtkWidget* fixed, int x, int y, int w = 640, int h = 480)
+    void Set(GtkWidget* fixed, int x, int y)
     {
         m_fixed = fixed;
-        m_frx = x;
-        m_fry = y;
-        m_frw = w;
-        m_frh = h;
-        m_frameRenderer = new FrameRenderer;
-        m_frameRenderer->Set(m_fixed, m_frx, m_fry, m_frw, m_frh);
-        //m_frameRenderer->Show();
+        m_x = x;
+        m_y = y;
         m_frameDelay = 0;
-        m_rawBGRA.resize(m_frw*m_frh * 4);
     }
 
     void StartPlayback()
@@ -38,92 +32,16 @@ public:
             if (m_newFrameAvailable)
             {
                 m_newFrameAvailable = false;
-                if (!m_frameDelay)
+                if (!m_frameRenderer)
                 {
-                    m_scw = m_fw;
-                    m_sch = m_fh;
-                    m_xOff = 0;
-                    m_yOff = 0;
-                    if (m_fw != m_frw || m_fh != m_frh)
-                    {
-                        // either width or height of decoded frame is 
-                        // not equal to that of frame renderer
-                        if (m_fw > m_frw || m_fh > m_frh)
-                        {
-                            // either width or height of decoded frame is 
-                            // larger than that of frame renderer
-                            int diffW = m_fw - m_frw;
-                            int diffH = m_fh - m_frh;
-                            if (diffW > diffH)
-                            {
-                                m_scw = m_frw;
-                                m_sch = static_cast<int>(0.5f + static_cast<float>(m_fh*m_frw / m_fw));
-                                if (m_sch % 2) --m_sch;
-                                m_yOff = (m_frh - m_sch) >> 1;
-                            }
-                            else
-                            {
-                                m_sch = m_frh;
-                                m_scw = static_cast<int>(0.5f + static_cast<float>(m_fw*m_frh / m_fh));
-                                if (m_scw % 2) --m_scw;
-                                m_xOff = (m_frw - m_scw) >> 1;
-                            }
-
-                        }
-                        else
-                        {
-                            // either width or height of decoded frame is 
-                            // smaller than that of frame renderer
-                            int diffW = m_frw - m_fw;
-                            int diffH = m_frh - m_fh;
-
-                            if (diffW < diffH)
-                            {
-                                m_scw = m_frw;
-                                m_sch = static_cast<int>(0.5f + static_cast<float>(m_fh*m_frw / m_fw));
-                                if (m_sch % 2) --m_sch;
-                                m_yOff = (m_frh - m_sch) >> 1;
-                            }
-                            else
-                            {
-                                m_sch = m_frh;
-                                m_scw = static_cast<int>(0.5f + static_cast<float>(m_fw*m_frh / m_fh));
-                                if (m_scw % 2) --m_scw;
-                                m_xOff = (m_frw - m_scw) >> 1;
-                            }
-                        }
-                    }
-                    m_videoScalerContext = sws_getContext(m_fw, m_fh, PIX_FMT_RGB24,
-                        m_scw, m_sch, PIX_FMT_BGRA, SWS_FAST_BILINEAR, 0, 0, 0);
-                    m_tempBlock.resize(m_scw*m_sch * 4);
+                    m_frameRenderer = new FrameRenderer;
+                    m_frameRenderer->Set(m_fixed, m_x, m_y, m_fw, m_fh);
+                    m_frameRenderer->Show();
                     if (m_fps != 0) m_frameDelay = 1000 / m_fps;
-                    else m_frameDelay = 60;
-                    m_xOff = m_xOff * 4;
-                    
+                    else m_frameDelay = 10;
                 }
                 unsigned char* rgbData = this->GetRawRGBData();
-                uint8_t* rgb24Data[1] = { rgbData };
-                uint8_t* bgraData[1] = { m_tempBlock.data() };
-                static int linesizeRGB24[1] = { 3 * m_fw };
-                static int linesizeBGRA[1] = { 4 * m_scw };
-                sws_scale(m_videoScalerContext, rgb24Data, linesizeRGB24, 0, m_fh, bgraData, linesizeBGRA);
-                uint8_t* bgra = m_rawBGRA.data();
-
-                // maybe optimize the following code
-                static int off1 = 0, off2 = 0;
-                for (int y = 0; y < m_sch; y++)
-                {
-                    off1 = (((m_yOff + y)*m_frw) << 2) + m_xOff;
-                    off2 = (y*m_scw) << 2;
-                    for (int x = 0, lim = m_scw*4; x < lim; x+=4)
-                    {
-                        bgra[off1 + x + 0] = bgraData[0][off2 + x + 0];
-                        bgra[off1 + x + 1] = bgraData[0][off2 + x + 1];
-                        bgra[off1 + x + 2] = bgraData[0][off2 + x + 2];
-                        bgra[off1 + x + 3] = bgraData[0][off2 + x + 3];
-                    }
-                }
-                m_frameRenderer->SetBGRAData(bgra);
+                if (rgbData) m_frameRenderer->SetRGBData(rgbData);
             }
             else
             {
@@ -134,52 +52,91 @@ public:
                 }
             }
         }
+        //while (!m_playbackStopped)
+        //{
+        //    if (timeElapsed >= m_frameDelay)
+        //    {
+        //        while (!m_decodedFrameLock.try_lock())
+        //        {
+
+        //        }
+        //            
+        //            //std::cout << "start playback waiting..." << std::endl;
+        //        if (m_decodedFrames.size() > 0)
+        //        {
+        //            t.Reset();
+        //            if (!m_frameRenderer)
+        //            {
+        //                m_frameRenderer = new FrameRenderer;
+        //                m_frameRenderer->Set(m_fixed, m_x, m_y, m_fw, m_fh);
+        //                m_frameRenderer->Show();
+        //                if (m_frameDelay == 0 && m_fps != 0)
+        //                {
+        //                    m_frameDelay = 1000000 / m_fps;
+        //                }
+        //            }
+        //            unsigned char* rgbData = this->GetRawRGBData(0);
+        //            if (rgbData)
+        //            {
+        //                m_frameRenderer->SetRGBData(rgbData);
+        //            }
+        //            av_frame_free(&m_decodedFrames[0]);
+        //            this->EraseDecodedFrameFromHead();
+        //            timeElapsed = 0;
+        //            m_decodedFrameLock.unlock();
+        //        }
+        //        else
+        //        {
+        //            m_decodedFrameLock.unlock();
+        //            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+        //            /*if (m_encodedPacketLock.try_lock()){
+        //                if (m_encodedPackets.size() > 0)
+        //                {
+        //                    this->AddPacket(m_encodedPackets[0]);
+        //                    av_free_packet(m_encodedPackets[0]);
+        //                    this->EraseEncodedPacketFromHead();
+        //                }
+        //                m_encodedPacketLock.unlock();
+        //            }*/
+        //        }
+        //    }
+        //    timeElapsed = t.Elapsed();
+        //    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+        //}
     }
     void StartPlaybackAsync()
     {
-        if (m_frameRenderer) m_frameRenderer->Show();
         m_playbackThread = boost::thread(boost::bind(&VideoPlayback::StartPlayback, this));
     }
     void StopPlayback()
     {
-        m_playbackStopped = true;
-        if (m_frameRenderer) m_frameRenderer->Hide();
-        m_playbackThread.join();
+
     }
+    void FrameSyncronizer()
+    {
+
+    }
+
     void ReceiveRtp(RtpStreamer& streamer)
     {
         uint8_t* pdata = 0;
         size_t len = streamer.GetPacket(0, &pdata, av_malloc);
         if (len > 0)
         {
-            try
+            //this->AddPacket(pdata, len);
+            if (this->DecodeToFrame(pdata, len))
             {
-                if (this->DecodeToFrame(pdata, len))
-                {
-                    m_newFrameAvailable = true;
-                }
-            }
-            catch (FailedToDecode)
-            {
-                // The packet was corrupted :/
+                m_newFrameAvailable = true;
             }
         }
     }
 private:
     FrameRenderer *m_frameRenderer;
-    SwsContext* m_videoScalerContext;
     GtkWidget* m_fixed;
-    
-    // position and size for frame renderer
-    int m_frx, m_fry, m_frw, m_frh;
-    int m_scw, m_sch;
-
+    int m_x, m_y;
 
     unsigned int m_frameDelay;
     boost::thread m_playbackThread;
     bool m_playbackStopped;
     bool m_newFrameAvailable;
-    std::vector<uint8_t> m_rawBGRA;
-    std::vector<uint8_t> m_tempBlock;
-    int m_xOff, m_yOff;
 };
