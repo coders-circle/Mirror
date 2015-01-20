@@ -6,6 +6,32 @@
 
 #include "common/Timer.h"
 
+class VideoSource
+{
+public:
+    void Set(int x, int y, int w, int h)
+    {
+        m_x = x;
+        m_y = y;
+        m_frw = w;
+        m_frh = h;
+    }
+    VideoSource()
+    {
+        m_x = 0;
+        m_y = 0;
+        m_frw = 0;
+        m_frh = 0;
+    }
+    uint8_t* GetRawBGRAData()
+    {
+
+    }
+private:
+    int m_x, m_y, m_frw, m_frh;
+    std::vector<uint8_t> m_rawBGRAData;
+};
+
 
 class VideoPlayback : public VideoStream
 {
@@ -148,7 +174,7 @@ public:
     }
     void ReceiveRtp(RtpStreamer& streamer)
     {
-        uint8_t* pdata = 0;
+        uint8_t* pdata = 0; 
         size_t len = streamer.GetPacket(0, &pdata, av_malloc);
         if (len > 0)
         {
