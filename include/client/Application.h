@@ -12,8 +12,6 @@
 #include "client/UI/pages/HomePage.h"
 #include "client/UI/pages/WaitPage.h"
 
-#include "client/MediaStream/VideoCapture.h"
-
 #include <gdk/gdkkeysyms.h>
 
 
@@ -26,7 +24,6 @@ public:
     enum TOOLITEM{ BACK = 0 };
 
     Application();
-    ~Application();
     void OnMenuItemClick(int menuItemID);
     void OnButtonEvent(int buttonID);
     void OnToolItemClick(int toolItemID);
@@ -47,8 +44,6 @@ private:
 
     UIManager   uiManager;
     Client      client;
-    RtpStreamer rtps;
-    VideoCapture cap;
 
     bool connectedtoSV;
     bool connectionThreadEnded;

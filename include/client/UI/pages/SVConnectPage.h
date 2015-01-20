@@ -25,7 +25,7 @@ public:
         this->m_ID = PAGE::SVCONNECTPAGE;
         this->Initialize(parentWindow, fixed);
 
-        int x = (this->GetParentWidth()/2)-175 , y = 100;
+        int x = 300, y = 100;
         
         this->AddLabel("<span font='22'>Connect to a Server</span>", x, y);
         this->AddLabel("<span font='14'>Name:</span> ", x, y + 100);
