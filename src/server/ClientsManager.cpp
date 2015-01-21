@@ -105,7 +105,6 @@ void ClientsManager::ProcessClients()
                         m_groups[id].push_back(i);
                         std::cout << "Connected client #" << i << " to group #" << id << std::endl;
                         break;
-
                     // Request to receive an incoming chat message
                     case TcpRequest::CHAT_MESSAGE:
                         id = m_requests.GetGroupId();
@@ -199,7 +198,7 @@ void ClientsManager::ProcessClients()
                 auto it = m_videoGroups.find(cid);
                 if (it != m_videoGroups.end())
                 for (unsigned int j = 0; j < m_groups[it->second].size(); ++j)
-                    if (m_groups[it->second][j] != cid)
+//                    if (m_groups[it->second][j] != cid)
                     // Send to each peer in the video-chat group the data received
                     m_udpHandler1.Send(m_clients[m_groups[it->second][j]].udpEndpoint1, data, len);
             }
