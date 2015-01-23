@@ -3,7 +3,7 @@
 
 VideoCapture::VideoCapture()
 : m_formatCtx(NULL), m_codecCtx(NULL), m_codec(NULL), m_stream(NULL), m_imgConvertCtx(NULL),
-  m_frame(NULL), m_frameRGB(NULL)
+  m_frame(NULL), m_frameRGB(NULL), m_sendSequence(0)
 {
     m_packetAvailable = false;
     m_readyToSend = false;
@@ -11,26 +11,25 @@ VideoCapture::VideoCapture()
 }
 
 
-void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint)
+void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint, uint32_t sourceId)
 {
     if (!m_cameraAvailable)
         return;
     // We will use a RTP streamer to stream out the encoded packets
     // over as fragmented RTP packets
     RtpPacket rtp;
-    static uint16_t sn = 0;
     // Initialize the sending parameters for the RTP packets
     rtp.Initialize(streamer.GetUdpHandler(), remoteEndpoint);
     rtp.SetPayloadType(123);
-    rtp.SetSourceId(0);
-    rtp.SetSequenceNumber(sn);
+    rtp.SetSourceId(sourceId);
+    rtp.SetSequenceNumber(m_sendSequence);
     m_readyToSend = true;
     while (!m_packetAvailable)
         boost::this_thread::sleep(boost::posix_time::milliseconds(30));
     m_packetAvailable = false;
     if (m_encodedPacket->size > 0)
         streamer.Send(rtp, m_encodedPacket->data, m_encodedPacket->size);
-    sn = rtp.GetSequenceNumber();
+    m_sendSequence = rtp.GetSequenceNumber();
 }
 
 
@@ -99,16 +98,15 @@ void VideoCapture::Initialize()
     int w = m_codecCtx->width;
     int h = m_codecCtx->height;
 
-    if (w % 2 != 0) --w;
-    if (h % 2 != 0) --h;
+    w = 320; h = 240;
 
     if (av_image_alloc(m_frameRGB->data, m_frameRGB->linesize, w, h, pFormat, 32) < 0)
     {
         throw Exception("failed to allocate raw picture buffer");
     }
     VideoStream::InitializeEncoder(w, h, 15, 200000);
-    m_frameRGB->width = m_encoderContext->width;
-    m_frameRGB->height = m_encoderContext->height;
+    m_frameRGB->width = 320;//m_encoderContext->width;
+    m_frameRGB->height = 240;//m_encoderContext->height;
     m_frameRGB->format = pFormat;
     m_imgConvertCtx = sws_getCachedContext(NULL, m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,  
                                              w, h, pFormat, SWS_BICUBIC, NULL, NULL, NULL);

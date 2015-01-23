@@ -10,7 +10,6 @@
 VideoPlayback *v;
 
 Client client;
-RtpStreamer rtps;
 int main(int argc, char *argv[])
 try
 {
@@ -23,18 +22,16 @@ try
     client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011)));
     client.JoinChat(client.GetServer());
     client.JoinVideoChat(client.GetServer());
-
-    rtps.Initialize(&client.GetUdpHandler1());
-    boost::thread rtpsre ([](){
-        rtps.StartReceiving();
-    });
-   
+    
+  
     VideoCapture cap;
     cap.StartRecording();
 
     v = new VideoPlayback();
     //v->InitializeDecoder();
     
+    client.StartReceivingAV(v, &cap);
+
     GtkWidget *mainWindow;
     gtk_init(&argc, &argv);
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -60,20 +57,13 @@ try
     v->Set(fixed, 10, 10);
     v->StartPlaybackAsync();
 
-    VideoCapture* capp = &cap;
-    boost::thread sendthread([capp](){
-        while(1)
-        {
-            capp->SendRtp(rtps, client.GetUdpEndpoint(client.GetServer()));
-            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-            v->ReceiveRtp(rtps);
-        }
-    });
+
     gtk_widget_show_all(mainWindow);
     /*Application app;
     app.Initialize(mainWindow, fixed);*/
     gtk_main();
-    rtps.StopReceiving();
+
+    client.StopReceivingAV();
     cap.StopRecording();
     return 0;
 }

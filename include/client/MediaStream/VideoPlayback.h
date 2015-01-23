@@ -120,13 +120,17 @@ public:
     void ReceiveRtp(RtpStreamer& streamer)
     {
         uint8_t* pdata = 0;
-        size_t len = streamer.GetPacket(0, &pdata, av_malloc);
-        if (len > 0)
+        for (uint32_t sourceId:streamer.GetSources())
         {
-            //this->AddPacket(pdata, len);
-            if (this->DecodeToFrame(pdata, len))
+            // Handle source sourceID here
+            size_t len = streamer.GetPacket(sourceId, &pdata, av_malloc);
+            if (len > 0)
             {
-                m_newFrameAvailable = true;
+                //this->AddPacket(pdata, len);
+                if (this->DecodeToFrame(pdata, len))
+                {
+                    m_newFrameAvailable = true;
+                }
             }
         }
     }

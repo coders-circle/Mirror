@@ -88,29 +88,6 @@ void TcpRequest::ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, const
     Send(tcpHandler);;
 }
 
-void TcpRequest::P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::string &privateIp, uint16_t privatePort, const std::string &publicIp, uint16_t publicPort)
-{
-    /*
-    Example:
-        {
-            Request-Type: 3
-            Client-Id: 32
-            Private-IP: 1.2.3.4
-            Private-Port: 1234
-            Public-IP: 2.3.5.6
-            Public-Port: 2356
-        }
-    */
-    New();
-    m_document.AddMember("Request-Type", Value((int)P2P_TCP), m_document.GetAllocator());
-    m_document.AddMember("Client-Id", Value(clientId), m_document.GetAllocator());
-    m_document.AddMember("Private-IP", Value(privateIp.c_str(), m_document.GetAllocator()), m_document.GetAllocator());
-    m_document.AddMember("Private-Port", Value((unsigned int)privatePort), m_document.GetAllocator());
-    m_document.AddMember("Public-IP", Value(publicIp.c_str(), m_document.GetAllocator()), m_document.GetAllocator());
-    m_document.AddMember("Public-Port", Value((unsigned int)publicPort), m_document.GetAllocator());
-    Send(tcpHandler);
-}
-
 void TcpRequest::Disconnect(TcpHandler &tcpHandler)
 {
     /*
@@ -136,6 +113,21 @@ void TcpRequest::UdpPort(TcpHandler& tcpHandler, uint16_t port)
     New();
     m_document.AddMember("Request-Type", Value((int)UDP_PORT), m_document.GetAllocator());
     m_document.AddMember("Udp-Port", Value((unsigned int)port), m_document.GetAllocator());
+    Send(tcpHandler);
+}
+
+void TcpRequest::ClientId(TcpHandler& tcpHandler, uint32_t clientId)
+{
+    /*
+    Example:
+        {
+            Request-Type: 6
+            Client-Id: 23
+        }
+    */
+    New();
+    m_document.AddMember("Request-Type", Value((int)CLIENT_ID), m_document.GetAllocator());
+    m_document.AddMember("Client-Id", Value((unsigned int)clientId), m_document.GetAllocator());
     Send(tcpHandler);
 }
 
@@ -225,3 +217,4 @@ uint16_t TcpRequest::GetUdpPort()
 {
     return GetValue("Udp-Port").GetUint();
 }
+

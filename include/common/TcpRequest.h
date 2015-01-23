@@ -19,6 +19,7 @@ public:
         DISCONNECT,
         UDP_PORT,
         JOIN_VIDEO_CHAT,
+        CLIENT_ID,
     };
 
     TcpRequest();
@@ -30,13 +31,12 @@ public:
     void JoinVideoChat(TcpHandler &tcpHandler, uint32_t groupId = 0);
     // Request to wait for incoming chat message
     void ChatMessage(TcpHandler &tcpHandler, uint32_t messageSize, const std::string &userId, uint32_t groupId = 0);
-    // Request to establish a P2P TCP connection with a client
-    // Contains private and public addess-port pairs and client-id
-    void P2PTcp(TcpHandler& tcpHandler, uint32_t clientId, const std::string &privateIp, uint16_t privatePort, const std::string &publicIp = "", uint16_t publicPort = 0);
     // Request to disconnect
     void Disconnect(TcpHandler& tcpHandler);
     // Request to send/receive the udp-endpoint port
     void UdpPort(TcpHandler& tcpHandler, uint16_t port = 0);
+    // Request to send/receive the client id
+    void ClientId(TcpHandler& tcpHandler, uint32_t clientId = 0);
     // Send an invalid request
     void Invalid(TcpHandler& tcpHandler);
 
