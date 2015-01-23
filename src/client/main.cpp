@@ -42,6 +42,7 @@ try
     gtk_window_set_resizable(GTK_WINDOW(mainWindow), FALSE);
     gtk_widget_set_size_request(mainWindow, 1000, 600);
     g_signal_connect_swapped(G_OBJECT(mainWindow), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    //g_idle_add()
     GtkCssProvider *provider;
     GdkDisplay *display;
     GdkScreen *screen;

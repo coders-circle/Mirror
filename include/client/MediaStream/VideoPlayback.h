@@ -7,6 +7,7 @@
 #include "common/Timer.h"
 
 
+
 class VideoPlayback : public VideoStream
 {
 public:
@@ -22,87 +23,47 @@ public:
         m_x = x;
         m_y = y;
         m_frameDelay = 0;
+        
     }
 
     void StartPlayback()
     {
         m_playbackStopped = false;
+        Timer timeElapsed;
+        int frameCounter = 0;
         while (!m_playbackStopped)
         {
+            timeElapsed.Reset();
             if (m_newFrameAvailable)
             {
                 m_newFrameAvailable = false;
-                if (!m_frameRenderer)
+                if (!m_frameDelay)
                 {
                     m_frameRenderer = new FrameRenderer;
                     m_frameRenderer->Set(m_fixed, m_x, m_y, m_fw, m_fh);
                     m_frameRenderer->Show();
-                    if (m_fps != 0) m_frameDelay = 1000 / m_fps;
-                    else m_frameDelay = 10;
+                    if (m_fps != 0) m_frameDelay = 1000000L / m_fps;
+                    else m_frameDelay = 10000L;
                 }
-                unsigned char* rgbData = this->GetRawRGBData();
-                if (rgbData) m_frameRenderer->SetRGBData(rgbData);
+                unsigned char* bgraData = this->GetRawBGRAData();
+                if (bgraData) m_frameRenderer->SetBGRAData(bgraData);
+                ++frameCounter;
+                if (frameCounter % 10 == 0)
+                    std::cout << frameCounter << std::endl;
             }
             else
             {
-                boost::this_thread::sleep(boost::posix_time::milliseconds(m_frameDelay));
+                boost::this_thread::sleep(boost::posix_time::milliseconds(timeElapsed.ElapsedMilliSecs()));
+                /*if (timeElapsed.ElapsedMicroSecs() < (m_frameDelay + 2000L))
+                {
+                    boost::this_thread::sleep(boost::posix_time::milliseconds((m_frameDelay-timeElapsed.ElapsedMicroSecs()))/1000L);
+                }*/
                 if (!m_frameDelay)
                 {
-                    boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+                    boost::this_thread::sleep(boost::posix_time::milliseconds(100));
                 }
             }
         }
-        //while (!m_playbackStopped)
-        //{
-        //    if (timeElapsed >= m_frameDelay)
-        //    {
-        //        while (!m_decodedFrameLock.try_lock())
-        //        {
-
-        //        }
-        //            
-        //            //std::cout << "start playback waiting..." << std::endl;
-        //        if (m_decodedFrames.size() > 0)
-        //        {
-        //            t.Reset();
-        //            if (!m_frameRenderer)
-        //            {
-        //                m_frameRenderer = new FrameRenderer;
-        //                m_frameRenderer->Set(m_fixed, m_x, m_y, m_fw, m_fh);
-        //                m_frameRenderer->Show();
-        //                if (m_frameDelay == 0 && m_fps != 0)
-        //                {
-        //                    m_frameDelay = 1000000 / m_fps;
-        //                }
-        //            }
-        //            unsigned char* rgbData = this->GetRawRGBData(0);
-        //            if (rgbData)
-        //            {
-        //                m_frameRenderer->SetRGBData(rgbData);
-        //            }
-        //            av_frame_free(&m_decodedFrames[0]);
-        //            this->EraseDecodedFrameFromHead();
-        //            timeElapsed = 0;
-        //            m_decodedFrameLock.unlock();
-        //        }
-        //        else
-        //        {
-        //            m_decodedFrameLock.unlock();
-        //            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-        //            /*if (m_encodedPacketLock.try_lock()){
-        //                if (m_encodedPackets.size() > 0)
-        //                {
-        //                    this->AddPacket(m_encodedPackets[0]);
-        //                    av_free_packet(m_encodedPackets[0]);
-        //                    this->EraseEncodedPacketFromHead();
-        //                }
-        //                m_encodedPacketLock.unlock();
-        //            }*/
-        //        }
-        //    }
-        //    timeElapsed = t.Elapsed();
-        //    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-        //}
     }
     void StartPlaybackAsync()
     {
@@ -123,10 +84,16 @@ public:
         size_t len = streamer.GetPacket(0, &pdata, av_malloc);
         if (len > 0)
         {
-            //this->AddPacket(pdata, len);
-            if (this->DecodeToFrame(pdata, len))
+            try
             {
-                m_newFrameAvailable = true;
+                if (this->DecodeToFrame(pdata, len))
+                {
+                    m_newFrameAvailable = true;
+                }
+            }
+            catch (FailedToDecode)
+            {
+                std::cout << "packet lost :/" << std::endl;
             }
         }
     }
@@ -135,7 +102,7 @@ private:
     GtkWidget* m_fixed;
     int m_x, m_y;
 
-    unsigned int m_frameDelay;
+    long long m_frameDelay;
     boost::thread m_playbackThread;
     bool m_playbackStopped;
     bool m_newFrameAvailable;

@@ -18,25 +18,23 @@ public:
         if (avcodec_decode_video2(m_decoderContext, m_decodedFrame, &framePresent, pkt) < 0)
         {
             m_decodedFrameLock.unlock();
-            return 0;
-            //throw FailedToDecode();
+            throw FailedToDecode();
         }
         if (framePresent && m_decodedFrame->width != 0)
         {
-            m_decodedFrameLock.unlock();
             if (m_rawData.size() == 0)
             {
                 m_fw = m_decodedFrame->width;
                 m_fh = m_decodedFrame->height;
-
-                this->AllocateRawData(m_fw*m_fh * 3);
-
+                this->AllocateRawData(m_fw*m_fh * 4);
                 m_fps = m_decoderContext->time_base.den 
                     / (m_decoderContext->time_base.num*m_decoderContext->ticks_per_frame);
-
                 m_YUV420PToRGB24ConverterContext = sws_getContext(m_fw, m_fh, 
                     AV_PIX_FMT_YUV420P, m_fw, m_fh, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
+                m_YUV420PToBGRAConverterContext = sws_getContext(m_fw, m_fh,
+                    AV_PIX_FMT_YUV420P, m_fw, m_fh, AV_PIX_FMT_BGRA, SWS_BICUBIC, 0, 0, 0);
             }
+            m_decodedFrameLock.unlock();
         }
         else m_decodedFrameLock.unlock();
         return m_decodedFrame;
@@ -97,11 +95,46 @@ public:
         av_frame_free(&frame);
         return pkt;
     }
+    unsigned char* GetRawBGRAData()
+    {
+        while (!m_decodedFrameLock.try_lock())
+            std::cout << "GetRawRGBData waiting..." << std::endl;
+        if (!m_decodedFrame)
+        {
+            m_decodedFrameLock.unlock();
+            return 0;
+        }
+        if (m_decodedFrame->width == 0)
+        {
+            m_decodedFrameLock.unlock();
+            return 0;
+        }
+        int w = m_decodedFrame->width;
+        int h = m_decodedFrame->height;
+        if (w != 0)
+        {
+            AVFrame* yuvFrame = m_decodedFrame;
+            AVPicture *bgraFrame = new AVPicture;
+            avpicture_alloc(bgraFrame, AV_PIX_FMT_BGRA, w, h);
+            sws_scale(m_YUV420PToBGRAConverterContext, yuvFrame->data, yuvFrame->linesize, 0, h, bgraFrame->data, bgraFrame->linesize);
+            m_decodedFrameLock.unlock();
+            memcpy(m_rawData.data(), bgraFrame->data[0], w*h * 4);
+            avpicture_free(bgraFrame);
+            delete bgraFrame;
+        }
+        else m_decodedFrameLock.unlock();
+        return m_rawData.data();
+    }
     unsigned char* GetRawRGBData()
     {
         while (!m_decodedFrameLock.try_lock())
-            std::cout << "GetRawRGBData waiting..."<<std::endl;
-        if (!m_decodedFrame || m_decodedFrame->width == 0)
+            std::cout << "GetRawRGBData waiting..." << std::endl;
+        if (!m_decodedFrame)
+        {
+            m_decodedFrameLock.unlock();
+            return 0;
+        }
+        if (m_decodedFrame->width == 0)
         {
             m_decodedFrameLock.unlock();
             return 0;
@@ -166,6 +199,11 @@ protected:
     SwsContext* m_RGB24ToYUP420PConverterContext;
     // scaler context to convert YUV420P to 24-bit RGB color format
     SwsContext* m_YUV420PToRGB24ConverterContext;
+
+    // scaler context to convert 32-bit BGRA to YUV420P color format
+    SwsContext* m_BGRAToYUP420PConverterContext;
+    // scaler context to convert YUV420P to 32-bit BGRA color format
+    SwsContext* m_YUV420PToBGRAConverterContext;
 
     // frame width and height
     int m_fw, m_fh;

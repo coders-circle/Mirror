@@ -12,8 +12,8 @@ public:
     void Set(GtkWidget* fixed, int x, int y, int fw, int fh);
     static gboolean OnDraw(GtkWidget* widget, cairo_t* cr, gpointer frPointer);
     void Show();
+    void SetBGRAData(unsigned char* bgraData);
 private:
-    GtkWidget *m_drawingArea;
-    cairo_surface_t *m_rgbImage;
-    unsigned char* m_rgbData;
+    cairo_surface_t *m_drawingSurface;
+    unsigned char* m_rawBGRAData;
 };
