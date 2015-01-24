@@ -22,7 +22,7 @@ public:
     // Test function to start recording and stop on input
     void Test();
 
-    void SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint);
+    void SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint, uint32_t sourceId);
 
 
 private:
@@ -34,6 +34,8 @@ private:
     AVFrame *m_frame, *m_frameRGB;
     AVPacket m_packet;
     boost::thread m_recordThread;
+
+    uint16_t m_sendSequence;
  
     void Initialize();
     void CleanUp();

@@ -3,7 +3,7 @@
 
 VideoCapture::VideoCapture()
 : m_formatCtx(NULL), m_codecCtx(NULL), m_codec(NULL), m_stream(NULL), m_imgConvertCtx(NULL),
-  m_frame(NULL), m_frameRGB(NULL)
+  m_frame(NULL), m_frameRGB(NULL), m_sendSequence(0)
 {
     m_packetAvailable = false;
     m_readyToSend = false;
@@ -11,26 +11,29 @@ VideoCapture::VideoCapture()
 }
 
 
-void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint)
+void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint, uint32_t sourceId)
 {
     if (!m_cameraAvailable)
+        return;
+
+    if (!m_recording)
         return;
     // We will use a RTP streamer to stream out the encoded packets
     // over as fragmented RTP packets
     RtpPacket rtp;
-    static uint16_t sn = 0;
     // Initialize the sending parameters for the RTP packets
     rtp.Initialize(streamer.GetUdpHandler(), remoteEndpoint);
     rtp.SetPayloadType(123);
-    rtp.SetSourceId(0);
-    rtp.SetSequenceNumber(sn);
+    rtp.SetSourceId(sourceId);
+    rtp.SetSequenceNumber(m_sendSequence);
     m_readyToSend = true;
     while (!m_packetAvailable)
-        boost::this_thread::sleep(boost::posix_time::milliseconds(30));
+        //;
+        boost::this_thread::sleep(boost::posix_time::milliseconds(10));
     m_packetAvailable = false;
     if (m_encodedPacket->size > 0)
         streamer.Send(rtp, m_encodedPacket->data, m_encodedPacket->size);
-    sn = rtp.GetSequenceNumber();
+    m_sendSequence = rtp.GetSequenceNumber();
 }
 
 
@@ -99,8 +102,7 @@ void VideoCapture::Initialize()
     int w = m_codecCtx->width;
     int h = m_codecCtx->height;
 
-    if (w % 2 != 0) --w;
-    if (h % 2 != 0) --h;
+    //w = 320; h = 240;
 
     if (av_image_alloc(m_frameRGB->data, m_frameRGB->linesize, w, h, pFormat, 32) < 0)
     {
@@ -132,13 +134,19 @@ void VideoCapture::Record()
                 {
                     sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize,
                         0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
-                    if (m_readyToSend && this->EncodeToPacket(m_frameRGB))
+                    if (m_readyToSend)
                     {
-                        m_readyToSend = false;
-                        m_packetAvailable = true;
+                        m_frameRGB->pts /= 10;
+                        if (this->EncodeToPacket(m_frameRGB))
+                        {
+                            m_readyToSend = false;
+                            m_packetAvailable = true;
+                        }
                     }
+                    else boost::this_thread::sleep(boost::posix_time::milliseconds(20));
                     av_free_packet(&m_packet);
                 }
+                else boost::this_thread::sleep(boost::posix_time::milliseconds(30));
                 //boost::this_thread::sleep(boost::posix_time::milliseconds(30));
             }
         }

@@ -105,7 +105,7 @@ std::string HttpHandler::GetResponse()
 	{
 		boost::asio::read_until(*m_socket, m_serverResponse, "<<>>"); // <<>> denotes the end of the json data from the server
 	}
-	catch (Exception &e)
+	catch (Exception /*&e*/)
 	{
 		boost::asio::read_until(*m_socket, m_serverResponse, "\r\n\r\n");
 	}

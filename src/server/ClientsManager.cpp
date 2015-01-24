@@ -112,27 +112,6 @@ void ClientsManager::ProcessClients()
                         ReceiveChat(i, id);
                         break;
                     
-                    // Request for a p2p tcp connection to another client
-                    case TcpRequest::P2P_TCP:
-                        id = m_requests.GetClientId();
-                        if (id < m_clients.size() && id != i)
-                        {
-                            // Send request to second client
-                            m_requests.P2PTcp(m_clients[id].tcpHandler, i, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
-                                m_clients[i].tcpHandler.GetRemoteIp(), m_clients[i].tcpHandler.GetRemotePort());
-                            // Receive the return request
-                            m_requests.ReceiveRequest(m_clients[id].tcpHandler);
-                            // Send back the return request to first client
-                            m_requests.P2PTcp(m_clients[i].tcpHandler, id, m_requests.GetPrivateIp(), m_requests.GetPrivatePort(),
-                                m_clients[id].tcpHandler.GetRemoteIp(), m_clients[id].tcpHandler.GetRemotePort());
-                        }
-                        else
-                        {
-                            // Send an invalid request
-                            m_requests.Invalid(m_clients[i].tcpHandler);
-                        }
-                        break;
-                    
                     // Request for disconnection
                     case TcpRequest::DISCONNECT:
                         m_clients[i].tcpHandler.Close();
@@ -170,7 +149,12 @@ void ClientsManager::ProcessClients()
                             std::cout << "Client #" << i << " is video chatting in group #" << id << std::endl;
                         }
                         break;
-
+                    
+                    //Request for client's id
+                    case TcpRequest::CLIENT_ID:
+                        // Send back the id
+                        m_requests.ClientId(m_clients[i].tcpHandler, i);
+                        break;
                     default:
                         std::cout << "Invalid Request " << m_requests.GetRequestType() << " from client #" << i << std::endl;
                     }

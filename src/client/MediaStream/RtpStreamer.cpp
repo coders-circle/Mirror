@@ -58,63 +58,76 @@ size_t RtpStreamer::Receive(RtpPacket& rtp, uint8_t** data, void* (*allocator)(s
 // Get a received frame of data; rtp packets are merged till the packet that contains the marker bit
 size_t RtpStreamer::GetPacket(uint32_t source, uint8_t** data, void* (*allocator)(size_t))
 {
-
     boost::lock_guard<boost::mutex> guard(m_mutex);
 
     if (m_rtpUnits.find(source) == m_rtpUnits.end())
         return 0;
     
     RtpUnitList& rtunits = m_rtpUnits[source];
-    if (rtunits.size() == 0) 
+    if (rtunits.list.size() == 0) 
         return 0;
 
     // Find the length of the frame and the last rtp packet that contains the marker bit
     // The total length is all length of all packets till the last rtp packet
-    size_t tlen = 0, i = m_startId;
-    for (; i < rtunits.size(); i = (i + 1) % rtunits.size())
+    size_t tlen = 0;
+    if (rtunits.begin == rtunits.list.end())
+        rtunits.begin = rtunits.list.begin();
+    auto it = rtunits.begin;
+    while (true)
     {
-        RtpUnit& unit = rtunits[i];
+        RtpUnit& unit = *it;
         tlen += unit.data.size();
         if (unit.marker)
             break;
-        else if ((m_startId > 0 && i == m_startId - 1) || (m_startId == 0 && i == rtunits.size()-1))
+        it++;
+        if (it == rtunits.list.end())
+            it = rtunits.list.begin();
+        if (it == rtunits.begin)
             return 0;
     }
-
+    
     // Allocate memory for the total encoded frame and send back the pointer
     uint8_t* newdata = *data = (uint8_t*)allocator(tlen);
-    // In the allocated memory, copy all data from each fragment
-    for (size_t j = 0; j <= i; ++j)
+    // In the allocated memory, copy all data from each fragment and remove the fragment from list
+    auto jt = rtunits.begin;
+    while (true)
     {
-        memcpy(newdata, &rtunits[j].data[0], rtunits[j].data.size());
-        newdata += rtunits[j].data.size();
+        if (jt == rtunits.list.end())
+            jt = rtunits.list.begin();
+        memcpy(newdata, &jt->data[0], jt->data.size());
+        newdata += jt->data.size();
+        auto toerase = jt;
+        if (jt == it) 
+            break;
+        jt++;
+
+        rtunits.list.erase(toerase);
     }
+    rtunits.begin = ++it;
     
-    // Remove the processed units
-    if (i < m_startId)
-    {
-        rtunits.erase(rtunits.begin() + m_startId, rtunits.end());
-        rtunits.erase(rtunits.begin(), rtunits.begin() + i + 1);
-        m_startId = i + 1;
-    }
-    else
-        rtunits.erase(rtunits.begin() + m_startId, rtunits.begin() + i + 1);
-
-
     return tlen;
+}
+
+std::vector<uint32_t> RtpStreamer::GetSources()
+{
+    std::vector<uint32_t> sources;
+    for (auto it = m_rtpUnits.begin(); it != m_rtpUnits.end(); ++it)
+        if (it->second.list.size() > 0)
+            sources.push_back(it->first);
+
+    return sources;
 }
 
 // Start receiving Rtp packets
 void RtpStreamer::StartReceiving()
 {
     m_receiving = true;
-    m_startId = 0;
     RtpPacket rtp;
     rtp.Initialize(m_udpHandler, udp::endpoint());
     // Receive the packets till StopReceiving is called
     while (m_receiving)
     {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+        //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         // sleep(...)
         if (m_udpHandler->GetSocket()->available() > 0)
         {
@@ -130,9 +143,11 @@ void RtpStreamer::StartReceiving()
             unit.data.resize(len);
             unit.marker = rtp.IsMarkerSet();
             unit.sn = rtp.GetSequenceNumber();
-            m_rtpUnits[rtp.GetSourceId()].push_back(std::move(unit));
-            std::sort(m_rtpUnits[rtp.GetSourceId()].begin(), m_rtpUnits[rtp.GetSourceId()].end());
+            m_rtpUnits[rtp.GetSourceId()].list.push_back(std::move(unit));
+            m_rtpUnits[rtp.GetSourceId()].list.sort();
+            //std::sort(m_rtpUnits[rtp.GetSourceId()].list.begin(), m_rtpUnits[rtp.GetSourceId()].list.end());
         }
+        else boost::this_thread::sleep(boost::posix_time::milliseconds(30));
     }
 }
 

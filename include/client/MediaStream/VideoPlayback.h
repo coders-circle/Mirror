@@ -33,36 +33,21 @@ public:
         int frameCounter = 0;
         while (!m_playbackStopped)
         {
-            timeElapsed.Reset();
             if (m_newFrameAvailable)
             {
-                m_newFrameAvailable = false;
                 if (!m_frameDelay)
                 {
                     m_frameRenderer = new FrameRenderer;
                     m_frameRenderer->Set(m_fixed, m_x, m_y, m_fw, m_fh);
                     m_frameRenderer->Show();
-                    if (m_fps != 0) m_frameDelay = 1000000L / m_fps;
-                    else m_frameDelay = 10000L;
+                    if (m_fps != 0) m_frameDelay = 1000L / m_fps;
+                    else m_frameDelay = 10L;
                 }
                 unsigned char* bgraData = this->GetRawBGRAData();
                 if (bgraData) m_frameRenderer->SetBGRAData(bgraData);
-                ++frameCounter;
-                if (frameCounter % 10 == 0)
-                    std::cout << frameCounter << std::endl;
+                m_newFrameAvailable = false;
             }
-            else
-            {
-                boost::this_thread::sleep(boost::posix_time::milliseconds(timeElapsed.ElapsedMilliSecs()));
-                /*if (timeElapsed.ElapsedMicroSecs() < (m_frameDelay + 2000L))
-                {
-                    boost::this_thread::sleep(boost::posix_time::milliseconds((m_frameDelay-timeElapsed.ElapsedMicroSecs()))/1000L);
-                }*/
-                if (!m_frameDelay)
-                {
-                    boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-                }
-            }
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1000/30));
         }
     }
     void StartPlaybackAsync()
@@ -81,19 +66,26 @@ public:
     void ReceiveRtp(RtpStreamer& streamer)
     {
         uint8_t* pdata = 0;
-        size_t len = streamer.GetPacket(0, &pdata, av_malloc);
-        if (len > 0)
+        for (uint32_t sourceId : streamer.GetSources())
         {
-            try
+            // Handle source sourceID here
+            //if (sourceId) continue;
+
+            size_t len = streamer.GetPacket(sourceId, &pdata, av_malloc);
+            if (len > 0)
             {
-                if (this->DecodeToFrame(pdata, len))
+                try
                 {
-                    m_newFrameAvailable = true;
+                    if (this->DecodeToFrame(pdata, len))
+                    {
+                        m_newFrameAvailable = true;
+                    }
                 }
-            }
-            catch (FailedToDecode)
-            {
-                std::cout << "packet lost :/" << std::endl;
+                catch (FailedToDecode)
+                {
+                    std::cout << "packet lost :/" << std::endl;
+                    m_newFrameAvailable = false;
+                }
             }
         }
     }
