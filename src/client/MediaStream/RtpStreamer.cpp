@@ -145,7 +145,6 @@ void RtpStreamer::StartReceiving()
             unit.sn = rtp.GetSequenceNumber();
             m_rtpUnits[rtp.GetSourceId()].list.push_back(std::move(unit));
             m_rtpUnits[rtp.GetSourceId()].list.sort();
-            //std::sort(m_rtpUnits[rtp.GetSourceId()].list.begin(), m_rtpUnits[rtp.GetSourceId()].list.end());
         }
         else boost::this_thread::sleep(boost::posix_time::milliseconds(30));
     }
