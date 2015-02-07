@@ -2,8 +2,6 @@
 #include <common/TcpHandler.h>
 #include <common/UdpHandler.h>
 #include <common/TcpRequest.h>
-#include "MediaStream/VideoPlayback.h"
-#include "MediaStream/VideoCapture.h"
 #include "MediaStream/RtpStreamer.h"
 
 /* Data passed to the message event handler */
@@ -56,10 +54,6 @@ public:
     // Get connectionId of server
     size_t GetServer() const { return m_serverId; }
 
-    // Start receiving Audio-Video asynchronously
-    void StartReceivingAV(VideoPlayback* videoPlaybackHandler, VideoCapture* videoCapture);
-    // Stop receviing Audio-Video data and clear all received units
-    void StopReceivingAV();
     // RTP Streamer
     RtpStreamer& GetRtpStreamer() { return m_rtpStreamer; }
 
@@ -91,8 +85,6 @@ private:
 
     // Streamer to send/receive av data
     RtpStreamer m_rtpStreamer;
-    VideoPlayback* m_videoPlayback;
-    VideoCapture* m_videoCapture;
 
     // List of the connections
     std::vector<Connection> m_connections;

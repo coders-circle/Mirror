@@ -3,7 +3,7 @@
 #include <common/ChatMessage.h>
 
 Client::Client()
-: m_udpHandler1(m_io), m_udpHandler2(m_io), m_videoPlayback(NULL), m_videoCapture(NULL)
+: m_udpHandler1(m_io), m_udpHandler2(m_io)
 {
     // Get a pair of consecutive even and odd udp ports
     UdpHandler::GetUdpPairs(m_udpHandler1, m_udpHandler2);
@@ -123,8 +123,6 @@ void Client::HandleRequests()
                 // See if any request is incomming for this connection
                 size_t bytes = m_connections[i].tcpHandler.Available();
                 ChatMessage chat;
-                //uint32_t id;
-                //bool joinChat;
                 // if so, process accordingly
                 if (bytes > 0)
                 {
@@ -203,46 +201,3 @@ void Client::SendMessage(size_t receiverId, const std::string& message, uint32_t
 }
 
 
-void Client::StartReceivingAV(VideoPlayback* videoPlayback, VideoCapture* videoCapture)
-{
-    m_videoCapture = videoCapture;
-    m_videoPlayback = videoPlayback;
-    boost::thread t([this](){
-        try
-        {
-            m_rtpStreamer.StartReceiving();
-        }
-        catch (std::exception &e)
-        {
-            m_rtpStreamer.StopReceiving();
-            std::cout << "Error on streaming\n\t" << e.what() << std::endl;
-        }
-    });
-
-    boost::thread t1([this](){
-        try
-        {
-            while(true)
-            {
-                if (m_videoCapture)
-                    m_videoCapture->SendRtp(m_rtpStreamer, GetUdpEndpoint(GetServer()), m_clientId);
-                //boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-                if (m_videoPlayback)
-                    m_videoPlayback->ReceiveRtp(m_rtpStreamer);
-                boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-            }
-        }
-        catch (std::exception &e)
-        {
-            m_rtpStreamer.StopReceiving();
-            std::cout << "Error on streaming\n\t" << e.what() << std::endl;
-        }
-    });
-}
-
-void Client::StopReceivingAV()
-{
-    m_rtpStreamer.StopReceiving();
-    m_videoPlayback = NULL;
-    m_videoCapture = NULL;
-}
