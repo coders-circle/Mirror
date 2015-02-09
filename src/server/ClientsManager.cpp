@@ -75,6 +75,7 @@ void ClientsManager::ProcessClients()
 
     while (true)
     {
+        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
         // Sleep for some time if no client is available
         while (m_clients.size() == 0)
             boost::this_thread::sleep(boost::posix_time::milliseconds(1000));

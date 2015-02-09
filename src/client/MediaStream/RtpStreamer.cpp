@@ -136,6 +136,7 @@ void RtpStreamer::StartReceiving()
             RtpUnit unit;
             unit.data.resize(1024);
             size_t len = rtp.Receive(&unit.data[0], 1024);
+            std::cout << len << std::endl;
             if (len == 0) 
                 continue;
             

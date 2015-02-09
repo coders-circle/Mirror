@@ -68,6 +68,9 @@ public:
             m_encodedPacketLock.unlock();
             throw FailedToEncode();
         }
+        while (true){
+
+        }
         m_encodedPacketLock.unlock();
         return m_encodedPacket;
     }

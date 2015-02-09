@@ -33,6 +33,7 @@ void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEnd
     m_packetAvailable = false;
     if (m_encodedPacket->size > 0)
         streamer.Send(rtp, m_encodedPacket->data, m_encodedPacket->size);
+    std::cout << "Sent " << m_encodedPacket->size << std::endl;
     m_sendSequence = rtp.GetSequenceNumber();
 }
 
@@ -119,6 +120,7 @@ void VideoCapture::Initialize()
 
 void VideoCapture::Record()
 {
+    int frameCount = 0;
     try
     {
         if (m_cameraAvailable){
@@ -136,11 +138,12 @@ void VideoCapture::Record()
                         0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
                     if (m_readyToSend)
                     {
-                        m_frameRGB->pts /= 10;
+                        m_frameRGB->pts = frameCount;
                         if (this->EncodeToPacket(m_frameRGB))
                         {
                             m_readyToSend = false;
                             m_packetAvailable = true;
+                            ++frameCount;
                         }
                     }
                     else boost::this_thread::sleep(boost::posix_time::milliseconds(20));
