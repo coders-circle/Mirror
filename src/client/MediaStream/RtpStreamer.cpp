@@ -26,35 +26,6 @@ void RtpStreamer::Send(RtpPacket& rtp, uint8_t* data, size_t len)
     }
 }
 
-// Receive fragmented RTP packets into single memory block
-size_t RtpStreamer::Receive(RtpPacket& rtp, uint8_t** data, void* (*allocator)(size_t))
-{
-    // A vector of fragments where each fragment is a vector of bytes
-    std::vector<std::vector<uint8_t>> datas;
-    size_t tlen = 0;    // The total length of received data
-
-    // We receive all RTP packets for which marker bit on rtp header is unset
-    // and only break the process when marker bit is set on the received packet
-    do
-    {
-        datas.push_back(std::vector<uint8_t>(1024));
-        size_t sz = rtp.Receive(&datas[datas.size()-1][0], 1024);
-        datas[datas.size()-1].resize(sz);
-        tlen += sz;
-    } while (!rtp.IsMarkerSet());
-
-    // Allocate memory for the total received data and send back the pointer
-    uint8_t* newdata = *data = (uint8_t*)allocator(tlen);
-    // In the allocated memory, copy all data from each fragment
-    for (size_t i = 0; i < datas.size(); ++i)
-    {
-        memcpy(newdata, &datas[i][0], datas[i].size());
-        newdata += datas[i].size();
-    }
-
-    return tlen;
-}
-
 // Get a received frame of data; rtp packets are merged till the packet that contains the marker bit
 size_t RtpStreamer::GetPacket(uint32_t source, uint8_t** data, void* (*allocator)(size_t))
 {
@@ -98,12 +69,15 @@ size_t RtpStreamer::GetPacket(uint32_t source, uint8_t** data, void* (*allocator
         newdata += jt->data.size();
         auto toerase = jt;
         if (jt == it) 
+        {
+            ++it;
+            rtunits.list.erase(toerase);
             break;
+        }
         jt++;
-
         rtunits.list.erase(toerase);
     }
-    rtunits.begin = ++it;
+    rtunits.begin = it;
     
     return tlen;
 }
@@ -138,7 +112,7 @@ void RtpStreamer::StartReceiving()
             size_t len = rtp.Receive(&unit.data[0], 1024);
             if (len == 0) 
                 continue;
-            
+
             // Add each rtp packet to the list and sort it
             unit.data.resize(len);
             unit.marker = rtp.IsMarkerSet();

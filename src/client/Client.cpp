@@ -201,3 +201,33 @@ void Client::SendMessage(size_t receiverId, const std::string& message, uint32_t
 }
 
 
+void Client::TestVideo()
+{
+    boost::thread t([this](){m_rtpStreamer.StartReceiving();});
+    RtpPacket packet;
+    packet.Initialize(&m_udpHandler1, m_connections[m_serverId].udpEndpoint);
+    packet.SetSourceId(m_clientId);
+    int i=0;
+    while(1)
+    {
+        boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+        if (i<10){
+        std::vector<char> data;
+        data.resize(50000);
+        for (size_t i=0; i<data.size(); ++i)
+            data[i] = i%255;
+        m_rtpStreamer.Send(packet, (uint8_t*)&data[0], data.size());
+        std::cout << "Sending: " << data.size() << std::endl;
+        i++;
+        }
+        uint8_t * rdata;
+        if (m_rtpStreamer.GetSources().size() > 0)
+        {
+            uint32_t srcid = m_rtpStreamer.GetSources()[0];
+            size_t len = m_rtpStreamer.GetPacket(srcid, &rdata, malloc);
+            std::cout << len << " from " << srcid << std::endl;
+        }
+    }
+    m_rtpStreamer.StopReceiving();
+}
+

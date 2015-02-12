@@ -19,7 +19,8 @@ int main(int argc, char *argv[])
         client.JoinChat(client.GetServer());
         client.JoinVideoChat(client.GetServer());
 
-        client.HandleRequests();
+        client.HandleRequestsAsync();
+        client.TestVideo();
         
         return 0;
     }

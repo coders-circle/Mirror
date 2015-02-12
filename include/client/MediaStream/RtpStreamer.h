@@ -10,12 +10,7 @@ public:
     
     // Send the data as fragmented RTP packets
     void Send(RtpPacket& rtp, uint8_t* data, size_t len);
-    // Receive fragmented RTP packets into single memory block
-    // An allocater needs to be passed to allocate the memory block
-    // WARNING: DONOT USE
-    size_t Receive(RtpPacket& rtp, uint8_t** data, void* (*allocator)(size_t));
-
-
+    
     // Start receiving Rtp packets and keeping the order of their sequence number
     //  merge the fragmented ones into single unit
     void StartReceiving();

@@ -57,6 +57,8 @@ public:
     // RTP Streamer
     RtpStreamer& GetRtpStreamer() { return m_rtpStreamer; }
 
+    void TestVideo();
+
     // Get remote udp endpoint of a connection
     const udp::endpoint& GetUdpEndpoint(size_t connectionId) const { return m_connections[connectionId].udpEndpoint; }
     UdpHandler& GetUdpHandler1() { return m_udpHandler1; }
