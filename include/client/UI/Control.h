@@ -1,5 +1,4 @@
-#ifndef __CONTROL__
-#define __CONTROL__
+#pragma once
 
 #include <gtk/gtk.h>
 #include <string>
@@ -10,20 +9,26 @@ enum CONTROL{ BUTTON, LABEL, TEXTEDIT, STATUSBAR, SPINNER, FRAMERENDERER};
 class Control
 {
 public:
-    Control() :m_handle(0){}
-    void SetID(int id);
-    int GetID();
-    void PutFixedAt(GtkWidget *fixed, int x, int y);
-    void PutFixedRelativeTo(Control* obj, GtkWidget* fixed, int xOffset, int yOffset);
+    Control();
+    virtual void SetID(int id);
+    virtual int ID();
+    virtual int GetID();
+    virtual void PutFixedAt(GtkWidget *fixedContainer, int x, int y);
     virtual void Show();
     virtual void Hide();
-    GtkWidget* GetHandle();
+    virtual GtkWidget* GetHandle();
+
+    virtual void MoveTo(int x, int y);
+    virtual void Resize(int w, int h);
+
+    void SetContainer(GtkWidget* container);
+
 protected:
     GtkWidget* m_handle;
+    GtkWidget* m_container;
     int m_x, m_y, m_w, m_h;
     std::string m_label;
     int m_type;
     int m_id;
 };
 
-#endif

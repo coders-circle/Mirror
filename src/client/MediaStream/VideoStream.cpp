@@ -1,35 +1,36 @@
 #include "common/common.h"
 #include "client/MediaStream/VideoStream.h"
-
-
-void VideoStream::Test()
-{
-    /*this->InitializeEncoder(800, 480, 15, 600000);
-    int w = m_encoderContext->width;
-    int h = m_encoderContext->height;
-    
-    boost::thread memLeakTestThread([this, w, h]()
-    {
-    uint8_t *rgb24Data = new uint8_t[w*h * 3];
-        unsigned long long pts = 0;
-        while (1)
-        {
-            for (int y = 0; y < h; y++)
-            {
-                for (int x = 0; x < w; x++)
-                {
-                    rgb24Data[3 * (y*w + x) + 0] = 255.0*abs(sin(pts*3.14159f / 360.0f));
-                    rgb24Data[3 * (y*w + x) + 1] = 255.0*abs(sin(x*3.14159f / 800.0f));
-                    rgb24Data[3 * (y*w + x) + 2] = 255.0*abs(sin(y*3.14159f / 480.0f));
-                    
-                }
-            }
-            this->AddFrame(rgb24Data, pts++);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-        }
-        
-    });*/
-}
+//
+//
+//void VideoStream::Test()
+//{
+//    this->InitializeEncoder(640, 480, 30, 400000);
+//    int w = m_encoderContext->width;
+//    int h = m_encoderContext->height;
+//    
+//    boost::thread memLeakTestThread([this, w, h]()
+//    {
+//        uint8_t *rgb24Data = new uint8_t[w*h * 3];
+//        unsigned long long pts = 0;
+//        while (1)
+//        {
+//            for (int y = 0; y < h; y++)
+//            {
+//                for (int x = 0; x < w; x++)
+//                {
+//                    rgb24Data[3 * (y*w + x) + 0] = 255.0*abs(sin(pts*3.14159f / 360.0f));
+//                    rgb24Data[3 * (y*w + x) + 1] = 255.0*abs(sin(x*3.14159f / 800.0f));
+//                    rgb24Data[3 * (y*w + x) + 2] = 255.0*abs(sin(y*3.14159f / 480.0f));
+//                    
+//                }
+//            }
+//            this->EncodeToPacket(rgb24Data, pts++);
+//            this->newAvailable = true;
+//            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+//        }
+//        
+//    });
+//}
 
 
 VideoStream::VideoStream() 
@@ -41,9 +42,7 @@ VideoStream::VideoStream()
     m_fh = 0;
     m_fps = 0;
 
-    m_decodedFrame = av_frame_alloc();
-    m_encodedPacket = new AVPacket;
-    av_init_packet(m_encodedPacket);
+    
 }
 
 VideoStream::~VideoStream()
@@ -64,84 +63,6 @@ void VideoStream::InitializeDecoder()
     this->OpenCodec(m_decoderContext, m_decoder);
 }
 
-void VideoStream::AddPacket(uint8_t *packetData, int packetSize)
-{
-    AVPacket* pkt = new AVPacket();
-    av_init_packet(pkt);
-    pkt->data = packetData;
-    pkt->size = packetSize;
-    this->AddPacket(pkt);
-    av_free_packet(pkt);
-}
-
-void VideoStream::AddPacket(AVPacket* pkt)
-{
-    AVFrame* frame = av_frame_alloc();
-    int framePresent = 0;
-    if (avcodec_decode_video2(m_decoderContext, frame, &framePresent, pkt) < 0)
-    {
-        throw FailedToDecode();
-    }
-    if (framePresent)
-    {
-        if (frame->width != 0)
-        {
-            while (!m_decodedFrameLock.try_lock())
-                ;
-                //std::cout << "Addpacket waiting" << std::endl;
-            unsigned int frameIndex = this->AllocateNewDecodedFrame();
-            m_decodedFrames[frameIndex] = av_frame_clone(frame);            
-            if (!m_decodedFrames[frameIndex])
-            {
-                m_decodedFrames[frameIndex] = av_frame_alloc();
-            }
-            av_frame_copy(m_decodedFrames[frameIndex], frame);
-            m_decodedFrameLock.unlock();
-            if (m_rawData.size() == 0)
-            {
-                // this is the first time we get the filled frame
-                // so allocate enough memory for raw data and
-                // initialize scaler context for color fromat conversion
-                this->AllocateRawData(frame->height*frame->width * 3);
-                if (m_YUV420PToRGB24ConverterContext)
-                {
-                    //should not happen
-                    sws_freeContext(m_YUV420PToRGB24ConverterContext);
-                }
-                
-                m_fw = frame->width;
-                m_fh = frame->height;
-                m_fps = m_decoderContext->time_base.den/(m_decoderContext->time_base.num*m_decoderContext->ticks_per_frame);
-                std::cout << m_fps << std::endl;
-                m_YUV420PToRGB24ConverterContext = sws_getContext(m_fw, m_fh, AV_PIX_FMT_YUV420P, 
-                    m_fw, m_fh, AV_PIX_FMT_RGB24, SWS_BICUBIC, 0, 0, 0);
-            }
-        }
-    }
-    av_frame_free(&frame);
-}
-
-
-unsigned char* VideoStream::GetRawRGBData(unsigned int decodedFrameIndex)
-{
-    if (decodedFrameIndex >= m_decodedFrames.size())
-    {
-        throw Exception("invalid frame index");
-    }
-    int w = m_decodedFrames[decodedFrameIndex]->width;
-    int h = m_decodedFrames[decodedFrameIndex]->height;
-    if (w != 0)
-    {
-        AVFrame* yuvFrame = m_decodedFrames[decodedFrameIndex];
-        AVPicture *rgbFrame = new AVPicture;
-        avpicture_alloc(rgbFrame, AV_PIX_FMT_RGB24, w, h);
-        sws_scale(m_YUV420PToRGB24ConverterContext, yuvFrame->data, yuvFrame->linesize, 0, h, rgbFrame->data, rgbFrame->linesize);
-        memcpy(m_rawData.data(), rgbFrame->data[0], w*h * 3);
-        avpicture_free(rgbFrame);
-        delete rgbFrame;
-    }
-    return m_rawData.data();
-}
 
 void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
 {
@@ -170,60 +91,3 @@ void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
     m_fh = h;
     m_fps = fps;
 }
-
-
-void VideoStream::AddFrame(uint8_t* rgb24Data, uint64_t pts)
-{
-    AVFrame *frame = av_frame_alloc();
-    frame->width = m_encoderContext->width;
-    frame->height = m_encoderContext->height;
-    frame->format = m_encoderContext->pix_fmt;
-    frame->pts = pts;
-
-    if (av_image_alloc(frame->data, frame->linesize, m_encoderContext->width,
-        m_encoderContext->height, m_encoderContext->pix_fmt, 32) < 0)
-    {
-        throw Exception("failed to allocate raw picture buffer");
-    }
-
-    // Convert RGB data to YUV before adding the frame for encoding
-    uint8_t * inData[1] = { rgb24Data };                    // RGB24 have only one plane
-    int inLinesize[1] = { 3 * m_encoderContext->width };    // RGB stride
-    sws_scale(m_RGB24ToYUP420PConverterContext, inData, inLinesize, 0, frame->height, frame->data, frame->linesize);
-    
-    // Add frame for encoding
-    this->AddFrame(frame);
-    av_freep(&frame->data[0]);
-    av_frame_free(&frame);
-}
-
-
-void VideoStream::AddFrame(AVFrame *frame)
-{
-    while (!m_encodedPacketLock.try_lock())
-        std::cout << "AddFrame waiting ... :/" << std::endl;
-    unsigned int packetIndex = this->AllocateNewEndodedPacket();
-    m_encodedPackets[packetIndex] = new AVPacket;
-    av_init_packet(m_encodedPackets[packetIndex]);
-    AVPacket* pkt = m_encodedPackets[packetIndex];
-    pkt->data = NULL;   // packet data will be allocated by the encoder
-    pkt->size = 0;
-
-    // The output packet doesn't necessarily contain encoded data for most
-    // recent frame, as encoder can delay and reorder input frames internally
-    // as required.
-    //
-    // But in our case packets should never be delayed.
-    //
-    // 'packetFilled' checks if the packet is delayed or not
-    int packetFilled = 0;
-    if (avcodec_encode_video2(m_encoderContext, pkt, frame, &packetFilled) < 0)
-    {
-        m_encodedPacketLock.unlock();
-        throw FailedToEncode();
-    }
-    m_encodedPacketLock.unlock();
-}
-
-
-

@@ -7,17 +7,19 @@
 #include "client/MediaStream/VideoPlayback.h"
 
 
-VideoPlayback *v;
+//VideoPlayback *v;
 
-Client client;
+//Client client;
 int main(int argc, char *argv[])
 try
 {
-    std::string ip;
-    std::cout << "Enter server ip: ";
-    std::cin >> ip;
     av_register_all();
     avdevice_register_all();
+
+    /*std::string ip;
+    std::cout << "Enter server ip: ";
+    std::cin >> ip;
+    
 
     client.SetServer(client.Connect(tcp::endpoint(boost::asio::ip::address::from_string(ip), 10011)));
     client.JoinChat(client.GetServer());
@@ -27,10 +29,10 @@ try
     VideoCapture cap;
     cap.StartRecording();
 
-    v = new VideoPlayback();
+    v = new VideoPlayback();*/
     //v->InitializeDecoder();
     
-    client.StartReceivingAV(v, &cap);
+    //client.StartReceivingAV(v, &cap);
 
     GtkWidget *mainWindow;
     gtk_init(&argc, &argv);
@@ -55,17 +57,52 @@ try
     GtkWidget* fixed = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(mainWindow), fixed);
 
-    v->Set(fixed, 10, 10);
-    v->StartPlaybackAsync();
+    //v->Set(fixed, 10, 10);
+    //v->StartPlaybackAsync();
 
+    VideoPlaybackManager vpm;
+    RandomVideoGenerator rv0, rv1, rv2, rv3;
+    vpm.Set(fixed);
+    volatile bool done = false;
+    
+    boost::thread testThread0 = boost::thread([&done, &vpm, &rv0]()
+    {
+        while (!done){
+            vpm.SetPacket(0, rv0.GetPacket());
+        }
+    });
+    boost::thread testThread1 = boost::thread([&done, &vpm, &rv1]()
+    {
+        while (!done){
+            vpm.SetPacket(1, rv1.GetPacket());
+        }
+    });
+    boost::thread testThread2 = boost::thread([&done, &vpm, &rv2]()
+    {
+        while (!done){
+            vpm.SetPacket(2, rv2.GetPacket());
+        }
+    });
+    boost::thread testThread3 = boost::thread([&done, &vpm, &rv3]()
+    {
+        while (!done){
+            vpm.SetPacket(3, rv3.GetPacket());
+        }
+    });
 
     gtk_widget_show_all(mainWindow);
     /*Application app;
     app.Initialize(mainWindow, fixed);*/
     gtk_main();
-
-    client.StopReceivingAV();
-    cap.StopRecording();
+    done = true;
+    testThread1.join();
+    testThread2.join();
+    testThread3.join();
+    testThread0.join();
+    rv0.End();
+    rv1.End();
+    rv2.End();
+    rv3.End();
     return 0;
 }
 catch (std::exception err)

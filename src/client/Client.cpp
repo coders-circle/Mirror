@@ -224,11 +224,11 @@ void Client::StartReceivingAV(VideoPlayback* videoPlayback, VideoCapture* videoC
         {
             while(true)
             {
-                if (m_videoCapture)
-                    m_videoCapture->SendRtp(m_rtpStreamer, GetUdpEndpoint(GetServer()), m_clientId);
+                /*if (m_videoCapture)
+                    m_videoCapture->SendRtp(m_rtpStreamer, GetUdpEndpoint(GetServer()), m_clientId);*/
                 //boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-                if (m_videoPlayback)
-                    m_videoPlayback->ReceiveRtp(m_rtpStreamer);
+                /*if (m_videoPlayback)
+                    m_videoPlayback->ReceiveRtp(m_rtpStreamer);*/
                 boost::this_thread::sleep(boost::posix_time::milliseconds(10));
             }
         }

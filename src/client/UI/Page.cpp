@@ -61,7 +61,7 @@ Control* Page::AddLabel(std::string label, int x, int y, int w, int h, int justi
 {
     this->AllocateNewControl(CONTROL::LABEL, -1);
     ((Label*)m_controls[m_controls.size() - 1])->Set(label, m_fixed, x, y, w, h);
-    ((Label*)m_controls[m_controls.size() - 1])->SetJustify(justification);
+    //((Label*)m_controls[m_controls.size() - 1])->SetJustify(justification);
     return m_controls[m_controls.size() - 1];
 }
 

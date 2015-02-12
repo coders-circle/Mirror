@@ -11,31 +11,31 @@ VideoCapture::VideoCapture()
 }
 
 
-void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint, uint32_t sourceId)
-{
-    if (!m_cameraAvailable)
-        return;
-
-    if (!m_recording)
-        return;
-    // We will use a RTP streamer to stream out the encoded packets
-    // over as fragmented RTP packets
-    RtpPacket rtp;
-    // Initialize the sending parameters for the RTP packets
-    rtp.Initialize(streamer.GetUdpHandler(), remoteEndpoint);
-    rtp.SetPayloadType(123);
-    rtp.SetSourceId(sourceId);
-    rtp.SetSequenceNumber(m_sendSequence);
-    m_readyToSend = true;
-    while (!m_packetAvailable)
-        //;
-        boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-    m_packetAvailable = false;
-    if (m_encodedPacket->size > 0)
-        streamer.Send(rtp, m_encodedPacket->data, m_encodedPacket->size);
-    std::cout << "Sent " << m_encodedPacket->size << std::endl;
-    m_sendSequence = rtp.GetSequenceNumber();
-}
+//void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint, uint32_t sourceId)
+//{
+//    if (!m_cameraAvailable)
+//        return;
+//
+//    if (!m_recording)
+//        return;
+//    // We will use a RTP streamer to stream out the encoded packets
+//    // over as fragmented RTP packets
+//    RtpPacket rtp;
+//    // Initialize the sending parameters for the RTP packets
+//    rtp.Initialize(streamer.GetUdpHandler(), remoteEndpoint);
+//    rtp.SetPayloadType(123);
+//    rtp.SetSourceId(sourceId);
+//    rtp.SetSequenceNumber(m_sendSequence);
+//    m_readyToSend = true;
+//    while (!m_packetAvailable)
+//        //;
+//        boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+//    m_packetAvailable = false;
+//    if (m_encodedPacket->size > 0)
+//        streamer.Send(rtp, m_encodedPacket->data, m_encodedPacket->size);
+//    std::cout << "Sent " << m_encodedPacket->size << std::endl;
+//    m_sendSequence = rtp.GetSequenceNumber();
+//}
 
 
 void VideoCapture::CleanUp()

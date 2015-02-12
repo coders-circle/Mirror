@@ -1,6 +1,11 @@
 #include <common/common.h>
 #include "client/UI/Control.h"
 
+Control::Control() :m_container(0), m_handle(0)
+{
+
+}
+
 void Control::PutFixedAt(GtkWidget *fixed, int x, int y)
 {
     m_x = x;
@@ -13,9 +18,23 @@ GtkWidget* Control::GetHandle()
     return m_handle;
 }
 
-void Control::PutFixedRelativeTo(Control* obj, GtkWidget* fixed, int xOffset, int yOffset)
+void Control::SetContainer(GtkWidget* container)
 {
-    this->PutFixedAt(fixed, obj->m_x + xOffset, obj->m_y + yOffset);
+    m_container = container;
+}
+
+void Control::MoveTo(int x, int y)
+{
+    m_x = x;
+    m_y = y;
+    gtk_fixed_move(GTK_FIXED(m_container), m_handle, m_x, m_y);
+}
+
+void Control::Resize(int w, int h)
+{
+    m_w = w;
+    m_h = h;
+    gtk_widget_set_size_request(m_handle, m_w, m_h);
 }
 
 void Control::SetID(int id)
@@ -24,6 +43,11 @@ void Control::SetID(int id)
 }
 
 int Control::GetID()
+{
+    return m_id;
+}
+
+int Control::ID()
 {
     return m_id;
 }

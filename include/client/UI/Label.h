@@ -17,7 +17,6 @@ public:
         m_y = y;
         m_w = w;
         m_h = h;
-
        
         scw = gtk_scrolled_window_new(NULL, NULL);
         gtk_scrolled_window_set_min_content_width(GTK_SCROLLED_WINDOW(scw), m_w);
@@ -39,7 +38,6 @@ public:
     {
         if (scw)
             gtk_widget_show(scw);
-        
         Control::Show();
     }
     void Hide()
@@ -56,11 +54,6 @@ public:
         std::string temp = buff + std::string("\n");
         gtk_label_set_label(GTK_LABEL(m_handle), temp.c_str());
         this->ScrollToEnd();
-    }
-    void SetJustify(int justification)
-    {
-        //gtk_label_set_justify(GTK_LABEL(this->m_handle), (GtkJustification)justification);
-        //gtk_widget_set_halign(this->m_handle, GTK_ALIGN_START);
     }
 private:
     GtkWidget* scw;

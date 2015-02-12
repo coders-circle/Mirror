@@ -7,6 +7,16 @@ MediaStream::MediaStream()
     m_decoder = 0;
     m_encoderContext = 0;
     m_decoderContext = 0;
+
+    m_encodedPacketBuffer = new AVPacket;
+    av_init_packet(m_encodedPacketBuffer);
+
+    m_decodedFrame = av_frame_alloc();
+    m_encodedPacket = new AVPacket;
+    av_init_packet(m_encodedPacket);
+
+    m_newPacketAvailable = false;
+    m_newFrameAvailable = false;
 }
 
 MediaStream::~MediaStream()
@@ -26,39 +36,6 @@ MediaStream::~MediaStream()
         av_freep(&m_decoderContext);
     }
 }
-
-unsigned int MediaStream::AllocateNewEndodedPacket()
-{
-    m_encodedPackets.resize(m_encodedPackets.size() + 1);
-    return (m_encodedPackets.size() - 1);
-}
-
-unsigned int MediaStream::AllocateNewDecodedFrame()
-{
-    m_decodedFrames.resize(m_decodedFrames.size() + 1);
-    return (m_decodedFrames.size() - 1);
-}
-
-void MediaStream::EraseEncodedPacketFromHead(unsigned int noOfPackets)
-{
-    m_encodedPackets.erase(m_encodedPackets.begin(), m_encodedPackets.begin() + noOfPackets);
-}
-
-void MediaStream::EraseDecodedFrameFromHead(unsigned int noOfFrames)
-{
-    m_decodedFrames.erase(m_decodedFrames.begin(), m_decodedFrames.begin() + noOfFrames);
-}
-
-unsigned int MediaStream::AllocateRawData(unsigned int noOfBytesToAdd)
-{
-    m_rawData.resize(m_rawData.size() + noOfBytesToAdd);
-    return (m_rawData.size() - noOfBytesToAdd);
-}
-void MediaStream::EraseRawDataFromHead(unsigned int noOfBytesToRemove)
-{
-    m_rawData.erase(m_rawData.begin(), m_rawData.begin() + noOfBytesToRemove);
-}
-
 
 void MediaStream::SetupEncoder()
 {
@@ -95,25 +72,6 @@ void MediaStream::OpenCodec(AVCodecContext* codecContext, AVCodec* codec)
         throw Exception("failed to open the codec");
     }
 }
-
-unsigned int MediaStream::AllocateEncodedDataStream(unsigned int noOfBytesToAdd)
-{
-    m_encodedDataStream.resize(m_encodedDataStream.size() + noOfBytesToAdd);
-    return (m_encodedDataStream.size() - noOfBytesToAdd);
-}
-
-void MediaStream::EraseEncodedDataStreamFromHead(unsigned int noOfBytesToRemove)
-{
-    m_encodedDataStream.erase(m_encodedDataStream.begin(), m_encodedDataStream.begin() + noOfBytesToRemove);
-}
-
-void MediaStream::AddEncodedDataStream(unsigned char* encodedStream, unsigned int streamSizeInBytes)
-{
-    int encodedDataStreamIndex = this->AllocateEncodedDataStream(streamSizeInBytes);
-    memcpy(m_encodedDataStream.data() + encodedDataStreamIndex, encodedStream, streamSizeInBytes);
-}
-
-
 
 #ifdef _WIN32
 #pragma comment(lib, "avutil.lib")

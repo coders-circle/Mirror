@@ -27,7 +27,8 @@ void FrameRenderer::SetRGBData(unsigned char* rgbData)
 void FrameRenderer::SetBGRAData(unsigned char* bgraData)
 {
     memcpy(m_rawBGRAData, bgraData, (m_w*m_h) << 2);
-    gtk_widget_queue_draw_area(m_handle, 0, 0, m_w, m_h);
+    gtk_widget_queue_draw(m_handle);
+    //gtk_widget_queue_draw_area(m_)
 }
 
 
@@ -36,7 +37,7 @@ gboolean FrameRenderer::OnDraw(GtkWidget* widget, cairo_t* cr, gpointer frPointe
     FrameRenderer* fr = (FrameRenderer*)frPointer;
     cairo_set_source_surface(cr, fr->m_drawingSurface, 0, 0);
     cairo_paint(cr);
-    return TRUE;
+    return FALSE;
 }
 
 

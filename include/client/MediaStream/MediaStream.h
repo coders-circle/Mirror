@@ -1,7 +1,6 @@
 #pragma once
 
-#include <common/common.h>
-#include "common/Exception.h"
+#include "common/common.h"
 
 extern "C"
 {
@@ -58,6 +57,20 @@ public:
 class MediaStream
 {
 public:
+    AVPacket* GetPacket()
+    {
+        while (!m_newPacketAvailable)
+            boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+        boost::lock_guard<boost::mutex> locker(m_encodedPacketLock);
+        m_newPacketAvailable = false;
+        /*if (m_encodedPacketBuffer->size)
+        {
+            av_free_packet(m_encodedPacketBuffer);
+        }
+        av_init_packet(m_encodedPacket);
+        av_copy_packet(m_encodedPacketBuffer, m_encodedPacket);*/
+        return m_encodedPacket;
+    }
 protected:
     MediaStream();
     ~MediaStream();
@@ -70,37 +83,6 @@ protected:
 
     // Open the codec for the context setup
     void OpenCodec(AVCodecContext* codecContext, AVCodec* codec);
-
-    // Allocates memory for a new encoded packet
-    unsigned int AllocateNewEndodedPacket();
-
-    // Allocates memory for a new decoded frame
-    unsigned int AllocateNewDecodedFrame();
-
-    // Removes the given no. of packets from the begining of the packets
-    void EraseEncodedPacketFromHead(unsigned int noOfPackets = 1);
-
-    // Removes the given no. of frames from the begining of the frames
-    void EraseDecodedFrameFromHead(unsigned int noOfFrames = 1);
-
-    // Allocates memory for the given no. of bytes to add into the raw data
-    unsigned int AllocateRawData(unsigned int noOfBytesToAdd = 1);
-
-    // Removes the given no. of bytes from the begining of the raw data
-    void EraseRawDataFromHead(unsigned int noOfBytesToRemove = 1);
-
-    // Allocates memory for the given no. of bytes to add into the encoded data stream
-    // used exclusively for continious decoding process
-    unsigned int AllocateEncodedDataStream(unsigned int noOfBytesToAdd);
-
-    // Removes the given no. of bytes from the begining of the encoded stream
-    // used exclusively for continious decoding process
-    void EraseEncodedDataStreamFromHead(unsigned int noOfBytesToAdd);
-
-    // Adds data stream to the decoding queue
-    // used exclusively for continious decoding process
-    void AddEncodedDataStream(unsigned char* encodedStream, unsigned int streamSizeInBytes);
-    
     
     //--------------------------------------------------
     //common variables required for a audio/video stream
@@ -118,30 +100,18 @@ protected:
     AVCodec *m_decoder;                 // Decoder Handle
     AVCodecContext *m_decoderContext;   // Decoder Context
 
-    std::vector<AVPacket*>  m_encodedPackets;   // Encoded Packets
-    std::vector<AVFrame*>   m_decodedFrames;    // Decoded Frames
-
     // used to store raw data
     // typical use:
     // to return raw data after decoding,
     std::vector<uint8_t> m_rawData;
 
-    // used to store encoded data stream which is then
-    // queued for the decoding process
-    // used exclusive for continious decoding process
-    std::vector<uint8_t> m_encodedDataStream;
-
-
-    // mutex to lock encoded frames
-    boost::mutex m_frameLock;
-
     boost::mutex m_decodedFrameLock;
     boost::mutex m_encodedPacketLock;
 
-
-    // new Approach
     AVPacket* m_encodedPacket;
+    AVPacket* m_encodedPacketBuffer;
     AVFrame* m_decodedFrame;
 
-    
+    bool m_newPacketAvailable;
+    bool m_newFrameAvailable;
 };
