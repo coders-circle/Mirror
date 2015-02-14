@@ -9,7 +9,7 @@ public:
     void Initialize(UdpHandler* udpHandler) { m_udpHandler = udpHandler; }
     
     // Send the data as fragmented RTP packets
-    void Send(RtpPacket& rtp, uint8_t* data, size_t len);
+    void Send(RtpPacket& rtp, const uint8_t* data, size_t len);
     
     // Start receiving Rtp packets and keeping the order of their sequence number
     //  merge the fragmented ones into single unit

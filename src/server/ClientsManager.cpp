@@ -167,6 +167,14 @@ void ClientsManager::ProcessClients()
             }
         }
         
+
+        /* 
+            TODO:
+                    Too slow processing leads to overwriting of udp data from one client by another
+                    before being processed.
+                    It might be better to process the data in separate threads.
+                    Temporarily, this can be avoided if client doesn't send udp data too frequently
+        */
         // Also check for udp data
         if (m_udpHandler1.GetSocket()->available() > 0)
         {

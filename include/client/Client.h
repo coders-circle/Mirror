@@ -3,6 +3,7 @@
 #include <common/UdpHandler.h>
 #include <common/TcpRequest.h>
 #include "MediaStream/RtpStreamer.h"
+#include "MediaStream/MediaStreamer.h"
 
 /* Data passed to the message event handler */
 struct MessageEventData
@@ -57,7 +58,14 @@ public:
     // RTP Streamer
     RtpStreamer& GetRtpStreamer() { return m_rtpStreamer; }
 
-    void TestVideo();
+    // Start streaming media (asynchronously)
+    // MediaStreamer will receive the recieved data
+    //  and will be initialized to be able to send data
+    void StartStreaming(MediaStreamer& mediaStreamer);
+    // Stop streaming media
+    void StopStreaming();
+    // Check if media is streaming
+    bool IsStreaming() { return m_streaming; }
 
     // Get remote udp endpoint of a connection
     const udp::endpoint& GetUdpEndpoint(size_t connectionId) const { return m_connections[connectionId].udpEndpoint; }
@@ -87,6 +95,7 @@ private:
 
     // Streamer to send/receive av data
     RtpStreamer m_rtpStreamer;
+    bool m_streaming;       // Is in streaming state?
 
     // List of the connections
     std::vector<Connection> m_connections;

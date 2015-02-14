@@ -3,7 +3,7 @@
 #include <common/ChatMessage.h>
 
 Client::Client()
-: m_udpHandler1(m_io), m_udpHandler2(m_io)
+: m_udpHandler1(m_io), m_udpHandler2(m_io), m_streaming(false)
 {
     // Get a pair of consecutive even and odd udp ports
     UdpHandler::GetUdpPairs(m_udpHandler1, m_udpHandler2);
@@ -201,33 +201,55 @@ void Client::SendMessage(size_t receiverId, const std::string& message, uint32_t
 }
 
 
-void Client::TestVideo()
+void Client::StartStreaming(MediaStreamer& mediaStreamer)
 {
-    boost::thread t([this](){m_rtpStreamer.StartReceiving();});
-    RtpPacket packet;
-    packet.Initialize(&m_udpHandler1, m_connections[m_serverId].udpEndpoint);
-    packet.SetSourceId(m_clientId);
-    int i=0;
-    while(1)
-    {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(200));
-        if (i<10){
-        std::vector<char> data;
-        data.resize(50000);
-        for (size_t i=0; i<data.size(); ++i)
-            data[i] = i%255;
-        m_rtpStreamer.Send(packet, (uint8_t*)&data[0], data.size());
-        std::cout << "Sending: " << data.size() << std::endl;
-        i++;
-        }
-        uint8_t * rdata;
-        if (m_rtpStreamer.GetSources().size() > 0)
+    m_streaming = true;
+    boost::thread t([this](){
+        try
         {
-            uint32_t srcid = m_rtpStreamer.GetSources()[0];
-            size_t len = m_rtpStreamer.GetPacket(srcid, &rdata, malloc);
-            std::cout << len << " from " << srcid << std::endl;
+            m_rtpStreamer.StartReceiving();
         }
-    }
-    m_rtpStreamer.StopReceiving();
+        catch (std::exception& ex)
+        {
+            std::cout << "Rtp Streaming Failure: " << ex.what() << std::endl; 
+            m_streaming = false;
+        }
+    });
+    
+    boost::thread t1([this, &mediaStreamer](){
+        try
+        {
+            mediaStreamer.InitializeStreamer(&m_rtpStreamer, &m_streaming, &m_udpHandler1, m_connections[m_serverId].udpEndpoint, m_clientId);
+            while(m_streaming)
+            {
+                boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+                uint8_t * rdata;
+                auto sources = m_rtpStreamer.GetSources();
+                for (size_t i=0; i<sources.size(); ++i)
+                {
+                    if (i >= sources.size())
+                        break;
+                    uint32_t srcid = sources[i];
+                    size_t len = m_rtpStreamer.GetPacket(srcid, &rdata, malloc);
+                    if (len > 0)
+                    {
+                        mediaStreamer.Receive(srcid, rdata, len);
+                        free(rdata);
+                    }
+                    sources = m_rtpStreamer.GetSources();
+                }
+            }
+        }
+        catch (std::exception& ex)
+        {
+            std::cout << "Media Streaming Failure: " << ex.what() << std::endl;
+            m_streaming = false;
+        }
+        m_rtpStreamer.StopReceiving();
+    });
 }
 
+void Client::StopStreaming()
+{
+    m_streaming = false;
+}

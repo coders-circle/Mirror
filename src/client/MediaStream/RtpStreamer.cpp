@@ -2,7 +2,7 @@
 #include <client/MediaStream/RtpStreamer.h>
 
 // Send the data as fragmented RTP packets
-void RtpStreamer::Send(RtpPacket& rtp, uint8_t* data, size_t len)
+void RtpStreamer::Send(RtpPacket& rtp, const uint8_t* data, size_t len)
 {
     boost::lock_guard<boost::mutex> guard(m_mutex);
 
@@ -101,7 +101,6 @@ void RtpStreamer::StartReceiving()
     // Receive the packets till StopReceiving is called
     while (m_receiving)
     {
-        //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         // sleep(...)
         if (m_udpHandler->GetSocket()->available() > 0)
         {
@@ -120,7 +119,7 @@ void RtpStreamer::StartReceiving()
             m_rtpUnits[rtp.GetSourceId()].list.push_back(std::move(unit));
             m_rtpUnits[rtp.GetSourceId()].list.sort();
         }
-        else boost::this_thread::sleep(boost::posix_time::milliseconds(30));
+        else boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
 }
 
