@@ -64,6 +64,8 @@ try
     RandomVideoGenerator rv0, rv1, rv2, rv3;
     vpm.Set(fixed);
     volatile bool done = false;
+            
+//            boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
     
     boost::thread testThread0 = boost::thread([&done, &vpm, &rv0]()
     {

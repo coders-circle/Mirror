@@ -94,7 +94,8 @@ public:
 
         AVPacket* pkt = this->EncodeToPacket(frame);
         av_freep(&frame->data[0]);
-        av_frame_free(&frame);
+        //av_frame_free(&frame);
+        avcodec_free_frame(&frame);
         return pkt;
     }
     unsigned char* GetRawBGRAData()
