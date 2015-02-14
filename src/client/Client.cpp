@@ -222,21 +222,26 @@ void Client::StartStreaming(MediaStreamer& mediaStreamer)
             mediaStreamer.InitializeStreamer(&m_rtpStreamer, &m_streaming, &m_udpHandler1, m_connections[m_serverId].udpEndpoint, m_clientId);
             while(m_streaming)
             {
-                boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+                boost::this_thread::sleep(boost::posix_time::milliseconds(20));
                 uint8_t * rdata;
-                auto sources = m_rtpStreamer.GetSources();
-                for (size_t i=0; i<sources.size(); ++i)
+                std::vector<uint8_t> mediaTypes = { MEDIA_VIDEO, MEDIA_AUDIO };
+                for (size_t k=0; k<mediaTypes.size(); ++k)
                 {
-                    if (i >= sources.size())
-                        break;
-                    uint32_t srcid = sources[i];
-                    size_t len = m_rtpStreamer.GetPacket(srcid, &rdata, malloc);
-                    if (len > 0)
+                    auto type = mediaTypes[k];
+                    auto sources = m_rtpStreamer.GetSources(type);
+                    for (size_t i=0; i<sources.size(); ++i)
                     {
-                        mediaStreamer.Receive(srcid, rdata, len);
-                        free(rdata);
+                        if (i >= sources.size())
+                            break;
+                        uint32_t srcid = sources[i];
+                        size_t len = m_rtpStreamer.GetPacket(srcid, type, &rdata, malloc);
+                        if (len > 0)
+                        {
+                            mediaStreamer.Receive(srcid, type, rdata, len);
+                            free(rdata);
+                        }
+                        sources = m_rtpStreamer.GetSources(type);
                     }
-                    sources = m_rtpStreamer.GetSources();
                 }
             }
         }

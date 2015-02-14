@@ -27,14 +27,14 @@ void RtpStreamer::Send(RtpPacket& rtp, const uint8_t* data, size_t len)
 }
 
 // Get a received frame of data; rtp packets are merged till the packet that contains the marker bit
-size_t RtpStreamer::GetPacket(uint32_t source, uint8_t** data, void* (*allocator)(size_t))
+size_t RtpStreamer::GetPacket(uint32_t source, uint8_t mediaType, uint8_t** data, void* (*allocator)(size_t))
 {
     boost::lock_guard<boost::mutex> guard(m_mutex);
-
-    if (m_rtpUnits.find(source) == m_rtpUnits.end())
+    std::pair<uint32_t, uint8_t> mapid(source, mediaType);
+    if (m_rtpUnits.find(mapid) == m_rtpUnits.end())
         return 0;
     
-    RtpUnitList& rtunits = m_rtpUnits[source];
+    RtpUnitList& rtunits = m_rtpUnits[mapid];
     if (rtunits.list.size() == 0) 
         return 0;
 
@@ -82,12 +82,13 @@ size_t RtpStreamer::GetPacket(uint32_t source, uint8_t** data, void* (*allocator
     return tlen;
 }
 
-std::vector<uint32_t> RtpStreamer::GetSources()
+std::vector<uint32_t> RtpStreamer::GetSources(uint8_t mediaType)
 {
     std::vector<uint32_t> sources;
     for (auto it = m_rtpUnits.begin(); it != m_rtpUnits.end(); ++it)
         if (it->second.list.size() > 0)
-            sources.push_back(it->first);
+            if (it->first.second == mediaType)
+                sources.push_back(it->first.first);
 
     return sources;
 }
@@ -116,8 +117,9 @@ void RtpStreamer::StartReceiving()
             unit.data.resize(len);
             unit.marker = rtp.IsMarkerSet();
             unit.sn = rtp.GetSequenceNumber();
-            m_rtpUnits[rtp.GetSourceId()].list.push_back(std::move(unit));
-            m_rtpUnits[rtp.GetSourceId()].list.sort();
+            std::pair<uint32_t, uint8_t> mapid(rtp.GetSourceId(), rtp.GetPayloadType());
+            m_rtpUnits[mapid].list.push_back(std::move(unit));
+            m_rtpUnits[mapid].list.sort();
         }
         else boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }

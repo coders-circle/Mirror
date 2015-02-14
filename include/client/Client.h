@@ -59,8 +59,7 @@ public:
     RtpStreamer& GetRtpStreamer() { return m_rtpStreamer; }
 
     // Start streaming media (asynchronously)
-    // MediaStreamer will receive the recieved data
-    //  and will be initialized to be able to send data
+    // MediaStreamer will receive the recieved data and can be used to send data
     void StartStreaming(MediaStreamer& mediaStreamer);
     // Stop streaming media
     void StopStreaming();

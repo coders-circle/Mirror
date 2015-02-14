@@ -73,6 +73,42 @@ void ClientsManager::ProcessClients()
 {
     // TODO: Disconnect client when long in idle state (i.e. when no data available for long time)
 
+
+    boost::thread t([this]()
+    {
+        while (true)
+        {
+            try
+            {
+                boost::lock_guard<boost::mutex> guard(m_mutex);
+                // Also check for udp data
+                if (m_udpHandler1.GetSocket()->available() > 0)
+                {
+                    // Let max udp-packet size be 1500; receive the data through the udpHandler
+                    udp::endpoint ep;
+                    char data[1500];
+                    size_t len = m_udpHandler1.Receive(ep, data, 1500);
+                    if (len != 0)
+                    {
+                        // To find the client who send the data, we use the endpoint-clientId mapping
+                        size_t cid = m_udpEndpointsMap[GetEndpointKey(ep)];
+                        // Find which video group the client is connected at
+                        auto it = m_videoGroups.find(cid);
+                        if (it != m_videoGroups.end())
+                        for (unsigned int j = 0; j < m_groups[it->second].size(); ++j)
+//                            if (m_groups[it->second][j] != cid)
+                            // Send to each peer in the video-chat group the data received
+                            m_udpHandler1.Send(m_clients[m_groups[it->second][j]].udpEndpoint1, data, len);
+                    }
+                }
+            }
+            catch (std::exception& ex)
+            {
+                std::cout << ex.what() << std::endl;
+            }
+        }
+    });
+
     while (true)
     {
         // Sleep for some time if no client is available
@@ -80,7 +116,7 @@ void ClientsManager::ProcessClients()
             boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
         // Lock the clients-list while processing the clients
-        m_mutex.lock();
+        boost::lock_guard<boost::mutex> guard(m_mutex);
         // Process each client in turn
         for (unsigned int i = 0; i < m_clients.size(); ++i)
         {
@@ -167,36 +203,6 @@ void ClientsManager::ProcessClients()
             }
         }
         
-
-        /* 
-            TODO:
-                    Too slow processing leads to overwriting of udp data from one client by another
-                    before being processed.
-                    It might be better to process the data in separate threads.
-                    Temporarily, this can be avoided if client doesn't send udp data too frequently
-        */
-        // Also check for udp data
-        if (m_udpHandler1.GetSocket()->available() > 0)
-        {
-            // Let max udp-packet size be 1500; receive the data through the udpHandler
-            udp::endpoint ep;
-            char data[1500];
-            size_t len = m_udpHandler1.Receive(ep, data, 1500);
-            if (len != 0)
-            {
-                // To find the client who send the data, we use the endpoint-clientId mapping
-                size_t cid = m_udpEndpointsMap[GetEndpointKey(ep)];
-                // Find which video group the client is connected at
-                auto it = m_videoGroups.find(cid);
-                if (it != m_videoGroups.end())
-                for (unsigned int j = 0; j < m_groups[it->second].size(); ++j)
-//                    if (m_groups[it->second][j] != cid)
-                    // Send to each peer in the video-chat group the data received
-                    m_udpHandler1.Send(m_clients[m_groups[it->second][j]].udpEndpoint1, data, len);
-            }
-        }
-
-        m_mutex.unlock();
     }
 }
 
