@@ -7,7 +7,7 @@ public:
     void StartCapturing()
     {
         Initialize();
- /*       while (av_read_frame(m_decFormatCtx, &m_decPacket) >= 0)
+        while (av_read_frame(m_decFormatCtx, &m_decPacket) >= 0)
         {
             //if (m_decPacket.stream_index != m_decAudioIndex)
             //    continue;
@@ -47,7 +47,6 @@ public:
 
         avcodec_close(m_encCodecCtx);
         av_free(m_encCodecCtx);
-        */
     }
 
     void StopCapturing()
@@ -57,7 +56,7 @@ public:
 private:
     void Initialize()
     {
- /*       m_decFormatCtx = avformat_alloc_context();
+       m_decFormatCtx = avformat_alloc_context();
         AVInputFormat* ifmt = av_find_input_format("alsa");
         if (avformat_open_input(&m_decFormatCtx, "hw:0", ifmt, NULL)!=0)
             throw Exception("Couldn't open audio input stream");
@@ -86,7 +85,7 @@ private:
 
         av_init_packet(&m_decPacket);
         m_decFrame = NULL;
-*/
+
         m_encCodec = avcodec_find_encoder(AV_CODEC_ID_AAC);
         if (!m_encCodec)
             throw Exception("Couldn't find codec");
@@ -112,7 +111,7 @@ private:
         std::cout << "Encoded Packet " << m_encPacket.size << std::endl;
     }
     
-/*
+
     AVFormatContext* m_decFormatCtx;
     AVCodecContext* m_decCodecCtx;
     AVCodec* m_decCodec;
@@ -120,7 +119,7 @@ private:
     AVFrame* m_decFrame;
     int m_decLen;
     int m_decAudioIndex;
-*/
+
     AVCodec* m_encCodec;
     AVCodecContext* m_encCodecCtx;
     AVFrame* m_encFrame;
