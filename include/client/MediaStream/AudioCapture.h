@@ -6,6 +6,8 @@ class AudioCapture
 public:    
     void StartCapturing()
     {
+        std::fstream f;
+        f.open("test.wav", std::ios::out | std::ios::binary);
         Initialize();
         while (av_read_frame(m_decFormatCtx, &m_decPacket) >= 0)
         {
@@ -35,12 +37,14 @@ public:
                 if (got_output)
                 {
                     SendPacket();
+                    f.write((char*)m_encPacket.data, m_encPacket.size);
                     av_free_packet(&m_encPacket);
                 }
                 av_free_packet(&m_decPacket);
             }
         }
         
+        f.close();
         avcodec_close(m_decCodecCtx);
         avcodec_free_frame(&m_decFrame);
         avformat_close_input(&m_decFormatCtx);
