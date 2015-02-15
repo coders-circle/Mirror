@@ -98,13 +98,13 @@ private:
         if (!m_encCodecCtx)
             throw Exception("Couldn't allocate codec context");
         
-        m_encCodecCtx->bit_rate = 24000;
+        m_encCodecCtx->bit_rate = 64000;
         m_encCodecCtx->sample_fmt = AV_SAMPLE_FMT_S16;
-        m_encCodecCtx->sample_rate = 16000;
-        m_encCodecCtx->channel_layout = AV_CH_LAYOUT_MONO;
+        m_encCodecCtx->sample_rate = 44100;
+        m_encCodecCtx->channel_layout = AV_CH_LAYOUT_STEREO;
         m_encCodecCtx->time_base = (AVRational){1, m_encCodecCtx->sample_rate};
         m_encCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-        m_encCodecCtx->channels = 1;//av_get_channel_layout_nb_channels(m_encCodecCtx->channel_layout);
+        m_encCodecCtx->channels = av_get_channel_layout_nb_channels(m_encCodecCtx->channel_layout);
         m_encCodecCtx->profile = FF_PROFILE_AAC_LOW;
 
         if (avcodec_open2(m_encCodecCtx, m_encCodec, NULL) < 0)
