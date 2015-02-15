@@ -1,8 +1,8 @@
 /* Client - main.cpp */
 
 #include <common/common.h>
-#include "client/Application.h"
-#include "client/MediaStream/AudioStream.h"
+#include <client/MediaStream/AudioCapture.h>
+#include <client/MediaStream/AudioPlayback.h>
 
 
 //VideoPlayback *v;
@@ -14,11 +14,14 @@ int main(int argc, char *argv[])
     {
         av_register_all();
         avdevice_register_all();
-
+        avcodec_register_all();
+        
+        AudioCapture capture;
+        capture.StartCapturing();
 
         return 0;
     }
-    catch (std::exception err)
+    catch (std::exception& err)
     {
         std::cout << "\n:/ \n" << err.what() << std::endl;
         return 1;
