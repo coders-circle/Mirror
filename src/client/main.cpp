@@ -17,6 +17,12 @@ int main(int argc, char *argv[])
         avcodec_register_all();
         
         AudioCapture capture;
+        AudioPlayback playback;
+        capture.SetCaptureCallback([&playback](AVPacket& packet){
+            AVPacket pkt = packet;
+            playback.DecodeFrame(pkt);
+        });
+        playback.StartPlayback();
         capture.StartCapturing();
 
         return 0;

@@ -6,8 +6,8 @@ class AudioCapture
 public:    
     void StartCapturing()
     {
-        std::fstream f;
-        f.open("test.wav", std::ios::out | std::ios::binary);
+        //std::fstream f;
+        //f.open("test.wav", std::ios::out | std::ios::binary);
         Initialize();
         while (av_read_frame(m_decFormatCtx, &m_decPacket) >= 0)
         {
@@ -22,8 +22,8 @@ public:
                 avcodec_get_frame_defaults(m_decFrame);
             
             int got_frame = 0;
-            int m_decLen = avcodec_decode_audio4(m_decCodecCtx, m_decFrame, &got_frame, &m_decPacket);
-            if (m_decLen < 0)
+            int len = avcodec_decode_audio4(m_decCodecCtx, m_decFrame, &got_frame, &m_decPacket);
+            if (len < 0)
                 throw Exception("Error decoding");
 
             if (got_frame)
@@ -37,14 +37,14 @@ public:
                 if (got_output)
                 {
                     SendPacket();
-                    f.write((char*)m_encPacket.data, m_encPacket.size);
+                    //f.write((char*)m_encPacket.data, m_encPacket.size);
                     av_free_packet(&m_encPacket);
                 }
                 av_free_packet(&m_decPacket);
             }
         }
         
-        f.close();
+        //f.close();
         avcodec_close(m_decCodecCtx);
         avcodec_free_frame(&m_decFrame);
         avformat_close_input(&m_decFormatCtx);
@@ -56,6 +56,8 @@ public:
     void StopCapturing()
     {
     }
+
+    void SetCaptureCallback(std::function<void(AVPacket& packet)> f) { m_captureCallback = f; }
 
 private:
     void Initialize()
@@ -112,16 +114,18 @@ private:
     }
     void SendPacket()
     {
-        std::cout << "Encoded Packet " << m_encPacket.size << std::endl;
+        //std::cout << "Encoded Packet " << m_encPacket.size << std::endl;
+        if (m_captureCallback)
+            m_captureCallback(m_encPacket);
     }
     
+    std::function<void(AVPacket& packet)> m_captureCallback;
 
     AVFormatContext* m_decFormatCtx;
     AVCodecContext* m_decCodecCtx;
     AVCodec* m_decCodec;
     AVPacket m_decPacket;
     AVFrame* m_decFrame;
-    int m_decLen;
     int m_decAudioIndex;
 
     AVCodec* m_encCodec;
