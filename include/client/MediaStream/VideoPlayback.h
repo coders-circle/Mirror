@@ -11,6 +11,7 @@ public:
     void Set(GtkWidget* fixed, int x, int y, int w, int h);
     void StartPlayback();
     void SetPacket(AVPacket* pkt);
+    void SetPacket(const uint8_t* data, size_t size);
     void StartPlaybackAsync();
     void StopPlayback();
 private:
@@ -77,6 +78,7 @@ class VideoPlaybackManager
 public:
     void Set(GtkWidget* fixed, int x = 180, int y = 50, int w = 650, int h = 490);
     void SetPacket(int playerID, AVPacket* pkt);
+    void SetPacket(int playerID, const uint8_t* data, size_t size);
     VideoPlaybackManager();
     void AddPlayback(int id);
 private:

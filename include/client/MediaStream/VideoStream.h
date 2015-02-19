@@ -2,6 +2,10 @@
 
 #include "client/MediaStream/MediaStream.h"
 
+#ifdef _WIN32
+#define avcodec_free_frame av_frame_free
+#endif
+
 class VideoStream :public MediaStream
 {
 public:
@@ -33,7 +37,7 @@ public:
         //else m_decodedFrameLock.unlock();
         return m_decodedFrame;
     }
-    AVFrame* DecodeToFrame(uint8_t *packetData, int packetSize)
+    AVFrame* DecodeToFrame(const uint8_t *packetData, int packetSize)
     {
         AVPacket* pkt = new AVPacket();
         /*if (!av_new_packet(pkt, packetSize))
@@ -41,7 +45,7 @@ public:
             throw FailedToDecode();
         }*/
         av_init_packet(pkt);
-        pkt->data = packetData;
+        pkt->data = (uint8_t*)(packetData);
         pkt->size = packetSize;
         /*if (av_packet_from_data(pkt, packetData, packetSize) < 0)
         {
