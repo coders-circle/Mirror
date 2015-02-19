@@ -6,6 +6,13 @@
 #include "client/MediaStream/AudioStream.h"
 #include "client/MediaStream/VideoPlayback.h"
 
+gint TimeoutCallback(gpointer data)
+{
+    gtk_widget_queue_draw((GtkWidget*)data);
+    return TRUE;
+}
+
+
 
 //VideoPlayback *v;
 
@@ -26,8 +33,7 @@ try
     client.JoinVideoChat(client.GetServer());
     
   
-    VideoCapture cap;
-    cap.StartRecording();
+    
 
     v = new VideoPlayback();*/
     //v->InitializeDecoder();
@@ -57,8 +63,13 @@ try
     GtkWidget* fixed = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(mainWindow), fixed);
 
-    //v->Set(fixed, 10, 10);
+    
+    g_timeout_add(100, TimeoutCallback, mainWindow);
+        //v->Set(fixed, 10, 10);
     //v->StartPlaybackAsync();
+
+    /*VideoCapture cap;
+    cap.StartRecording();*/
 
     VideoPlaybackManager vpm;
     RandomVideoGenerator rv0, rv1, rv2, rv3;
@@ -95,6 +106,7 @@ try
     app.Initialize(mainWindow, fixed);*/
     gtk_main();
     done = true;
+    //cap.StopRecording();
     testThread1.join();
     testThread2.join();
     testThread3.join();
@@ -105,7 +117,7 @@ try
     rv3.End();
     return 0;
 }
-catch (std::exception err)
+catch (std::exception& err)
 {
     std::cout << "\n:/ \n" << err.what() << std::endl;
     return 1;

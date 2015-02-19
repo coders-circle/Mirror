@@ -95,10 +95,13 @@ void VideoCapture::Initialize()
     av_init_packet(&m_packet);
 
     //AVPixelFormat pFormat = AV_PIX_FMT_RGB24;
+
+
     AVPixelFormat pFormat = AV_PIX_FMT_YUV420P;
     /*auto numBytes = avpicture_get_size(pFormat, m_codecCtx->width, m_codecCtx->height) ;
     auto buffer = (uint8_t*)av_malloc(numBytes*sizeof(uint8_t));
     avpicture_fill((AVPicture*)m_frameRGB, buffer, pFormat, m_codecCtx->width, m_codecCtx->height);*/
+
 
     int w = m_codecCtx->width;
     int h = m_codecCtx->height;
@@ -109,7 +112,8 @@ void VideoCapture::Initialize()
     {
         throw Exception("failed to allocate raw picture buffer");
     }
-    VideoStream::InitializeEncoder(w, h, 30, 200000);
+    this->InitializeEncoder(w, h, 10, 200000);
+
     m_frameRGB->width = m_encoderContext->width;
     m_frameRGB->height = m_encoderContext->height;
     m_frameRGB->format = pFormat;
@@ -136,15 +140,13 @@ void VideoCapture::Record()
                 {
                     sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize,
                         0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
-                    if (m_readyToSend)
+
+                    m_frameRGB->pts = frameCount;
+                    if (this->EncodeToPacket(m_frameRGB))
                     {
-                        m_frameRGB->pts = frameCount;
-                        if (this->EncodeToPacket(m_frameRGB))
-                        {
-                            m_readyToSend = false;
-                            m_packetAvailable = true;
-                            ++frameCount;
-                        }
+                        //m_readyToSend = false;
+                        //m_packetAvailable = true;
+                        ++frameCount;
                     }
                     else boost::this_thread::sleep(boost::posix_time::milliseconds(20));
                     av_free_packet(&m_packet);
@@ -169,6 +171,7 @@ void VideoCapture::StartRecording()
 {
     try{
         Initialize();
+        m_cameraAvailable = true;
     }
     catch (...){
         m_cameraAvailable = false;

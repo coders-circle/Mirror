@@ -13,7 +13,8 @@ public:
     static gboolean OnDraw(GtkWidget* widget, cairo_t* cr, gpointer frPointer);
     void Show();
     void SetBGRAData(unsigned char* bgraData);
+    void Resize(int w, int h);
 private:
     cairo_surface_t *m_drawingSurface;
-    unsigned char* m_rawBGRAData;
+    std::vector<unsigned char> m_rawBGRAData;
 };

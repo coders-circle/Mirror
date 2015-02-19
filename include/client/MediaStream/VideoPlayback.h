@@ -28,15 +28,16 @@ public:
         while (!m_playbackStopped)
         {
             unsigned char* bgraData = this->GetRawBGRAData();
-            m_newFrameAvailable = false;
+            m_newFrameAvailable= false;
             if (bgraData)
             {
+                
                 uint8_t * inData[1] = { bgraData };
                 int inLinesize[1] = { 4 * m_fw };
                 uint8_t* outData[1] = { m_buffer.data() };
                 int outLinesize[1] = { 4*m_w };
-                sws_scale(m_scaler, inData, inLinesize, 0, m_h, outData, outLinesize);
-                m_frameRenderer->SetBGRAData(m_buffer.data());
+                if(sws_scale(m_scaler, inData, inLinesize, 0, m_h, outData, outLinesize) > 0)
+                    m_frameRenderer->SetBGRAData(m_buffer.data());
             }
             while (!m_newFrameAvailable)
             {
@@ -89,21 +90,27 @@ class RandomVideoGenerator:public VideoStream
 public:
     RandomVideoGenerator()
     {
+        srand(time(0));
         this->InitializeEncoder(320, 240, 10, 1000000);
         running = true;
         boost::thread videoGeneratorThread([this](){
             const int w = 320, h = 240;
             uint8_t* buff = new uint8_t[w*h * 3];
             int pts = 0;
+            int val = g_random_int() % 256;
+            int dv = 1;
             while (running)
             {
+                if (val >= 255 || val <= 0)
+                    dv = -dv;
+                val += dv;
                 for (int y = 0; y < h; y++)
                 {
                     for (int x = 0; x < w; x++)
                     {
-                        buff[3 * (y*w + x) + 0] = rand() % 256;
-                        buff[3 * (y*w + x) + 1] = rand() % 256;
-                        buff[3 * (y*w + x) + 2] = rand() % 256;
+                        buff[3 * (y*w + x) + 0] = val;
+                        buff[3 * (y*w + x) + 1] = val;
+                        buff[3 * (y*w + x) + 2] = val;
                     }
                 }
                 this->EncodeToPacket(buff, pts++);
@@ -125,16 +132,20 @@ private:
 class VideoPlaybackManager
 {
 public:
-    void Set(GtkWidget* fixed)
+    void Set(GtkWidget* fixed, int x = 180, int y = 50, int w = 650, int h = 490)
     {
+        m_x = x;
+        m_y = y;
+        m_w = w;
+        m_h = h;
         m_fixed = fixed;
-        int w = 320, h = 240;
+        int fw = 320, fh = 240;
         for (int j = 0; j < 2; j++)
         {
             for (int i = 0; i < 2; i++)
             {
                 m_videoPlayers.push_back(new VideoPlayback);
-                m_videoPlayers[m_videoPlayers.size() - 1]->Set(m_fixed, 10 + i*(w + 10), 10 + j*(h + 10), w, h);
+                m_videoPlayers[m_videoPlayers.size() - 1]->Set(m_fixed, m_x + i*(fw + 10), m_y + j*(fh + 10), fw, fh);
                 m_videoPlayers[m_videoPlayers.size() - 1]->StartPlaybackAsync();
             }
         }
@@ -144,6 +155,10 @@ public:
     {
         m_videoPlayers[playerID]->SetPacket(pkt);
     }
+    void AddVideoPlaybackSource(int noOfVideoSources = 1)
+    {
+        
+    }
     VideoPlaybackManager()
     {  
         
@@ -152,4 +167,5 @@ public:
 private:
     std::vector<VideoPlayback*> m_videoPlayers;
     GtkWidget* m_fixed;
+    int m_x, m_y, m_w, m_h;
 };
