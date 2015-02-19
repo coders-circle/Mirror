@@ -81,6 +81,7 @@ public:
     void SetPacket(int playerID, const uint8_t* data, size_t size);
     VideoPlaybackManager();
     void AddPlayback(int id);
+    void Stop();
 private:
     std::vector<VideoPlayback*> m_videoPlayers;
     GtkWidget* m_fixed;

@@ -29,10 +29,10 @@ void VideoPlayback::StartPlayback()
             int inLinesize[1] = { 4 * m_fw };
             uint8_t* outData[1] = { m_buffer.data() };
             int outLinesize[1] = { 4 * m_w };
-            if (sws_scale(m_scaler, inData, inLinesize, 0, m_h, outData, outLinesize) > 0)
+            if (sws_scale(m_scaler, inData, inLinesize, 0, 4*m_h, outData, outLinesize) > 0)
                 m_frameRenderer->SetBGRAData(m_buffer.data());
         }
-        while (!m_newFrameAvailable)
+        while (!m_newFrameAvailable && !m_playbackStopped)
         {
             boost::this_thread::sleep(boost::posix_time::milliseconds(10));
         }
@@ -82,7 +82,8 @@ void VideoPlayback::StartPlaybackAsync()
 }
 void VideoPlayback::StopPlayback()
 {
-
+    m_playbackStopped = true;
+    if (m_playbackThread.joinable()) m_playbackThread.join();
 }
 
 
@@ -121,4 +122,10 @@ VideoPlaybackManager::VideoPlaybackManager()
 
 void VideoPlaybackManager::AddPlayback(int id)
 {
+}
+
+void VideoPlaybackManager::Stop()
+{
+    for (auto videoPlayer : m_videoPlayers)
+        videoPlayer->StopPlayback();
 }

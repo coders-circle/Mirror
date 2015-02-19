@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
         Client client;
         // Test MediaStreamer for streaming media
         std::string ip = "127.0.0.1";
-        /*std::cout << "Enter server ip: ";
-        std::cin >> ip;*/
+        std::cout << "Enter server ip: ";
+        std::cin >> ip;
 
         MediaStreamer mediaStreamer;
         // Set callbacks for receiving video and audio data
@@ -91,28 +91,31 @@ int main(int argc, char *argv[])
 
 
         VideoPlaybackManager vpm;
-        RandomVideoGenerator rv0, rv1, rv2, rv3;
         vpm.Set(fixed);
         VideoCapture cap;
         cap.StartRecording();
-        boost::thread streamerThread([&mediaStreamer, &cap]()
+        bool done = false;
+        boost::thread streamerThread([&done, &mediaStreamer, &cap]()
         {
-            while (true)
+            while (!done)
             {
                 AVPacket* pkt = cap.GetPacket();
                 mediaStreamer.Send(MEDIA_VIDEO, pkt->data, pkt->size);
             }
-            boost::this_thread::sleep(boost::posix_time::milliseconds(200));
         });
 
         mediaStreamer.SetVideoHandler([&vpm](uint32_t sourceId, const uint8_t* data, size_t len){
             //std::cout << "Received video: Length=" << len << " from source #" << sourceId << std::endl;
             vpm.SetPacket(static_cast<int>(sourceId), data, len);
         });
-
+        
         gtk_widget_show_all(mainWindow);
         gtk_main();
-        
+
+        done = true;
+        streamerThread.join();
+        vpm.Stop();
+
         cap.StopRecording();
 
         return 0;
