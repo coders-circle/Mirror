@@ -44,12 +44,12 @@ void VideoCapture::CleanUp()
     if (m_frame)
     {
         av_freep(&m_frame->data[0]);
-        av_frame_free(&m_frame);
+        avcodec_free_frame(&m_frame);
     }
     if (m_frameRGB)
     {
         av_freep(&m_frameRGB->data[0]);
-        av_frame_free(&m_frameRGB);
+        avcodec_free_frame(&m_frameRGB);
     }
     /*if (m_codecCtx)
         avcodec_close(m_codecCtx);
