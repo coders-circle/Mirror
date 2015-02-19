@@ -9,13 +9,8 @@ public:
     void Initialize(UdpHandler* udpHandler) { m_udpHandler = udpHandler; }
     
     // Send the data as fragmented RTP packets
-    void Send(RtpPacket& rtp, uint8_t* data, size_t len);
-    // Receive fragmented RTP packets into single memory block
-    // An allocater needs to be passed to allocate the memory block
-    // WARNING: DONOT USE
-    size_t Receive(RtpPacket& rtp, uint8_t** data, void* (*allocator)(size_t));
-
-
+    void Send(RtpPacket& rtp, const uint8_t* data, size_t len);
+    
     // Start receiving Rtp packets and keeping the order of their sequence number
     //  merge the fragmented ones into single unit
     void StartReceiving();
@@ -23,9 +18,9 @@ public:
     void StopReceiving();
 
     // Get a received packet of data; the fragmented rtp packets are merged into one and returned
-    size_t GetPacket(uint32_t source, uint8_t** data, void* (*allocator)(size_t));
+    size_t GetPacket(uint32_t source, uint8_t mediaType, uint8_t** data, void* (*allocator)(size_t));
     // Get a list of available sources
-    std::vector<uint32_t> GetSources();
+    std::vector<uint32_t> GetSources(uint8_t mediaType);
     
     // The udp handler this streamer used to send/receive rtp packets
     UdpHandler* GetUdpHandler() { return m_udpHandler; }
@@ -53,8 +48,8 @@ private:
         std::list<RtpUnit>::iterator begin;
     };
     
-    // Map each source with a list of RtpUnit's that it sends
-    std::map<uint32_t, RtpUnitList> m_rtpUnits;
+    // Map each source and media type with a list of RtpUnit's that it sends
+    std::map<std::pair<uint32_t, uint8_t>, RtpUnitList> m_rtpUnits;
     boost::mutex m_mutex;
     bool m_receiving;
 };

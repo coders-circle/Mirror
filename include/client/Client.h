@@ -2,9 +2,8 @@
 #include <common/TcpHandler.h>
 #include <common/UdpHandler.h>
 #include <common/TcpRequest.h>
-#include "MediaStream/VideoPlayback.h"
-#include "MediaStream/VideoCapture.h"
 #include "MediaStream/RtpStreamer.h"
+#include "MediaStream/MediaStreamer.h"
 
 /* Data passed to the message event handler */
 struct MessageEventData
@@ -56,12 +55,16 @@ public:
     // Get connectionId of server
     size_t GetServer() const { return m_serverId; }
 
-    // Start receiving Audio-Video asynchronously
-    void StartReceivingAV(VideoPlayback* videoPlaybackHandler, VideoCapture* videoCapture);
-    // Stop receviing Audio-Video data and clear all received units
-    void StopReceivingAV();
     // RTP Streamer
     RtpStreamer& GetRtpStreamer() { return m_rtpStreamer; }
+
+    // Start streaming media (asynchronously)
+    // MediaStreamer will receive the recieved data and can be used to send data
+    void StartStreaming(MediaStreamer& mediaStreamer);
+    // Stop streaming media
+    void StopStreaming();
+    // Check if media is streaming
+    bool IsStreaming() { return m_streaming; }
 
     // Get remote udp endpoint of a connection
     const udp::endpoint& GetUdpEndpoint(size_t connectionId) const { return m_connections[connectionId].udpEndpoint; }
@@ -91,8 +94,7 @@ private:
 
     // Streamer to send/receive av data
     RtpStreamer m_rtpStreamer;
-    VideoPlayback* m_videoPlayback;
-    VideoCapture* m_videoCapture;
+    bool m_streaming;       // Is in streaming state?
 
     // List of the connections
     std::vector<Connection> m_connections;
