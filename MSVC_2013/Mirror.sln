@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mirror-Server", "Mirror-Server\Mirror-Server.vcxproj", "{A0F62CED-26B1-4E23-BFAD-DA6FFA974CEB}"
 EndProject
@@ -21,6 +21,7 @@ Global
 		{C3B011C9-AB6A-467B-B72D-DBF24A92B057}.Debug|Win32.Build.0 = Debug|Win32
 		{C3B011C9-AB6A-467B-B72D-DBF24A92B057}.Release|Win32.ActiveCfg = Release|Win32
 		{C3B011C9-AB6A-467B-B72D-DBF24A92B057}.Release|Win32.Build.0 = Release|Win32
+		{C3B011C9-AB6A-467B-B72D-DBF24A92B057}.Release|Win32.Deploy.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

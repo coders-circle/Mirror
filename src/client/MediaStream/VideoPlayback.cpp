@@ -29,7 +29,7 @@ void VideoPlayback::StartPlayback()
             int inLinesize[1] = { 4 * m_fw };
             uint8_t* outData[1] = { m_buffer.data() };
             int outLinesize[1] = { 4 * m_w };
-            if (sws_scale(m_scaler, inData, inLinesize, 0, 4*m_h, outData, outLinesize) > 0)
+            if (sws_scale(m_scaler, inData, inLinesize, 0, m_fh, outData, outLinesize) > 0)
                 m_frameRenderer->SetBGRAData(m_buffer.data());
         }
         while (!m_newFrameAvailable && !m_playbackStopped)
@@ -46,7 +46,7 @@ void VideoPlayback::SetPacket(AVPacket* pkt)
         {
             if (m_scaler == 0 && m_fw != 0)
             {
-                m_scaler = sws_getContext(m_fw, m_fh, AV_PIX_FMT_BGRA, m_w, m_h, AV_PIX_FMT_BGRA, SWS_BILINEAR, 0, 0, 0);
+                m_scaler = sws_getContext(m_fw, m_fh, AV_PIX_FMT_BGRA, m_w, m_h, AV_PIX_FMT_BGRA, SWS_FAST_BILINEAR, 0, 0, 0);
             }
             m_newFrameAvailable = true;
         }
@@ -65,7 +65,7 @@ void VideoPlayback::SetPacket(const uint8_t* data, size_t size)
         {
             if (m_scaler == 0 && m_fw != 0)
             {
-                m_scaler = sws_getContext(m_fw, m_fh, AV_PIX_FMT_BGRA, m_w, m_h, AV_PIX_FMT_BGRA, SWS_BILINEAR, 0, 0, 0);
+                m_scaler = sws_getContext(m_fw, m_fh, AV_PIX_FMT_BGRA, m_w, m_h, AV_PIX_FMT_BGRA, SWS_FAST_BILINEAR, 0, 0, 0);
             }
             m_newFrameAvailable = true;
         }

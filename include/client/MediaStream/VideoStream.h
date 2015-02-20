@@ -31,6 +31,7 @@ public:
                     / (m_decoderContext->time_base.num*m_decoderContext->ticks_per_frame);
                 m_YUV420PToBGRAConverterContext = sws_getContext(m_fw, m_fh,
                     AV_PIX_FMT_YUV420P, m_fw, m_fh, AV_PIX_FMT_BGRA, SWS_BICUBIC, 0, 0, 0);
+                //std::cout << m_fw << std::endl << m_fh << std::endl;
             }
             //m_decodedFrameLock.unlock();
         }
@@ -122,14 +123,10 @@ public:
         //AVPicture *bgraFrame = new AVPicture;
         //avpicture_alloc(bgraFrame, AV_PIX_FMT_BGRA, w, h);
         //sws_scale(m_YUV420PToBGRAConverterContext, yuvFrame->data, yuvFrame->linesize, 0, h, bgraFrame->data, bgraFrame->linesize);
-        uint8_t * outData[1] = { m_rawData.data() };                    // RGB24 have only one plane
-        int outLinesize[1] = { 4 * w };    // RGB stride
+        uint8_t * outData[1] = { m_rawData.data() }; 
+        int outLinesize[1] = { 4 * w };
         sws_scale(m_YUV420PToBGRAConverterContext, yuvFrame->data, yuvFrame->linesize, 0, h, outData, outLinesize);
-        //m_decodedFrameLock.unlock();
-        //memcpy(m_rawData.data(), bgraFrame->data[0], w*h * 4);
-        //avpicture_free(bgraFrame);
-        //delete bgraFrame;
-        //else m_decodeDdFrameLock.unlock();
+        
         return m_rawData.data();
     }
 

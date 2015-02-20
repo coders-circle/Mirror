@@ -10,7 +10,6 @@ VideoCapture::VideoCapture()
     m_cameraAvailable = false;
 }
 
-
 //void VideoCapture::SendRtp(RtpStreamer& streamer, const udp::endpoint& remoteEndpoint, uint32_t sourceId)
 //{
 //    if (!m_cameraAvailable)
@@ -51,10 +50,6 @@ void VideoCapture::CleanUp()
         av_freep(&m_frameRGB->data[0]);
         avcodec_free_frame(&m_frameRGB);
     }
-    /*if (m_codecCtx)
-        avcodec_close(m_codecCtx);
-    if (m_formatCtx)
-        avformat_close_input(&m_formatCtx);*/
     if (m_imgConvertCtx)
         sws_freeContext(m_imgConvertCtx);
 }
@@ -94,31 +89,20 @@ void VideoCapture::Initialize()
     m_frameRGB = av_frame_alloc();
     av_init_packet(&m_packet);
 
-    //AVPixelFormat pFormat = AV_PIX_FMT_RGB24;
-
-
     AVPixelFormat pFormat = AV_PIX_FMT_YUV420P;
-    /*auto numBytes = avpicture_get_size(pFormat, m_codecCtx->width, m_codecCtx->height) ;
-    auto buffer = (uint8_t*)av_malloc(numBytes*sizeof(uint8_t));
-    avpicture_fill((AVPicture*)m_frameRGB, buffer, pFormat, m_codecCtx->width, m_codecCtx->height);*/
-
-
     int w = m_codecCtx->width;
     int h = m_codecCtx->height;
-
-    //w = 320; h = 240;
 
     if (av_image_alloc(m_frameRGB->data, m_frameRGB->linesize, w, h, pFormat, 32) < 0)
     {
         throw Exception("failed to allocate raw picture buffer");
     }
     this->InitializeEncoder(w, h, 5, 100000);
-
     m_frameRGB->width = m_encoderContext->width;
     m_frameRGB->height = m_encoderContext->height;
     m_frameRGB->format = pFormat;
     m_imgConvertCtx = sws_getCachedContext(NULL, m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,  
-                                             w, h, pFormat, SWS_BILINEAR, NULL, NULL, NULL);
+                                             w, h, pFormat, SWS_FAST_BILINEAR, NULL, NULL, NULL);
     m_cameraAvailable = true;
 }
 

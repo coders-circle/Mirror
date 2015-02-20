@@ -110,16 +110,17 @@ void Client::HandleRequests()
         // Sleep for some time if there is not connection
         while (m_connections.size() == 0)
             boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+        boost::this_thread::sleep(boost::posix_time::milliseconds(200));
 
         // While processing connections, lock the list so no new connection is added at the time
         m_mutex.lock();
         for (unsigned int i = 0; i < m_connections.size(); ++i)
         {
+
             if (!m_connections[i].connected) continue;
             try
             {
                 // Sleep some time to save CPU usage
-                boost::this_thread::sleep(boost::posix_time::milliseconds(200));
                 // See if any request is incomming for this connection
                 size_t bytes = m_connections[i].tcpHandler.Available();
                 ChatMessage chat;

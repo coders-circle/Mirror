@@ -87,6 +87,8 @@ void VideoStream::InitializeEncoder(int w, int h, int fps, int bitrate)
         m_encoderContext->height, AV_PIX_FMT_RGB24, m_encoderContext->width,
         m_encoderContext->height, AV_PIX_FMT_YUV420P, SWS_BICUBIC, 0, 0, 0);
 
+    //std::cout << m_encoderContext->width << std::endl << m_encoderContext->height << std::endl;
+
     m_fw = w;
     m_fh = h;
     m_fps = fps;
