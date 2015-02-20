@@ -112,13 +112,13 @@ void VideoCapture::Initialize()
     {
         throw Exception("failed to allocate raw picture buffer");
     }
-    this->InitializeEncoder(w, h, 10, 200000);
+    this->InitializeEncoder(w, h, 5, 100000);
 
     m_frameRGB->width = m_encoderContext->width;
     m_frameRGB->height = m_encoderContext->height;
     m_frameRGB->format = pFormat;
     m_imgConvertCtx = sws_getCachedContext(NULL, m_codecCtx->width, m_codecCtx->height, m_codecCtx->pix_fmt,  
-                                             w, h, pFormat, SWS_BICUBIC, NULL, NULL, NULL);
+                                             w, h, pFormat, SWS_BILINEAR, NULL, NULL, NULL);
     m_cameraAvailable = true;
 }
 
@@ -127,36 +127,43 @@ void VideoCapture::Record()
     int frameCount = 0;
     try
     {
-        if (m_cameraAvailable){
+        if (m_cameraAvailable)
+        {
+            int isFrameAvailable = 0;
+            int len = 0;
             while (m_recording && av_read_frame(m_formatCtx, &m_packet) >= 0)
             {
-                if (m_packet.stream_index != m_stream->index)
+                if (m_newPacketAvailable)
+                {
+                    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
                     continue;
-                int isFrameAvailable = 0;
-                int len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
+                }
+                if (m_packet.stream_index != m_stream->index)
+                {
+                    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+                    continue;
+                }
+                isFrameAvailable = 0;
+                len = avcodec_decode_video2(m_codecCtx, m_frame, &isFrameAvailable, &m_packet);
                 if (len < 0)
                     throw FailedToDecode();
                 if (isFrameAvailable)
                 {
                     sws_scale(m_imgConvertCtx, ((AVPicture*)m_frame)->data, ((AVPicture*)m_frame)->linesize,
                         0, m_codecCtx->height, ((AVPicture *)m_frameRGB)->data, ((AVPicture *)m_frameRGB)->linesize);
-
                     m_frameRGB->pts = frameCount;
                     if (this->EncodeToPacket(m_frameRGB))
                     {
-                        //m_readyToSend = false;
-                        //m_packetAvailable = true;
                         ++frameCount;
                     }
-                    else boost::this_thread::sleep(boost::posix_time::milliseconds(20));
                     av_free_packet(&m_packet);
                 }
-                else boost::this_thread::sleep(boost::posix_time::milliseconds(30));
-                //boost::this_thread::sleep(boost::posix_time::milliseconds(30));
             }
         }
-        else{
-            while (1){
+        else
+        {
+            while (m_recording)
+            {
                 boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
             }
         }

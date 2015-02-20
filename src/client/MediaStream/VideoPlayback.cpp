@@ -46,7 +46,7 @@ void VideoPlayback::SetPacket(AVPacket* pkt)
         {
             if (m_scaler == 0 && m_fw != 0)
             {
-                m_scaler = sws_getContext(m_fw, m_fh, AV_PIX_FMT_BGRA, m_w, m_h, AV_PIX_FMT_BGRA, SWS_BICUBIC, 0, 0, 0);
+                m_scaler = sws_getContext(m_fw, m_fh, AV_PIX_FMT_BGRA, m_w, m_h, AV_PIX_FMT_BGRA, SWS_BILINEAR, 0, 0, 0);
             }
             m_newFrameAvailable = true;
         }
@@ -65,7 +65,7 @@ void VideoPlayback::SetPacket(const uint8_t* data, size_t size)
         {
             if (m_scaler == 0 && m_fw != 0)
             {
-                m_scaler = sws_getContext(m_fw, m_fh, AV_PIX_FMT_BGRA, m_w, m_h, AV_PIX_FMT_BGRA, SWS_BICUBIC, 0, 0, 0);
+                m_scaler = sws_getContext(m_fw, m_fh, AV_PIX_FMT_BGRA, m_w, m_h, AV_PIX_FMT_BGRA, SWS_BILINEAR, 0, 0, 0);
             }
             m_newFrameAvailable = true;
         }
